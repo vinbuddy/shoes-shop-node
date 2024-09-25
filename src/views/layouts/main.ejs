@@ -5,25 +5,22 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title></title>
 
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: "#3490dc",
-                            secondary: "#ffed4a",
-                            danger: "#e3342f",
-                        },
-                    },
-                },
-            };
-        </script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet" />
+
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+        <link rel="stylesheet" href="/global.css" />
+        <link rel="stylesheet" href="/custom.css" />
+
+        <%- include('../partials/tailwind-config.ejs') %>
     </head>
     <body>
         <%- include('../partials/header.ejs') %>
 
-        <main>
+        <main class="min-h-[2000px]">
             <!-- Nội dung của trang cụ thể sẽ được render tại đây -->
             <%- body %>
         </main>

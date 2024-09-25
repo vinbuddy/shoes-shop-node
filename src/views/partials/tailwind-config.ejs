@@ -1,0 +1,33 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#00a0dd",
+                    secondary: "#ffed4a",
+                    danger: "#e3342f",
+                },
+                fontFamily: {
+                    archivo: ["Archivo Black", "sans-serif"],
+                },
+            },
+            container: {
+                // you can configure the container to be centered
+                center: true,
+
+                // or have default horizontal padding
+                padding: "1rem",
+
+                // default breakpoints but with 40px removed
+                screens: {
+                    sm: "540px",
+                    md: "720px",
+                    lg: "960px",
+                    xl: "1140px",
+                    "2xl": "1320px",
+                },
+            },
+        },
+    };
+</script>
