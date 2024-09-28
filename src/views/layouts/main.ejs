@@ -3,29 +3,21 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title></title>
+        <title><%= typeof title !== 'undefined' ? title : 'Default Title' %></title>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet" />
-
-        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
-        <link rel="stylesheet" href="/global.css" />
-        <link rel="stylesheet" href="/custom.css" />
-
-        <%- include('../partials/tailwind-config.ejs') %>
+        <%- include("../partials/import-meta.ejs", { page: page }) %> <%- include('../partials/tailwind-config.ejs') %>
     </head>
     <body>
         <%- include('../partials/header.ejs') %>
 
-        <main class="min-h-[2000px]">
+        <main>
             <!-- Nội dung của trang cụ thể sẽ được render tại đây -->
             <%- body %>
         </main>
 
         <!-- Import footer từ partials -->
-        <%- include('../partials/footer.ejs') %> <%- include('../partials/script.ejs') %>
+        <%- include('../partials/footer.ejs') %>
+        <script src="/js/main.js"></script>
+        <%- script %>
     </body>
 </html>

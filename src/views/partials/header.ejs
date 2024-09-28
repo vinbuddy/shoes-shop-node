@@ -7,41 +7,119 @@
 
         <nav class="py-2 px-3.5 rounded-full backdrop-blur-sm bg-white border">
             <ul class="flex items-center gap-5">
-                <li class="rounded-full bg-primary px-2 text-white">
+                <li class="rounded-full px-2 text-black bg-[#E4E4E7]">
                     <a href="/">Home</a>
                 </li>
-                <li>
+                <li class="relative group">
                     <a href="#">Brands</a>
                     <span>
                         <i class="bx bx-chevron-down"></i>
                     </span>
+
+                    <ul
+                        class="group-hover:visible invisible transition-all duration-200 ease-in-out transform group-hover:opacity-100 group-hover:scale-100 scale-75 opacity-0 absolute top-full w-auto min-w-[160px] left-1/2 -translate-x-1/2 bg-white rounded-lg border shadow-md overflow-hidden"
+                    >
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Nike</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Adidas</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Puma</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content">
+                            <a class="block" href="#">Vans</a>
+                        </li>
+                    </ul>
                 </li>
-                <li>
+                <li class="relative group">
                     <a href="#">Male</a>
                     <span>
                         <i class="bx bx-chevron-down"></i>
                     </span>
+
+                    <ul
+                        class="group-hover:visible invisible transition-all duration-200 ease-in-out transform group-hover:opacity-100 group-hover:scale-100 scale-75 opacity-0 absolute w-auto min-w-[160px] top-full bg-white rounded-lg border shadow overflow-hidden"
+                    >
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Nike</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Adidas</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Puma</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content">
+                            <a class="block" href="#">Vans</a>
+                        </li>
+                    </ul>
                 </li>
-                <li>
+                <li class="relative group">
                     <a href="#">Female</a>
                     <span>
                         <i class="bx bx-chevron-down"></i>
                     </span>
+
+                    <ul
+                        class="group-hover:visible invisible transition-all duration-200 ease-in-out transform group-hover:opacity-100 group-hover:scale-100 scale-75 opacity-0 absolute w-auto min-w-[160px] top-full bg-white rounded-lg border shadow overflow-hidden"
+                    >
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Nike</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Adidas</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content border-b">
+                            <a class="block" href="#">Puma</a>
+                        </li>
+                        <li class="py-2 px-4 hover:bg-content">
+                            <a class="block" href="#">Vans</a>
+                        </li>
+                    </ul>
                 </li>
                 <li><a href="#">Contact</a></li>
             </ul>
         </nav>
 
-        <div class="flex items-center gap-3 text-2xl rounded-full py-1 px-4 backdrop-blur-sm bg-white border">
-            <a href="">
-                <i class="bx bx-search"></i>
+        <div
+            class="text-base flex items-center gap-3 rounded-full py-1 ps-4 pe-3 backdrop-blur-sm bg-white border transition-all duration-300 ease-in"
+        >
+            <a id="search-icon" href="javascript:void(0);" class="text-2xl">
+                <i id="search-icon-inner" class="bx bx-search"></i>
             </a>
-            <a href="">
+
+            <a id="cart-icon" class="relative text-2xl" href="">
                 <i class="bx bx-cart-alt"></i>
+
+                <span
+                    class="absolute top-[-10px] right-[-10px] flex justify-center items-center bg-danger text-white rounded-full text-sm size-5"
+                    >2</span
+                >
             </a>
-            <a href="">
-                <i class="bx bx-user"></i>
+            <input id="search-input" class="hidden outline-none" placeholder="Search something" type="text" />
+
+            <a
+                id="sign-in-btn"
+                class="inline-block rounded-full px-3 py-1 text-sm bg-[#E4E4E7] text-black focus:outline-none focus:ring active:bg-primary"
+                href="#"
+            >
+                Sign in
             </a>
+            <button
+                id="search-btn"
+                class="hidden btn rounded-full px-3 py-1 text-sm bg-primary text-white focus:outline-none focus:ring active:bg-primary"
+            >
+                <i class="bx bx-search relative top-[1px]"></i>
+                <span>Search</span>
+            </button>
+            <!-- <img
+                id="current-user-avatar"
+                class="w-10 h-10 rounded-full cursor-pointer"
+                src="https://pagedone.io/asset/uploads/1704275541.png"
+                alt="Rounded Avatar"
+            /> -->
         </div>
     </div>
 </header>
