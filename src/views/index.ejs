@@ -1,4 +1,4 @@
-<section class="bg-[url('/images/sneaker-banner.jpg')] h-screen bg-cover bg-center pt-[83px]">
+<!-- <section class="bg-[url('/images/sneaker-banner.jpg')] h-screen bg-cover bg-center pt-[83px]">
     <div class="container mt-20 text-white">
         <div class="w-1/2">
             <h2 class="font-archivo text-7xl">Find your sneaker right now !</h2>
@@ -13,10 +13,29 @@
             </button>
         </div>
     </div>
+</section> -->
+
+<!-- Swiper slider -->
+<section class="container">
+    <div class="swiper mySwiper [&_.swiper-slide]:rounded-2xl [&_.swiper-slide]:border">
+        <div class="swiper-wrapper h-[500px]">
+            <div class="swiper-slide">
+                <img class="object-cover h-full w-full rounded-2xl" src="/images/banners/banner1.jpg" alt="" />
+            </div>
+            <div class="swiper-slide">
+                <img class="object-cover h-full w-full rounded-2xl" src="/images/banners/banner2.jpg" alt="" />
+            </div>
+            <div class="swiper-slide">
+                <img class="object-cover h-full w-full rounded-2xl" src="/images/banners/banner3.jpg" alt="" />
+            </div>
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
 </section>
 
 <!-- Infinite brand -->
-<section class="marquee">
+<section class="marquee mt-20">
     <ul class="marquee-content">
         <li>
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 50 50">
@@ -66,25 +85,6 @@
             </svg>
         </li>
     </ul>
-</section>
-
-<!-- Swiper slider -->
-<section class="mt-20 container">
-    <div class="swiper mySwiper [&_.swiper-slide]:rounded-2xl [&_.swiper-slide]:border">
-        <div class="swiper-wrapper h-[500px]">
-            <div class="swiper-slide">
-                <img class="object-cover h-full w-full rounded-2xl" src="/images/banners/banner1.jpg" alt="" />
-            </div>
-            <div class="swiper-slide">
-                <img class="object-cover h-full w-full rounded-2xl" src="/images/banners/banner2.jpg" alt="" />
-            </div>
-            <div class="swiper-slide">
-                <img class="object-cover h-full w-full rounded-2xl" src="/images/banners/banner3.jpg" alt="" />
-            </div>
-        </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-    </div>
 </section>
 
 <!-- Category -->
