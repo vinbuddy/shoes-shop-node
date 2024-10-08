@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= typeof title !== 'undefined' ? title : 'Default Title' %></title>
+
+        <%- include("../partials/import-meta.ejs", { page: page }) %> <%- include('../partials/tailwind-config.ejs') %>
+    </head>
+    <body>
+        <%- include('../partials/header.ejs') %>
+
+        <main class="mt-24 mb-20">
+            <div class="container pb-10 min-h-[400px]">
+                <div class="h-full">
+                    <div class="grid grid-cols-12 h-full gap-0 lg:gap-10">
+                        <section
+                            class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-3 xl:col-span-3 2xl:col-span-3 mb-5"
+                        >
+                            <aside class="sticky top-[80px] z-[1]">
+                                <div class="pb-3">
+                                    <div class="flex items-center border p-3 rounded-2xl">
+                                        <img
+                                            class="size-10 object-cover rounded-full"
+                                            src="https://img.freepik.com/free-photo/horizontal-portrait-smiling-happy-young-pleasant-looking-female-wears-denim-shirt-stylish-glasses-with-straight-blonde-hair-expresses-positiveness-poses_176420-13176.jpg"
+                                            alt=""
+                                        />
+                                        <div class="ms-3">
+                                            <h3 class="text-lg font-semibold">Annah</h3>
+                                            <p class="text-sm text-gray-500"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="py-3 px-2">
+                                    <li class="flex items-center py-2 rounded-lg">
+                                        <span class="me-3"><i class="bx bx-user"></i></span>
+                                        <a href="">Profile</a>
+                                    </li>
+                                    <li class="flex items-center py-2 rounded-lg">
+                                        <span class="me-3"><i class="bx bx-package"></i></span>
+                                        <a href="">Order</a>
+                                    </li>
+                                </ul>
+                            </aside>
+                        </section>
+
+                        <section
+                            class="col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-9 xl:col-span-9 2xl:col-span-9"
+                        >
+                            <%- body %>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Import footer từ partials -->
+        <%- include('../partials/footer.ejs') %>
+        <script src="/js/main.js"></script>
+        <%- script %>
+    </body>
+</html>

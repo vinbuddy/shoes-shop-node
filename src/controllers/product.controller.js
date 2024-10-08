@@ -19,7 +19,12 @@ const products = [
 export function renderProductPage(req, res) {
     // Get product data from database here
 
-    return res.render("product/index", { layout: "./layouts/main", products: products });
+    return res.render("product/index", {
+        layout: "./layouts/main",
+        page: "product",
+        title: "Product page",
+        products: products,
+    });
 }
 
 export function renderProductDetailPage(req, res) {
@@ -29,5 +34,10 @@ export function renderProductDetailPage(req, res) {
 
     const product = products.find((product) => product.id === productId);
 
-    return res.render("product/detail", { layout: "./layouts/main", product: product });
+    return res.render("product/detail", {
+        layout: "./layouts/main",
+        page: "product-detail",
+        title: "Product detail",
+        product: product,
+    });
 }

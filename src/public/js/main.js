@@ -25,24 +25,25 @@ searchIcon.addEventListener("click", () => {
     searchInput.classList.toggle("hidden");
 
     if (searchInput.classList.contains("hidden")) {
-        // Open
+        // CLOSE CASE
         searchIconInner.classList.remove("bx-left-arrow-alt");
         searchIconInner.classList.add("bx-search");
         cartIcon.classList.remove("hidden");
 
         signInBtn.classList.remove("hidden");
-        currentUserAvatar.classList.remove("hidden");
-
         searchBtn.classList.add("hidden");
+
+        if (currentUserAvatar) currentUserAvatar.classList.remove("hidden");
     } else {
-        // Close
+        // OPEN
         searchIconInner.classList.remove("bx-search");
         searchIconInner.classList.add("bx-left-arrow-alt");
         cartIcon.classList.add("hidden"); // Hide cart icon
+        signInBtn.classList.add("hidden");
+        if (currentUserAvatar) currentUserAvatar.classList.add("hidden");
+
         searchInput.focus();
 
-        signInBtn.classList.add("hidden");
-        currentUserAvatar.classList.add("hidden");
         searchBtn.classList.remove("hidden");
     }
 });
