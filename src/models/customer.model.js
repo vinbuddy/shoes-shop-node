@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const customerSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema(
         },
         email: {
             type: String,
-            required: false,
-            default: null,
+            required: true,
+            unique: true,
         },
         password: {
             type: String,
@@ -20,9 +20,9 @@ const userSchema = new mongoose.Schema(
             default:
                 "https://res.cloudinary.com/dtbhvc4p4/image/upload/v1720978549/profile/344060599-e8733bc3-ac77-42c6-b036-b9f1fb31b21c_hlh6by.png",
         },
-        role: {
-            type: Schema.Types.ObjectId,
-            ref: "Role",
+        googleId: {
+            type: String,
+            default: null,
         },
         isDeleted: {
             type: Boolean,
@@ -34,6 +34,6 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-const UserModel = mongoose.model("User", userSchema);
+const CustomerModel = mongoose.model("Customer", customerSchema);
 
-export default UserModel;
+export default CustomerModel;
