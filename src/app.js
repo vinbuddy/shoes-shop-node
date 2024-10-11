@@ -7,6 +7,9 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 
 import router from "./routes/index.js";
+import session from "express-session";
+
+import { connectToRedis } from "./utils/redis.js";
 
 const app = express();
 env.config();
@@ -27,6 +30,14 @@ app.set("layout extractScripts", true);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET_KEY,
+        resave: false,
+        saveUninitialized: true,
+    })
+);
+
 app.use(router);
 
 app.get("/", (req, res) => {
@@ -35,8 +46,11 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, async () => {
     const uri = process.env.MONGODB_URI;
+
     try {
+        await connectToRedis();
         await mongoose.connect(uri);
+
         console.log(`Database connected 🚀`);
 
         console.log(`running on http://localhost:${PORT}`);
