@@ -6,7 +6,12 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "nodemon src/app.js",
-        "dev": "nodemon src/app.js"
+        "dev": "nodemon src/app.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix --quiet && echo 'Lint fix completed!'",
+        "lint:check": "eslint . --quiet && echo 'Lint check passed ✅'",
+        "format": "prettier --write .",
+        "build": "node src/app.js"
     },
     "keywords": [],
     "author": "",
@@ -21,6 +26,13 @@
         "path": "^0.12.7"
     },
     "devDependencies": {
-        "nodemon": "^3.1.7"
+        "@eslint/js": "^9.12.0",
+        "eslint": "^9.12.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-prettier": "^5.2.1",
+        "globals": "^15.11.0",
+        "nodemon": "^3.1.7",
+        "prettier": "^3.3.3"
     }
 }
