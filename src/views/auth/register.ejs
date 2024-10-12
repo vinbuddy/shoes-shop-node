@@ -5,7 +5,7 @@
         </div>
         <div class="w-full md:w-1/2 h-full">
             <h2 class="text-2xl font-bold text-[#002D74]">Đăng ký</h2>
-            <form id="register-form" class="mt-6">
+            <form action="/auth/register" method="post" id="register-form" class="mt-6">
                 <div>
                     <label class="block text-gray-700">Tên đăng nhập</label>
                     <input
@@ -42,6 +42,13 @@
                         class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                     />
                 </div>
+
+                <% if (locals?.error) { %>
+                    <p class="text-red-500 text-center my-5">
+                        <%= error %>
+                    </p>
+                <% } %>
+                
 
                 <button
                     type="submit"
@@ -100,17 +107,17 @@
         .addField("#username", [
             {
                 rule: "required",
-                message: "Vui lòng nhập tên đăng nhập của bạn",
+                errorMessage: "Vui lòng nhập tên đăng nhập của bạn",
             },
             {
                 rule: "minLength",
                 value: 6,
-                message: "Tên đăng nhập phải có ít nhất 6 ký tự",
+                errorMessage: "Tên đăng nhập phải có ít nhất 6 ký tự",
             },
             {
                 rule: "maxLength",
                 value: 20,
-                message: "Tên đăng nhập phải có nhiều nhất 20 ký tự",
+                errorMessage: "Tên đăng nhập phải có nhiều nhất 20 ký tự",
             },
         ])
         .addField("#email", [
@@ -139,4 +146,8 @@
                 errorMessage: "Mật khẩu phải có nhiều nhất 16 ký tự",
             },
         ]);
+
+    validation.onSuccess((event) => {
+        event.target.submit(); // Gửi form khi không có lỗi
+    });
 </script>
