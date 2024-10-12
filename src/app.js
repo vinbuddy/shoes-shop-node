@@ -8,8 +8,9 @@ import { dirname } from "path";
 
 import router from "./routes/index.js";
 import session from "express-session";
+import RedisStore from "connect-redis";
 
-import { connectToRedis } from "./utils/redis.js";
+import { connectToRedis, getRedis } from "./utils/redis.js";
 
 const app = express();
 env.config();
@@ -30,32 +31,49 @@ app.set("layout extractScripts", true);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET_KEY,
-        resave: false,
-        saveUninitialized: true,
-    })
-);
+const initializeSession = (redisClient) => {
+    app.use(
+        session({
+            store: new RedisStore({ client: redisClient }),
+            secret: process.env.SESSION_SECRET_KEY,
+            resave: false,
+            saveUninitialized: false,
+        })
+    );
+};
 
-app.use(router);
-
-app.get("/", (req, res) => {
-    res.render("index");
-});
-
-app.listen(PORT, async () => {
-    const uri = process.env.MONGODB_URI;
-
+(async () => {
     try {
+        // Connect to Redis and initialize session
         await connectToRedis();
+        const redisClient = getRedis();
+        initializeSession(redisClient);
+
+        // Connect to MongoDB
+        const uri = process.env.MONGODB_URI;
         await mongoose.connect(uri);
 
-        console.log(`Database connected 🚀`);
+        console.log("Database connected 🚀");
 
-        console.log(`running on http://localhost:${PORT}`);
+        // Middleware to pass session to views
+        app.use((req, res, next) => {
+            res.locals.session = req.session;
+            next();
+        });
+
+        // Use routes after session is initialized
+        app.use(router);
+
+        app.get("/", (req, res) => {
+            res.render("index");
+        });
+
+        // Start the server
+        app.listen(PORT, () => {
+            console.log(`Running on http://localhost:${PORT}`);
+        });
     } catch (error) {
-        console.log("error: ", error.message);
+        console.log("Error:", error.message);
         process.exit(1);
     }
-});
+})();

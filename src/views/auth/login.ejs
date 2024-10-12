@@ -1,39 +1,35 @@
 <section class="border-red-500 bg-gray-200 min-h-screen flex items-center justify-center p-10">
     <div class="bg-gray-100 p-7 flex items-center rounded-3xl shadow-xl w-full md:max-w-3xl gap-10">
         <div class="w-full md:w-1/2 h-full">
-            <h2 class="text-2xl font-bold text-[#002D74]">Login</h2>
-            <p class="text-sm mt-4 text-[#002D74]">If you have an account, please login</p>
-            <form class="mt-6" action="#" method="POST">
+            <h2 class="text-2xl font-bold text-[#002D74]">Đăng nhập</h2>
+            <form class="mt-6" id="login-form" action="/auth/login" method="POST">
                 <div>
-                    <label class="block text-gray-700">Email Address</label>
+                    <label class="block text-gray-700">Địa chỉ Email</label>
                     <input
                         type="email"
-                        name=""
-                        id=""
-                        placeholder="Enter Email Address"
+                        name="email"
+                        id="email"
+                        placeholder="Nhập địa chỉ Email"
                         class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                         autofocus
                         autocomplete
-                        required
                     />
                 </div>
 
                 <div class="mt-4">
-                    <label class="block text-gray-700">Password</label>
+                    <label class="block text-gray-700">Mật khẩu</label>
                     <input
                         type="password"
-                        name=""
-                        id=""
-                        placeholder="Enter Password"
-                        minlength="6"
+                        name="password"
+                        id="password"
+                        placeholder="Nhập mật khẩu"
                         class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
-                        required
                     />
                 </div>
 
                 <div class="text-right mt-2">
                     <a href="#" class="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700"
-                        >Forgot Password?</a
+                        >Quên mật khẩu?</a
                     >
                 </div>
 
@@ -41,13 +37,13 @@
                     type="submit"
                     class="w-full block bg-primary hover:bg-blue-400 focus:bg-blue-400 text-white font-semibold rounded-lg px-4 py-3 mt-6"
                 >
-                    Log In
+                    Đăng nhập
                 </button>
             </form>
 
             <div class="mt-7 grid grid-cols-3 items-center text-gray-500">
                 <hr class="border-gray-500" />
-                <p class="text-center text-sm">OR</p>
+                <p class="text-center text-sm">Hoặc</p>
                 <hr class="border-gray-500" />
             </div>
 
@@ -72,13 +68,13 @@
                     <path clip-path="url(#b)" fill="#34A853" d="M0 37l30-23 7.9 1L48 0v48H0z" />
                     <path clip-path="url(#b)" fill="#4285F4" d="M48 48L17 24l-4-3 35-10z" />
                 </svg>
-                <span class="ml-4">Login with Google</span>
+                <span class="ml-4">Tiếp tục với Google</span>
             </button>
 
             <div class="text-sm flex justify-between items-center mt-7">
-                <p>If you don't have an account...</p>
+                <p>Bạn chưa có tài khoản...</p>
                 <button class="ml-3 bg-white border rounded-xl hover:scale-110 duration-300 border-blue-400">
-                    <a class="block py-2 px-5" href="/auth/register">Register</a>
+                    <a class="block py-2 px-5" href="/auth/register">Đăng ký</a>
                 </button>
             </div>
         </div>
@@ -88,3 +84,41 @@
         </div>
     </div>
 </section>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+
+<script>
+    const validation = new JustValidate("#register-form");
+
+    validation
+        .addField("#email", [
+            {
+                rule: "required",
+                errorMessage: "Email là bắt buộc",
+            },
+            {
+                rule: "email",
+                errorMessage: "Email không hợp lệ!",
+            },
+        ])
+        .addField("#password", [
+            {
+                rule: "required",
+                errorMessage: "Mật khẩu là bắt buộc",
+            },
+            {
+                rule: "minLength",
+                value: 6,
+                errorMessage: "Mật khẩu phải có ít nhất 6 ký tự",
+            },
+            {
+                rule: "maxLength",
+                value: 16,
+                errorMessage: "Mật khẩu phải có tối đa 16 ký tự",
+            },
+        ]);
+
+    validation.onSuccess((event) => {
+        event.target.submit(); // Gửi form khi không có lỗi
+    });
+</script>

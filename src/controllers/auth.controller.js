@@ -1,8 +1,8 @@
 import otpGenerator from "otp-generator";
+import bcrypt from "bcrypt";
 
 import CustomerModel from "../models/customer.model.js";
 import { getRedis } from "../utils/redis.js";
-
 import { sendEmail } from "../utils/mail.js";
 
 export function renderLoginPage(req, res) {
@@ -10,7 +10,7 @@ export function renderLoginPage(req, res) {
 }
 
 export async function renderRegisterPage(req, res) {
-    return res.render("auth/register", { layout: "./layouts/auth" });
+    return res.render("auth/register", { layout: "./layouts/auth", title: "Đăng ký" });
 }
 
 export async function renderVerifyOTPPage(req, res) {
@@ -127,9 +127,84 @@ export async function verifyOTPHandler(req, res) {
         const customer = await CustomerModel.findOne({ email: email });
         req.session.customer = customer;
 
+        req.session.save((err) => {
+            if (err) {
+                return res.render("auth/otp", {
+                    layout: "./layouts/auth",
+                    error: "Không thể lưu session.",
+                });
+            }
+        });
+
         return res.redirect("/");
     } catch (error) {
         return res.render("auth/otp", {
+            layout: "./layouts/auth",
+            error: error.message,
+        });
+    }
+}
+
+export async function logoutHandler(req, res) {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error destroying session:", err);
+            return res.redirect("/");
+        }
+
+        // Clear cookie
+        res.clearCookie("connect.sid"); // Clear the session cookie
+
+        return res.redirect("/auth/login");
+    });
+}
+
+export async function loginHandler(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        const customer = await CustomerModel.findOne({
+            email: email,
+        });
+
+        if (!customer) {
+            return res.render("auth/login", {
+                layout: "./layouts/auth",
+                error: "Người dùng không tồn tại.",
+            });
+        }
+
+        if (!customer.isVerified) {
+            return res.render("auth/login", {
+                layout: "./layouts/auth",
+                error: "Người dùng chưa xác thực.",
+            });
+        }
+
+        // Compare password with hashed password
+        const isMatch = await bcrypt.compare(password, customer.password);
+
+        if (!isMatch) {
+            return res.render("auth/login", {
+                layout: "./layouts/auth",
+                error: "Mật khẩu không đúng.",
+            });
+        }
+
+        // Create session
+        req.session.customer = customer;
+        req.session.save((err) => {
+            if (err) {
+                return res.render("auth/login", {
+                    layout: "./layouts/auth",
+                    error: "Không thể lưu session.",
+                });
+            }
+        });
+
+        return res.redirect("/");
+    } catch (error) {
+        return res.render("auth/login", {
             layout: "./layouts/auth",
             error: error.message,
         });
