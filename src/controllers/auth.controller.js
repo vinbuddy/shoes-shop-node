@@ -1,18 +1,23 @@
 import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
+import env from "dotenv";
 
 import CustomerModel from "../models/customer.model.js";
 import { getRedis } from "../utils/redis.js";
 import { sendEmail } from "../utils/mail.js";
 
+env.config();
+
 const VIEW_OPTIONS = {
     REGISTER: {
         layout: "./layouts/auth",
         title: "Đăng ký",
+        googleLoginUrl: `${process.env.BASE_URL}/auth/google`,
     },
     LOGIN: {
         layout: "./layouts/auth",
         title: "Đăng nhập",
+        googleLoginUrl: `${process.env.BASE_URL}/auth/google`,
     },
     VERIFY_OTP: {
         layout: "./layouts/auth",
@@ -311,5 +316,24 @@ export async function resetPasswordHandler(req, res) {
         return res.redirect("/auth/login");
     } catch (error) {
         return res.render("auth/reset", { ...VIEW_OPTIONS.RESET_PASSWORD, error: error.message, token, email });
+    }
+}
+
+// Google
+export async function googleAuthCallbackHandler(req, res) {
+    try {
+        const customer = req.user;
+
+        req.session.customer = customer;
+
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+
+        return res.redirect("/");
+    } catch (error) {
+        res.render("auth/login", { ...VIEW_OPTIONS.LOGIN, error: error.message });
     }
 }

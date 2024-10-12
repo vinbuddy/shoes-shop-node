@@ -28,6 +28,8 @@
         "mongoose": "^8.6.3",
         "nodemailer": "^6.9.15",
         "otp-generator": "^4.0.1",
+        "passport": "^0.7.0",
+        "passport-google-oauth20": "^2.0.0",
         "path": "^0.12.7",
         "redis": "^4.7.0"
     },
