@@ -10,116 +10,124 @@
         <!-- Sidebar filter -->
         <section class="col-span-3">
             <div class="sticky top-[74px]">
-                <div class="join join-vertical w-full">
-                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
-                        <input type="radio" name="my-accordion-4" checked="checked" />
-                        <div class="collapse-title text-base font-medium">Danh mục</div>
-                        <div class="collapse-content">
-                            <ul>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Tất cả</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Thể thao</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Nam</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Nữ</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Trẻ em</label>
-                                </li>
-                            </ul>
-                        </div>
+                <form id="filter-form" action="/product" method="get">
+                    <div>
+                        <input hidden type="text" name="name" value="<%= filters && filters.name ? filters.name : "" %>" />
+                        <input type="hidden" name="brand">
+                        <input type="hidden" name="category">
+                        <input type="hidden" name="size">
                     </div>
-                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
-                        <input type="radio" name="my-accordion-4" />
-                        <div class="collapse-title text-base font-medium">Hãng</div>
-                        <div class="collapse-content">
-                            <ul>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Nike</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Adidas</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Puma</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Vans</label>
-                                </li>
-                                <li class="flex items-center gap-2 mb-3">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">Converse</label>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
-                        <input type="radio" name="my-accordion-4" />
-                        <div class="collapse-title text-base font-medium">Kích cỡ</div>
-                        <div class="collapse-content">
-                            <ul class="flex flex-wrap gap-5">
-                                <li class="flex items-center gap-2">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">36</label>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">36</label>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">36</label>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">36</label>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">36</label>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
-                                    <label for="">36</label>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
-                        <input type="radio" name="my-accordion-4" />
-                        <div class="collapse-title text-base font-medium">Giá</div>
-                        <div class="collapse-content">
-                            <div class="flex items-center justify-between gap-4">
-                                <input
-                                    type="text"
-                                    placeholder="Từ"
-                                    class="input input-bordered w-full max-w-xs input-sm"
-                                />
-
-                                <input
-                                    type="text"
-                                    placeholder="Đến"
-                                    class="input input-bordered w-full max-w-xs input-sm"
-                                />
+                    
+                    <div id="filter-inputs" class="join join-vertical w-full">
+                        <!-- Category -->
+                        <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                            <input type="checkbox" name="categoryAccordion" checked="checked"/>
+                            <div class="collapse-title text-base font-medium">Danh mục</div>
+                            <div class="collapse-content">
+                                <ul>
+                                    <% if (categories && categories.length > 0) { %>
+                                        <% categories.forEach(category => { %>
+                                            <li class="flex items-center gap-2 mb-3">
+                                                <input type="checkbox" 
+                                                    id="category-<%= category._id %>" 
+                                                    name="_category" 
+                                                    value="<%= category._id %>" 
+                                                    class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                                    <% if (filters.category && filters.category.includes(category._id.toString())) { %> 
+                                                       checked <% } %> 
+                                                 />
+                                                <label class="cursor-pointer" for="category-<%= category._id %>">
+                                                    <%= category.name %>
+                                                </label>
+                                            </li>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <li class="mb-3">Không có danh mục nào.</li>
+                                    <% } %>
+                                </ul>
                             </div>
-                            <button class="btn btn-sm w-full mt-4">Áp dụng</button>
+                        </div>
+                        <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                            <input type="checkbox" name="brandAccordion" <%= filters?.brandAccordion === "on" ? "checked" : "" %> />
+                            <div class="collapse-title text-base font-medium">Hãng</div>
+                            <div class="collapse-content">
+                                <ul>
+                                    <% if (brands && brands.length > 0) { %>
+                                        <% brands.forEach(brand => { %>
+                                            <li class="flex items-center gap-2 mb-3">
+                                                <input type="checkbox" 
+                                                    id="brand-<%= brand._id %>" 
+                                                    name="_brand" 
+                                                    value="<%= brand._id %>" 
+                                                    class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                                       <% if (filters.brand && filters.brand.includes(brand._id.toString())) { %> 
+                                                       checked <% } %> />
+                                                <label class="cursor-pointer" for="brand-<%= brand._id %>">
+                                                    <%= brand.name %>
+                                                </label>
+                                            </li>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <li class="mb-3">Không có hãng nào.</li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                            <input type="checkbox" name="sizeAccordion" <%= filters?.sizeAccordion === "on" ? "checked" : "" %> />
+                            <div class="collapse-title text-base font-medium">Kích cỡ</div>
+                            <div class="collapse-content">
+                                <ul class="flex flex-wrap gap-5">
+                                    <% if (sizes && sizes.length > 0) { %>
+                                        <% sizes.forEach(size => { %>
+                                            <li class="flex items-center gap-2">
+                                                <input type="checkbox" 
+                                                    id="size-<%= size._id %>" 
+                                                    name="_size" 
+                                                    value="<%= size._id %>" 
+                                                    class="checkbox checkbox-sm [--chkbg:#0578f8]"
+                                                    <% if (filters.size && filters.size.includes(size._id.toString())) { %> 
+                                                    checked <% } %>/>
+                                                <label class="cursor-pointer" for="size-<%= size._id %>">
+                                                    <%= size.name %>
+                                                </label>
+                                            </li>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <li>Không có kích cỡ nào.</li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                            <input type="checkbox" name="my-accordion-4" />
+                            <div class="collapse-title text-base font-medium">Giá</div>
+                            <div class="collapse-content">
+                                <div class="flex items-center justify-between gap-4">
+                                    <input
+                                        type="text"
+                                        placeholder="Từ"
+                                        class="input input-bordered w-full max-w-xs input-sm"
+                                    />
+    
+                                    <input
+                                        type="text"
+                                        placeholder="Đến"
+                                        class="input input-bordered w-full max-w-xs input-sm"
+                                    />
+                                </div>
+                                <button class="btn btn-sm w-full mt-4">Áp dụng</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <button type="submit" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                        <i class="bx bx-filter-alt"></i>
+                        &nbsp; Lọc
+                    </button>
+                    <button type="submit" class="btn rounded-xl w-full mt-4">
+                        Hủy lọc
+                    </button>
+                </form>
             </div>
         </section>
 
@@ -128,66 +136,147 @@
             <div class="flex justify-between items-center mb-5">
                 <h1 class="text-2xl font-bold">Sản phẩm</h1>
 
-                <label class="input input-bordered flex items-center gap-2 rounded-full">
-                    <input type="search" class="grow" placeholder="Tìm kiếm sản phẩm" />
+                <form id="search-form" class="input input-bordered flex items-center gap-2 rounded-full">
+                    <input type="search" class="grow" placeholder="Tìm kiếm sản phẩm" name="search" value="<%= filters && filters.name ? filters.name : "" %>" />
                     <button class="btn btn-sm rounded-full">Tìm kiếm</button>
-                </label>
+                </form>
             </div>
 
             <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                <a href="#" class="group">
-                    <div
-                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
-                    >
-                        <img
-                            src="https://images.stockx.com/360/Air-Jordan-1-Retro-Low-OG-SP-Medium-Olive/Images/Air-Jordan-1-Retro-Low-OG-SP-Medium-Olive/Lv2/img01.jpg"
-                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
-                            class="h-full w-full object-cover object-center group-hover:opacity-75"
-                        />
-                    </div>
-                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
-                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
-                </a>
-                <a href="#" class="group">
-                    <div
-                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
-                    >
-                        <img
-                            src="https://images.stockx.com/360/Air-Jordan-1-Retro-High-OG-Midnight-Navy/Images/Air-Jordan-1-Retro-High-OG-Midnight-Navy/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1724699827&h=384&fm=avif&q=57 1x,"
-                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
-                            class="h-full w-full object-cover object-center group-hover:opacity-75"
-                        />
-                    </div>
-                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
-                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
-                </a>
-                <a href="#" class="group">
-                    <div
-                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
-                    >
-                        <img
-                            src="https://images.stockx.com/360/adidas-Samba-OG-Cloud-White-Core-Black/Images/adidas-Samba-OG-Cloud-White-Core-Black/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1687245728&h=384&fm=avif&q=57"
-                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
-                            class="h-full w-full object-cover object-center group-hover:opacity-75"
-                        />
-                    </div>
-                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
-                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
-                </a>
-                <a href="#" class="group">
-                    <div
-                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
-                    >
-                        <img
-                            src="https://images.stockx.com/360/Air-Jordan-4-Retro-Red-Cement/Images/Air-Jordan-4-Retro-Red-Cement/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1691770728&h=384&fm=avif&q=57"
-                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
-                            class="h-full w-full object-cover object-center group-hover:opacity-75"
-                        />
-                    </div>
-                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
-                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
-                </a>
+                <% if (products && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <a href="/product/<%= product._id %>" class="group">
+                            <div
+                                class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
+                            >
+                                <img
+                                    src="<%= product.images[0] %>"
+                                    alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                                    class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                />
+                            </div>
+                            <h3 class="mt-4 text-lg"><%= product.name %></h3>
+                            <p class="mt-1 text-base font-semibold text-gray-900">
+                                <%= formatCurrency(product.price) %>
+                            </p>
+                        </a>
+                    <% }) %>
+                <% } else { %>
+                    <p>Không có sản phẩm nào.</p>
+                <% } %>
+                
+                
             </div>
+
+            <!-- Pagination -->
+            <nav class="mt-7 flex justify-center">
+                <ul class="list-style-none flex">
+                    <li>
+                        <a
+                            class="pointer-events-none relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400"
+                            >Trước</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary-700 focus:outline-none active:bg-neutral-100 active:text-primary-700"
+                            href="#!"
+                            >1</a
+                        >
+                    </li>
+                    <li aria-current="page">
+                        <a
+                            class="relative block rounded bg-primary text-white px-3 py-1.5 text-sm font-medium text-primary-700 transition duration-300 focus:outline-none"
+                            href="#!"
+                            >2
+                            <span
+                                class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]"
+                                >(current)</span
+                            >
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary-700 focus:outline-none active:bg-neutral-100 active:text-primary-700"
+                            href="#!"
+                            >3</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary-700 focus:outline-none active:bg-neutral-100 active:text-primary-700"
+                            href="#!"
+                            >Sau</a
+                        >
+                    </li>
+                </ul>
+              </nav>
         </section>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const categoryCheckboxes = document.querySelectorAll('input[name="_category"]'); 
+        const brandCheckboxes = document.querySelectorAll('input[name="_brand"]');
+        const sizeCheckboxes = document.querySelectorAll('input[name="_size"]');
+
+        const categoryInput = document.querySelector('input[name="category"]');
+        const brandInput = document.querySelector('input[name="brand"]');
+        const sizeInput = document.querySelector('input[name="size"]');
+
+        const productNameInput = document.querySelector('input[name="name"]');
+        const searchInput = document.querySelector('input[name="search"]');
+
+        const filterForm = document.getElementById('filter-form');
+        const searchForm = document.getElementById('search-form');
+
+        searchInput.addEventListener('change', function() {
+            productNameInput.value = searchInput.value.trim();
+        });
+
+        searchInput.addEventListener("search", function() {
+            if (this.value.trim() === "") {
+                productNameInput.value = "";
+                searchForm.submit();
+            }
+        });
+
+
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterForm.submit();
+        });
+
+        categoryCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const checkedCategories = Array.from(categoryCheckboxes)
+                    .filter(i => i.checked)
+                    .map(i => i.value);
+                
+                categoryInput.value = checkedCategories.join('-'); 
+            });
+        });
+
+        brandCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const checkedBrands = Array.from(brandCheckboxes)
+                    .filter(i => i.checked)
+                    .map(i => i.value);
+                
+                brandInput.value = checkedBrands.join('-'); 
+            });
+        });
+
+        sizeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const checkedSizes = Array.from(sizeCheckboxes)
+                    .filter(i => i.checked)
+                    .map(i => i.value);
+                
+                sizeInput.value = checkedSizes.join('-'); 
+            });
+        });
+    })
+</script>
