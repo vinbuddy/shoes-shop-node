@@ -1,23 +1,193 @@
-<!-- Using layout -->
+<div class="container">
+    <div class="breadcrumbs text-sm mb-7">
+        <ul>
+            <li><a>Trang chủ</a></li>
+            <li><a>Sản phẩm</a></li>
+            <li>Tất cả</li>
+        </ul>
+    </div>
+    <div class="grid grid-cols-12 gap-10">
+        <!-- Sidebar filter -->
+        <section class="col-span-3">
+            <div class="sticky top-[74px]">
+                <div class="join join-vertical w-full">
+                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                        <input type="radio" name="my-accordion-4" checked="checked" />
+                        <div class="collapse-title text-base font-medium">Danh mục</div>
+                        <div class="collapse-content">
+                            <ul>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Tất cả</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Thể thao</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Nam</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Nữ</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Trẻ em</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                        <input type="radio" name="my-accordion-4" />
+                        <div class="collapse-title text-base font-medium">Hãng</div>
+                        <div class="collapse-content">
+                            <ul>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Nike</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Adidas</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Puma</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Vans</label>
+                                </li>
+                                <li class="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">Converse</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                        <input type="radio" name="my-accordion-4" />
+                        <div class="collapse-title text-base font-medium">Kích cỡ</div>
+                        <div class="collapse-content">
+                            <ul class="flex flex-wrap gap-5">
+                                <li class="flex items-center gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">36</label>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">36</label>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">36</label>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">36</label>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">36</label>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-sm [--chkbg:#0578f8]" />
+                                    <label for="">36</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                        <input type="radio" name="my-accordion-4" />
+                        <div class="collapse-title text-base font-medium">Giá</div>
+                        <div class="collapse-content">
+                            <div class="flex items-center justify-between gap-4">
+                                <input
+                                    type="text"
+                                    placeholder="Từ"
+                                    class="input input-bordered w-full max-w-xs input-sm"
+                                />
 
-<p>Hello from the product index view!</p>
+                                <input
+                                    type="text"
+                                    placeholder="Đến"
+                                    class="input input-bordered w-full max-w-xs input-sm"
+                                />
+                            </div>
+                            <button class="btn btn-sm w-full mt-4">Áp dụng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<p>Product list</p>
+        <!-- Products -->
+        <section class="col-span-9">
+            <div class="flex justify-between items-center mb-5">
+                <h1 class="text-2xl font-bold">Sản phẩm</h1>
 
-<ul>
-    <% products.map(product => { %>
-    <li>
-        <a href="/product/<%= product.id %>">
-            <span><%= product.name %></span>
-            <span><%= product.price %></span>
-        </a>
-    </li>
-    <% }) %>
-</ul>
+                <label class="input input-bordered flex items-center gap-2 rounded-full">
+                    <input type="search" class="grow" placeholder="Tìm kiếm sản phẩm" />
+                    <button class="btn btn-sm rounded-full">Tìm kiếm</button>
+                </label>
+            </div>
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-    const a = 1;
-
-    console.log(a);
-</script>
+            <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                <a href="#" class="group">
+                    <div
+                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
+                    >
+                        <img
+                            src="https://images.stockx.com/360/Air-Jordan-1-Retro-Low-OG-SP-Medium-Olive/Images/Air-Jordan-1-Retro-Low-OG-SP-Medium-Olive/Lv2/img01.jpg"
+                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                            class="h-full w-full object-cover object-center group-hover:opacity-75"
+                        />
+                    </div>
+                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
+                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
+                </a>
+                <a href="#" class="group">
+                    <div
+                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
+                    >
+                        <img
+                            src="https://images.stockx.com/360/Air-Jordan-1-Retro-High-OG-Midnight-Navy/Images/Air-Jordan-1-Retro-High-OG-Midnight-Navy/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1724699827&h=384&fm=avif&q=57 1x,"
+                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                            class="h-full w-full object-cover object-center group-hover:opacity-75"
+                        />
+                    </div>
+                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
+                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
+                </a>
+                <a href="#" class="group">
+                    <div
+                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
+                    >
+                        <img
+                            src="https://images.stockx.com/360/adidas-Samba-OG-Cloud-White-Core-Black/Images/adidas-Samba-OG-Cloud-White-Core-Black/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1687245728&h=384&fm=avif&q=57"
+                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                            class="h-full w-full object-cover object-center group-hover:opacity-75"
+                        />
+                    </div>
+                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
+                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
+                </a>
+                <a href="#" class="group">
+                    <div
+                        class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
+                    >
+                        <img
+                            src="https://images.stockx.com/360/Air-Jordan-4-Retro-Red-Cement/Images/Air-Jordan-4-Retro-Red-Cement/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1691770728&h=384&fm=avif&q=57"
+                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                            class="h-full w-full object-cover object-center group-hover:opacity-75"
+                        />
+                    </div>
+                    <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
+                    <p class="mt-1 text-lg font-medium text-gray-900">$48</p>
+                </a>
+            </div>
+        </section>
+    </div>
+</div>
