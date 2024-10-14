@@ -6,7 +6,7 @@ export async function renderBrandPage(req, res) {
         return res.render("brand/index", {
             layout: "./layouts/main",
             page: "brand",
-            title: "brand",
+            title: "brand page",
             brands: brands,
         });
     } catch (error) {
@@ -17,21 +17,41 @@ export async function renderBrandPage(req, res) {
 export async function deleteBrand(req, res) {
     try {
         const { id } = req.params;
-        await BrandModel.findByIdAndDelete(id);
+        await BrandModel.findByIdAndUpdate(id, { isDeleted: true });
         return res.redirect("/brand");
     } catch (error) {
         console.error("Error deleting brand:", error);
     }
 }
-
+export async function restoreBrand(req, res) {
+    try {
+        const { id } = req.params;
+        await BrandModel.findByIdAndUpdate(id, { isDeleted: false });
+        return res.redirect("/brand");
+    } catch (error) {
+        console.error("Error deleting brand:", error);
+    }
+}
 export async function updateBrand(req, res) {
     try {
         const id = req.body.id;
         const { name, description } = req.body;
-        const updatedData = { name, description };
+        const existingBrand = await BrandModel.findOne({ name, _id: { $ne: id } });
 
+        if (existingBrand) {
+            return res.redirect("/brand");
+        }
+
+        const updatedData = { name, description };
         await BrandModel.findByIdAndUpdate(id, updatedData);
-        return res.redirect("/brand");
+        const brands = await BrandModel.find();
+        return res.render("brand/index", {
+            layout: "./layouts/main",
+            page: "brand",
+            title: "brand page",
+            brands: brands,
+            error: "Nhãn hàng này đã tồn tại",
+        });
     } catch (error) {
         console.error("Error updating brand:", error);
     }

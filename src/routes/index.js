@@ -15,4 +15,5 @@ router.use("/product", productRoutes);
 router.use("/auth", authRoutes);
 router.use("/cart", cartRoutes);
 router.use("/brand", brandRoutes);
+
 export default router;

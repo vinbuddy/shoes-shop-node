@@ -8,6 +8,7 @@
                     <tr>
                         <th class="py-3 px-6 text-left">Tên</th>
                         <th class="py-3 px-6 text-left">Mô tả</th>
+                        <th class="py-3 px-6 text-left">Trạng thái</th>
                         <th class="py-3 px-6 text-left">Hành động</th>
                     </tr>
                 </thead>
@@ -17,12 +18,25 @@
                             <td class="py-3 px-6"><%= brand.name %></td>
                             <td class="py-3 px-6"><%= brand.description %></td>
                             <td class="py-3 px-6">
-                                <a href="#" class="text-blue-500 hover:underline" onclick="openModal('<%= brand.id %>', '<%= brand.name %>', '<%= brand.description %>')">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="/brand/delete/<%= brand.id %>" class="text-red-500 hover:underline ml-4">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </a>
+                                <% if (brand.isDeleted) { %>
+                                    <span class="text-red-500">Đã bị xoá</span>
+                                <% } else { %>
+                                    <span class="text-green-500">Hoạt động</span>
+                                <% } %>
+                            </td>
+                            <td class="py-3 px-6">
+                                <% if (!brand.isDeleted) { %>
+                                    <a href="#" class="text-blue-500 hover:underline" onclick="openModal('<%= brand.id %>', '<%= brand.name %>', '<%= brand.description %>')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="/brand/delete/<%= brand.id %>" class="text-red-500 hover:underline ml-4">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </a>
+                                <% } else { %>
+                                    <a href="/brand/restore/<%= brand.id %>" class="text-green-500 hover:underline">
+                                        <i class="fas fa-undo"></i> Khôi phục
+                                    </a>
+                                <% } %>
                             </td>
                         </tr>
                     <% }); %>
@@ -45,6 +59,7 @@
                     <label for="brandDescription" class="block text-gray-700">Description</label>
                     <textarea id="brandDescription" name="description" class="w-full p-2 border border-gray-300 rounded mt-1"></textarea>
                 </div>
+              
                 <div class="flex justify-end">
                     <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded mr-2" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
