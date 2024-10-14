@@ -1,9 +1,8 @@
 <div class="container">
     <div class="breadcrumbs text-sm mb-7">
         <ul>
-            <li><a>Trang chủ</a></li>
-            <li><a>Sản phẩm</a></li>
-            <li>Tất cả</li>
+            <li><a href="/">Trang chủ</a></li>
+            <li>Danh sách sản phẩm</li>
         </ul>
     </div>
     <div class="grid grid-cols-12 gap-10">
@@ -13,11 +12,8 @@
                 <form id="filter-form" action="/product" method="get">
                     <div>
                         <input hidden type="text" name="name" value="<%= filters && filters.name ? filters.name : "" %>" />
-                        <input type="hidden" name="brand">
-                        <input type="hidden" name="category">
-                        <input type="hidden" name="size">
                     </div>
-                    
+                   
                     <div id="filter-inputs" class="join join-vertical w-full">
                         <!-- Category -->
                         <div class="collapse collapse-arrow join-item border-base-300 border-b">
@@ -30,7 +26,7 @@
                                             <li class="flex items-center gap-2 mb-3">
                                                 <input type="checkbox" 
                                                     id="category-<%= category._id %>" 
-                                                    name="_category" 
+                                                    name="category[]" 
                                                     value="<%= category._id %>" 
                                                     class="checkbox checkbox-sm [--chkbg:#0578f8]" 
                                                     <% if (filters.category && filters.category.includes(category._id.toString())) { %> 
@@ -57,7 +53,7 @@
                                             <li class="flex items-center gap-2 mb-3">
                                                 <input type="checkbox" 
                                                     id="brand-<%= brand._id %>" 
-                                                    name="_brand" 
+                                                    name="brand[]" 
                                                     value="<%= brand._id %>" 
                                                     class="checkbox checkbox-sm [--chkbg:#0578f8]" 
                                                        <% if (filters.brand && filters.brand.includes(brand._id.toString())) { %> 
@@ -83,7 +79,7 @@
                                             <li class="flex items-center gap-2">
                                                 <input type="checkbox" 
                                                     id="size-<%= size._id %>" 
-                                                    name="_size" 
+                                                    name="size[]" 
                                                     value="<%= size._id %>" 
                                                     class="checkbox checkbox-sm [--chkbg:#0578f8]"
                                                     <% if (filters.size && filters.size.includes(size._id.toString())) { %> 
@@ -100,23 +96,26 @@
                             </div>
                         </div>
                         <div class="collapse collapse-arrow join-item border-base-300 border-b">
-                            <input type="checkbox" name="my-accordion-4" />
+                            <input type="checkbox" name="priceAccordion" <%= filters?.priceAccordion === "on" ? "checked" : "" %> />
                             <div class="collapse-title text-base font-medium">Giá</div>
                             <div class="collapse-content">
                                 <div class="flex items-center justify-between gap-4">
                                     <input
+                                        id="price-from"
                                         type="text"
                                         placeholder="Từ"
                                         class="input input-bordered w-full max-w-xs input-sm"
                                     />
+                                    <input type="text" hidden name="minPrice" value="<%= filters.minPrice %>">
+                                    <input type="text" hidden name="maxPrice" value="<%= filters.maxPrice %>">
     
                                     <input
+                                        id="price-to"
                                         type="text"
                                         placeholder="Đến"
                                         class="input input-bordered w-full max-w-xs input-sm"
                                     />
                                 </div>
-                                <button class="btn btn-sm w-full mt-4">Áp dụng</button>
                             </div>
                         </div>
                     </div>
@@ -124,9 +123,9 @@
                         <i class="bx bx-filter-alt"></i>
                         &nbsp; Lọc
                     </button>
-                    <button type="submit" class="btn rounded-xl w-full mt-4">
+                    <a href="/product" class="btn rounded-xl w-full mt-4">
                         Hủy lọc
-                    </button>
+                    </a>
                 </form>
             </div>
         </section>
@@ -155,62 +154,54 @@
                                     class="h-full w-full object-cover object-center group-hover:opacity-75"
                                 />
                             </div>
-                            <h3 class="mt-4 text-lg"><%= product.name %></h3>
+                            <h3 class="mt-4 text-lg truncate max-w-full"><%= product.name %></h3>
                             <p class="mt-1 text-base font-semibold text-gray-900">
                                 <%= formatCurrency(product.price) %>
                             </p>
                         </a>
                     <% }) %>
-                <% } else { %>
-                    <p>Không có sản phẩm nào.</p>
                 <% } %>
                 
                 
             </div>
 
+            <% if (products.length === 0) { %>
+                <div class="flex justify-center">
+                    <div>
+                        <img class="size-40" src="/images/no-result.png" alt="">
+                        <p>Không có sản phẩm nào.</p>
+                    </div>
+                </div>
+            <% } %>
+
             <!-- Pagination -->
-            <nav class="mt-7 flex justify-center">
-                <ul class="list-style-none flex">
-                    <li>
-                        <a
-                            class="pointer-events-none relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400"
-                            >Trước</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary-700 focus:outline-none active:bg-neutral-100 active:text-primary-700"
-                            href="#!"
-                            >1</a
-                        >
-                    </li>
-                    <li aria-current="page">
-                        <a
-                            class="relative block rounded bg-primary text-white px-3 py-1.5 text-sm font-medium text-primary-700 transition duration-300 focus:outline-none"
-                            href="#!"
-                            >2
-                            <span
-                                class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]"
-                                >(current)</span
-                            >
-                        </a>
-                    </li>
-                    <li>
-                        <a
-                            class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary-700 focus:outline-none active:bg-neutral-100 active:text-primary-700"
-                            href="#!"
-                            >3</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary-700 focus:outline-none active:bg-neutral-100 active:text-primary-700"
-                            href="#!"
-                            >Sau</a
-                        >
-                    </li>
-                </ul>
-              </nav>
+             <% if (totalPages > 1) { %>
+                <nav class="mt-10 flex justify-center">
+                    <ul class="list-style-none flex">
+                        <li>
+                            <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                            
+                            <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                                class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                                Trang trước
+                             </a>
+                        </li>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                               class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                                <%= i %>
+                            </a>
+                        <% } %>
+                       
+                        <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                        <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                            class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                             Trang sau
+                         </a>
+                    </ul>
+                </nav>
+            <% } %>
         </section>
     </div>
 </div>
@@ -218,9 +209,10 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         
-        const categoryCheckboxes = document.querySelectorAll('input[name="_category"]'); 
-        const brandCheckboxes = document.querySelectorAll('input[name="_brand"]');
-        const sizeCheckboxes = document.querySelectorAll('input[name="_size"]');
+        const priceFromInput = document.getElementById('price-from');
+        const priceToInput = document.getElementById('price-to');
+        const minPriceInput = document.querySelector('input[name="minPrice"]');
+        const maxPriceInput = document.querySelector('input[name="maxPrice"]');
 
         const categoryInput = document.querySelector('input[name="category"]');
         const brandInput = document.querySelector('input[name="brand"]');
@@ -249,34 +241,47 @@
             filterForm.submit();
         });
 
-        categoryCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const checkedCategories = Array.from(categoryCheckboxes)
-                    .filter(i => i.checked)
-                    .map(i => i.value);
-                
-                categoryInput.value = checkedCategories.join('-'); 
-            });
-        });
+        // Price input range
 
-        brandCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const checkedBrands = Array.from(brandCheckboxes)
-                    .filter(i => i.checked)
-                    .map(i => i.value);
-                
-                brandInput.value = checkedBrands.join('-'); 
-            });
-        });
+        function formatVNCurrency() {
+            let value = this.value.replace(/[^0-9]/g, '');
+            const numericValue = Number(value);
 
-        sizeCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const checkedSizes = Array.from(sizeCheckboxes)
-                    .filter(i => i.checked)
-                    .map(i => i.value);
-                
-                sizeInput.value = checkedSizes.join('-'); 
-            });
-        });
+            if (isNaN(numericValue)) {
+                this.value = ''; 
+                minPriceInput.value = ''; 
+                maxPriceInput.value = ''; 
+                return;
+            } 
+
+            this.value = numericValue.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            }).replace('₫', '').trim();
+
+            if (this.id === 'price-from') {
+                minPriceInput.value = numericValue;
+            } else {
+                maxPriceInput.value = numericValue;
+            }
+            
+
+        }
+        
+        priceFromInput.addEventListener('input', formatVNCurrency);
+        priceToInput.addEventListener('input', formatVNCurrency);
+
+        // Render price input 
+        priceFromInput.value = minPriceInput.value ? Number(minPriceInput.value).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim() : '';
+
+        priceToInput.value = maxPriceInput.value ? Number(maxPriceInput.value).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim() : '';
+
+
     })
 </script>

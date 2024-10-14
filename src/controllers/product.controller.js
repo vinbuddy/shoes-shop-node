@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import BrandModel from "../models/brand.model.js";
 import CategoryModel from "../models/category.model.js";
 import ProductModel from "../models/product.model.js";
@@ -5,11 +6,11 @@ import SizeModel from "../models/size.model.js";
 import { formatVNCurrency } from "../utils/format.js";
 
 export async function renderProductPage(req, res) {
-    const brands = await BrandModel.find();
-    const categories = await CategoryModel.find();
+    const brands = await BrandModel.find(); // Change this line after merge code
+    const categories = await CategoryModel.find({ isDeleted: false });
     const sizes = await SizeModel.find();
 
-    const { page = 1, name, brand, category, size } = req.query;
+    const { page = 1, name, brand, category, size, minPrice, maxPrice } = req.query;
     const pageSize = 10;
 
     const filters = {
@@ -21,18 +22,50 @@ export async function renderProductPage(req, res) {
     }
 
     if (brand) {
-        const brandArray = brand.split("-");
-        filters.brand = { $in: brandArray };
+        const brandIds = Array.isArray(brand) ? brand : [brand];
+        const brandObjectIds = brandIds.map((id) => new mongoose.Types.ObjectId(id));
+        filters.brand = { $in: brandObjectIds };
     }
 
     if (category) {
-        const categoryArray = category.split("-");
-        filters.categories = categoryArray;
+        const categoryIds = Array.isArray(category) ? category : [category];
+        const categoryObjectIds = categoryIds.map((id) => new mongoose.Types.ObjectId(id));
+        filters.categories = { $in: categoryObjectIds };
     }
 
     if (size) {
-        const sizeArray = size.split("-");
-        filters["sizes.size"] = { $in: sizeArray };
+        const sizeIds = Array.isArray(size) ? size : [size];
+        const sizeObjectIds = sizeIds.map((id) => new mongoose.Types.ObjectId(id));
+        filters["sizes.size"] = { $in: sizeObjectIds };
+    }
+
+    if (minPrice || maxPrice) {
+        const priceFilters = [];
+
+        // Nếu có minPrice, tìm sản phẩm có giá gốc hoặc giá trong sizes >= minPrice
+        if (minPrice) {
+            priceFilters.push({
+                $or: [
+                    { price: { $gte: parseFloat(minPrice) } }, // Giá gốc
+                    { "sizes.price": { $gte: parseFloat(minPrice) } }, // Giá theo size
+                ],
+            });
+        }
+
+        // Nếu có maxPrice, tìm sản phẩm có giá gốc hoặc giá trong sizes <= maxPrice
+        if (maxPrice) {
+            priceFilters.push({
+                $or: [
+                    { price: { $lte: parseFloat(maxPrice) } }, // Giá gốc
+                    { "sizes.price": { $lte: parseFloat(maxPrice) } }, // Giá theo size
+                ],
+            });
+        }
+
+        // Áp dụng cả minPrice và maxPrice vào filter
+        if (priceFilters.length) {
+            filters.$and = priceFilters;
+        }
     }
 
     const products = await ProductModel.find(filters)
