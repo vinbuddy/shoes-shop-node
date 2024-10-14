@@ -1,0 +1,69 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Danh sách nhãn hàng</h1>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="py-3 px-6 text-left">Tên</th>
+                        <th class="py-3 px-6 text-left">Mô tả</th>
+                        <th class="py-3 px-6 text-left">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% brands.forEach(function(brand) { %>
+                        <tr class="border-b hover:bg-gray-100">
+                            <td class="py-3 px-6"><%= brand.name %></td>
+                            <td class="py-3 px-6"><%= brand.description %></td>
+                            <td class="py-3 px-6">
+                                <a href="#" class="text-blue-500 hover:underline" onclick="openModal('<%= brand.id %>', '<%= brand.name %>', '<%= brand.description %>')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="/brand/delete/<%= brand.id %>" class="text-red-500 hover:underline ml-4">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-2/3">
+            <h2 class="text-2xl font-bold mb-4">Edit Brand</h2>
+            <form id="editForm" action="/brand/edit" method="POST">
+                <input type="hidden" id="brandId" name="id">
+                <div class="mb-4">
+                    <label for="brandName" class="block text-gray-700">Name</label>
+                    <input type="text" id="brandName" name="name" class="w-full p-2 border border-gray-300 rounded mt-1">
+                </div>
+                <div class="mb-4">
+                    <label for="brandDescription" class="block text-gray-700">Description</label>
+                    <textarea id="brandDescription" name="description" class="w-full p-2 border border-gray-300 rounded mt-1"></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded mr-2" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id, name, description) {
+            document.getElementById('brandId').value = id;
+            document.getElementById('brandName').value = name;
+            document.getElementById('brandDescription').value = description;
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('flex');
+            document.getElementById('editModal').classList.add('hidden');
+        }
+    </script>
