@@ -1,24 +1,29 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<div class=" justify-between items-center mb-4 fixed left-4 ">
-    <form action="/supplier/search" method="GET" class="flex flex-col gap-4 sm:rounded-md bg-white shadow-inner mb-4 p-4">
-        <input type="text" name="name" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2" value="<%= typeof name !== 'undefined' ? name : '' %>">
-        <select name="isDeleted" class="border border-gray-300 rounded px-4 py-2">
+<div class="flex flex-col sm:flex-row justify-between sm:fixed left-4 right-4 z-10">
+    <form action="/supplier/search" method="GET" class="fixed sm:static left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
+        <input type="text" name="name" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof name !== 'undefined' ? name : '' %>">
+        <select name="isDeleted" class="border border-gray-300 rounded px-4 py-2 flex-1">
             <option value="">Tất cả trạng thái</option>
-            <option value="false" >Đang hoạt động</option>
-            <option value="true" >Dừng hoạt động</option>
+            <option value="false">Đang hoạt động</option>
+            <option value="true">Dừng hoạt động</option>
         </select>
         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             <i class="fas fa-filter"></i> Lọc
         </button>
     </form>
+    <div class="sm:ml-4 sm:mt-0 mt-24">
+        <a href="/supplier/create" class=" float-right inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
+            <i class="fas fa-plus"></i> Thêm nhà cung cấp
+        </a>
+    </div>
 </div>
-<div class="flex mt-16 gap-12">
-        <ul class=" max-w-fit mx-auto">
+<div class="flex flex-col sm:flex-row sm:mt-16 mt-0 gap-12">
+    <ul class="max-w-fit mx-auto">
         <% suppliers.forEach(function(supplier) { %>
-        <li class="sm:rounded-md bg-white shadow-xl mb-4">
+        <li class="sm:rounded-md bg-white shadow mb-4">
             <div class="px-4 py-5 sm:px-6">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg leading-6 font-medium  text-gray-900"><%= supplier.name %></h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900"><%= supplier.name %></h3>
                     <p class="mt-1 max-w-2xl text-sm font-semibold text-gray-800">Đại diện: <%= supplier.contactPerson %></p>
                 </div>
                 <div class="mt-4 flex gap-8">
@@ -51,11 +56,6 @@
         </li>
         <% }); %>
     </ul>
-    <div class="sm:rounded-md bg-white shadow-inner fixed right-4 p-4">
-        <a href="/supplier/create" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            <i class="fas fa-plus"></i> Thêm nhà cung cấp
-        </a>
-    </div>
 </div>
 <div class="mt-8 flex justify-center">
     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
@@ -95,4 +95,4 @@
             </span>
         <% } %>
     </nav>
-</div></div>
+</div>
