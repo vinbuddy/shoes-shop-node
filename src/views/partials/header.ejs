@@ -84,7 +84,7 @@
         </nav>
 
         <div
-            class="text-base flex items-center gap-3 rounded-full py-1 ps-4 pe-3 backdrop-blur-sm bg-white border transition-all duration-300 ease-in"
+            class="relative text-base flex items-center gap-3 rounded-full py-1 ps-3 pe-2 backdrop-blur-sm bg-white border transition-all duration-300 ease-in"
         >
             <a id="search-icon" href="javascript:void(0);" class="text-2xl">
                 <i id="search-icon-inner" class="bx bx-search"></i>
@@ -98,28 +98,48 @@
                     >2</span
                 >
             </a>
-            <input id="search-input" class="hidden outline-none" placeholder="Search something" type="text" />
+            <input id="search-input" class="hidden outline-none" placeholder="Tìm kiếm sản phẩm" type="text" />
 
-            <a
-                id="sign-in-btn"
-                class="inline-block rounded-full px-3 py-1 text-sm bg-[#E4E4E7] text-black focus:outline-none focus:ring"
-                href="/auth/login"
-            >
-                Sign in
-            </a>
+            <% if (locals?.session?.customer) { %>
+                <div  class="group/customer relative">
+                    <img
+                        id="current-user-avatar"
+                        class="w-8 h-8 rounded-full cursor-pointer"
+                        src="<%= session.customer.avatar %>"
+                        alt="Rounded Avatar"
+                    />
+                    <div class="absolute overflow-hidden right-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 invisible transition-opacity duration-300 ease-in-out group-hover/customer:opacity-100 group-hover/customer:visible">
+                        <a href="/user/profile" class="flex items-center gap-2 px-4 py-2 text-neutral-600 hover:bg-gray-100">
+                            <i class='bx bx-user'></i>
+                            Trang cá nhân
+                        </a>
+                        <a href="/auth/logout" class="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-gray-100">
+                            <i class='bx bx-log-out'></i>
+                            Đăng xuất
+                        </a>
+                    </div>
+                </div>
+                
+            <% } %>
+
+            <% if (!locals?.session?.customer) { %>
+                <a
+                    id="sign-in-btn"
+                    class="inline-block rounded-full px-3 py-1 text-sm bg-[#E4E4E7] text-black focus:outline-none focus:ring"
+                    href="/auth/login"
+                >
+                    Đăng nhập
+                </a>
+            <% } %>
+             
             <button
                 id="search-btn"
-                class="hidden btn rounded-full px-3 py-1 text-sm bg-primary text-white focus:outline-none focus:ring"
+                class="hidden rounded-full px-3 py-1 text-sm bg-primary text-white focus:outline-none focus:ring"
             >
                 <i class="bx bx-search relative top-[1px]"></i>
-                <span>Search</span>
+                <span>Tìm</span>
             </button>
-            <!-- <img
-                id="current-user-avatar"
-                class="w-10 h-10 rounded-full cursor-pointer"
-                src="https://pagedone.io/asset/uploads/1704275541.png"
-                alt="Rounded Avatar"
-            /> -->
+            
         </div>
     </div>
 </header>

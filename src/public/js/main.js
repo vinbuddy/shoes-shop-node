@@ -30,7 +30,7 @@ searchIcon.addEventListener("click", () => {
         searchIconInner.classList.add("bx-search");
         cartIcon.classList.remove("hidden");
 
-        signInBtn.classList.remove("hidden");
+        if (signInBtn) signInBtn.classList.remove("hidden"); // Check if sign-in button exists
         searchBtn.classList.add("hidden");
 
         if (currentUserAvatar) currentUserAvatar.classList.remove("hidden");
@@ -39,11 +39,13 @@ searchIcon.addEventListener("click", () => {
         searchIconInner.classList.remove("bx-search");
         searchIconInner.classList.add("bx-left-arrow-alt");
         cartIcon.classList.add("hidden"); // Hide cart icon
-        signInBtn.classList.add("hidden");
-        if (currentUserAvatar) currentUserAvatar.classList.add("hidden");
+
+        if (signInBtn) signInBtn.classList.add("hidden"); // Check if sign-in button exists
+        if (currentUserAvatar) {
+            currentUserAvatar.classList.add("hidden"); // Hide avatar only if it exists
+        }
 
         searchInput.focus();
-
         searchBtn.classList.remove("hidden");
     }
 });

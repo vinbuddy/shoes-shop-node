@@ -1,7 +1,339 @@
+import otpGenerator from "otp-generator";
+import bcrypt from "bcrypt";
+import env from "dotenv";
+
+import CustomerModel from "../models/customer.model.js";
+import { getRedis } from "../utils/redis.js";
+import { sendEmail } from "../utils/mail.js";
+
+env.config();
+
+const VIEW_OPTIONS = {
+    REGISTER: {
+        layout: "./layouts/auth",
+        title: "Đăng ký",
+        googleLoginUrl: `${process.env.BASE_URL}/auth/google`,
+    },
+    LOGIN: {
+        layout: "./layouts/auth",
+        title: "Đăng nhập",
+        googleLoginUrl: `${process.env.BASE_URL}/auth/google`,
+    },
+    VERIFY_OTP: {
+        layout: "./layouts/auth",
+        title: "Xác thực OTP",
+    },
+    FORGOT_PASSWORD: {
+        layout: "./layouts/auth",
+        title: "Quên mật khẩu",
+    },
+    RESET_PASSWORD: {
+        layout: "./layouts/auth",
+        title: "Đặt lại mật khẩu",
+    },
+};
+
 export function renderLoginPage(req, res) {
-    return res.render("auth/login", { layout: "./layouts/auth" });
+    return res.render("auth/login", VIEW_OPTIONS.LOGIN);
 }
 
-export function renderRegisterPage(req, res) {
-    return res.render("auth/register", { layout: "./layouts/auth" });
+export async function renderRegisterPage(req, res) {
+    return res.render("auth/register", VIEW_OPTIONS.REGISTER);
+}
+
+export async function renderVerifyOTPPage(req, res) {
+    return res.render("auth/otp", VIEW_OPTIONS.VERIFY_OTP);
+}
+
+export async function renderForgotPasswordPage(req, res) {
+    return res.render("auth/forgot", VIEW_OPTIONS.FORGOT_PASSWORD);
+}
+
+//  HANDLERS
+export async function registerHandler(req, res) {
+    try {
+        const { email, password, username } = req.body;
+
+        const customer = await CustomerModel.findOne({
+            email: email,
+        });
+
+        // Check if email already exists, redirect to register page with error message
+        if (customer && customer.isVerified) {
+            throw new Error("Người dùng đã tồn tại.");
+        }
+
+        const redisClient = getRedis();
+
+        const existingOTP = await redisClient.get(email);
+
+        if (existingOTP) {
+            await redisClient.del(email);
+        }
+
+        const otp = otpGenerator.generate(6, {
+            digits: true,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false,
+        });
+
+        // Set OTP to Redis with 5 minutes expiration
+        await redisClient.setEx(email, 300, otp);
+
+        // Create new customer with isVerified: false
+        const newCustomer = new CustomerModel({
+            email,
+            password,
+            username,
+        });
+
+        await newCustomer.save();
+
+        await sendEmail(
+            process.env.EMAIL_APP_USER,
+            email,
+            "OTP for Shoes Shop",
+            `Your OTP is ${otp}. This OTP will expire in 5 minutes.`
+        );
+
+        return res.render("auth/otp", {
+            ...VIEW_OPTIONS.VERIFY_OTP,
+            email,
+            message: "OTP đã gửi đến email của bạn",
+        });
+    } catch (error) {
+        return res.render("auth/register", {
+            ...VIEW_OPTIONS.REGISTER,
+            error: error.message,
+        });
+    }
+}
+
+export async function verifyOTPHandler(req, res) {
+    const { email, otp } = req.body;
+
+    try {
+        if (!email) {
+            throw new Error("Email không có giá trị");
+        }
+
+        if (!otp) {
+            throw new Error("OTP không có giá trị");
+        }
+
+        const redisClient = getRedis();
+
+        const existingOTP = await redisClient.get(email);
+
+        if (!existingOTP) {
+            throw new Error("OTP không hợp lệ hoặc đã hết hạn.");
+        }
+
+        if (existingOTP !== otp) {
+            throw new Error("OTP không hợp lệ.");
+        }
+
+        // If OTP is correct, delete it from Redis
+        await redisClient.del(email);
+
+        // Update isVerified to true
+        await CustomerModel.updateOne({ email: email }, { isVerified: true });
+
+        // Create session
+        const customer = await CustomerModel.findOne({ email: email });
+        req.session.customer = customer;
+
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+
+        return res.redirect("/");
+    } catch (error) {
+        return res.render("auth/otp", {
+            ...VIEW_OPTIONS.VERIFY_OTP,
+            error: error.message,
+            email,
+        });
+    }
+}
+
+export async function logoutHandler(req, res) {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error destroying session:", err);
+            return res.redirect("/");
+        }
+
+        // Clear cookie
+        res.clearCookie("connect.sid"); // Clear the session cookie
+
+        return res.redirect("/auth/login");
+    });
+}
+
+export async function loginHandler(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        const customer = await CustomerModel.findOne({
+            email: email,
+        });
+
+        if (!customer) {
+            throw new Error("Người dùng không tồn tại.");
+        }
+
+        if (!customer.isVerified) {
+            throw new Error("Người dùng chưa xác thực.");
+        }
+
+        // Compare password with hashed password
+        const isMatch = await bcrypt.compare(password, customer.password);
+
+        if (!isMatch) {
+            throw new Error("Mật khẩu không chính xác.");
+        }
+
+        // Create session
+        req.session.customer = customer;
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+
+        return res.redirect("/");
+    } catch (error) {
+        return res.render("auth/login", {
+            ...VIEW_OPTIONS.LOGIN,
+            error: error.message,
+        });
+    }
+}
+
+const _generateToken = () => {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let token = "";
+    for (let i = 0; i < 32; i++) {
+        token += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return token;
+};
+
+export async function forgotPasswordHandler(req, res) {
+    try {
+        const { email } = req.body;
+
+        const user = await CustomerModel.findOne({ email });
+
+        if (!user) {
+            throw new Error("Email không tồn tại");
+        }
+
+        const token = _generateToken();
+        const redisClient = getRedis();
+
+        const tokenExpiry = 3600; // 1 hour
+
+        await redisClient.setEx(email, tokenExpiry, token);
+
+        const resetLink = `${req.protocol}://${req.get("host")}/auth/reset-password?token=${token}&email=${email}`;
+
+        await sendEmail(
+            process.env.EMAIL_APP_USER,
+            email,
+            "Reset Password",
+            `Bạn nhận được email này vì bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng nhấp vào đường dẫn sau để đặt lại mật khẩu: ${resetLink}`
+        );
+
+        return res.render("auth/forgot", { ...VIEW_OPTIONS.FORGOT_PASSWORD, message: "Email đã được gửi" });
+    } catch (error) {
+        return res.render("auth/forgot", { ...VIEW_OPTIONS.FORGOT_PASSWORD, error: error.message });
+    }
+}
+
+export async function renderResetPasswordPage(req, res) {
+    const { email, token } = req.query;
+
+    try {
+        const redisClient = getRedis();
+        const storedToken = await redisClient.get(email);
+
+        if (!storedToken) {
+            throw new Error("Token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        if (storedToken !== token) {
+            throw new Error("Token không hợp lệ.");
+        }
+
+        return res.render("auth/reset", { ...VIEW_OPTIONS.RESET_PASSWORD, token, email });
+    } catch (error) {
+        return res.render("auth/reset", { ...VIEW_OPTIONS.RESET_PASSWORD, token, email, error: error.message });
+    }
+}
+
+export async function resetPasswordHandler(req, res) {
+    const { email, password, token } = req.body;
+
+    try {
+        if (!email || !password || !token) {
+            throw new Error("Dữ liệu đầu vào không hợp lệ");
+        }
+
+        const redisClient = getRedis();
+        const storedToken = await redisClient.get(email);
+
+        if (!storedToken) {
+            return res.render("auth/reset", {
+                ...VIEW_OPTIONS.RESET_PASSWORD,
+                error: "Token không hợp lệ hoặc đã hết hạn.",
+                token,
+                email,
+            });
+        }
+
+        if (storedToken !== token) {
+            return res.render("auth/reset", {
+                ...VIEW_OPTIONS.RESET_PASSWORD,
+                error: "Token không hợp lệ.",
+                token,
+                email,
+            });
+        }
+
+        // Delete token from Redis
+        await redisClient.del(email);
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await CustomerModel.updateOne({ email }, { password: hashedPassword });
+
+        return res.redirect("/auth/login");
+    } catch (error) {
+        return res.render("auth/reset", { ...VIEW_OPTIONS.RESET_PASSWORD, error: error.message, token, email });
+    }
+}
+
+// Google
+export async function googleAuthCallbackHandler(req, res) {
+    try {
+        const customer = req.user;
+
+        req.session.customer = customer;
+
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+
+        return res.redirect("/");
+    } catch (error) {
+        res.render("auth/login", { ...VIEW_OPTIONS.LOGIN, error: error.message });
+    }
 }

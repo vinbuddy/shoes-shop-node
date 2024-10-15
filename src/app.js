@@ -7,6 +7,12 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 
 import router from "./routes/index.js";
+import session from "express-session";
+import RedisStore from "connect-redis";
+
+import { connectToRedis, getRedis } from "./utils/redis.js";
+import { initializeLoginWithGoogleService } from "./utils/google.js";
+import passport from "passport";
 
 const app = express();
 env.config();
@@ -27,21 +33,54 @@ app.set("layout extractScripts", true);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(router);
+const initializeSession = (redisClient) => {
+    app.use(
+        session({
+            store: new RedisStore({ client: redisClient }),
+            secret: process.env.SESSION_SECRET_KEY,
+            resave: false,
+            saveUninitialized: false,
+        })
+    );
+};
 
-app.get("/", (req, res) => {
-    res.render("index");
-});
-
-app.listen(PORT, async () => {
-    const uri = process.env.MONGODB_URI;
+(async () => {
     try {
-        await mongoose.connect(uri);
-        console.log(`Database connected 🚀`);
+        // Connect to Redis and initialize session
+        await connectToRedis();
+        const redisClient = getRedis();
+        initializeSession(redisClient);
 
-        console.log(`running on http://localhost:${PORT}`);
+        // Connect to MongoDB
+        const uri = process.env.MONGODB_URI;
+        await mongoose.connect(uri);
+
+        console.log("Database connected 🚀");
+
+        // Middleware to pass session to views
+        app.use((req, res, next) => {
+            res.locals.session = req.session;
+            next();
+        });
+
+        // Use routes after session is initialized
+        app.use(router);
+
+        // Initialize Google login
+        initializeLoginWithGoogleService();
+        app.use(passport.initialize());
+        app.use(passport.session());
+
+        app.get("/", (req, res) => {
+            res.render("index");
+        });
+
+        // Start the server
+        app.listen(PORT, () => {
+            console.log(`Running on http://localhost:${PORT}`);
+        });
     } catch (error) {
-        console.log("error: ", error.message);
+        console.log("Error:", error.message);
         process.exit(1);
     }
-});
+})();
