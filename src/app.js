@@ -11,6 +11,8 @@ import session from "express-session";
 import RedisStore from "connect-redis";
 
 import { connectToRedis, getRedis } from "./utils/redis.js";
+import { initializeLoginWithGoogleService } from "./utils/google.js";
+import passport from "passport";
 
 const app = express();
 env.config();
@@ -63,6 +65,11 @@ const initializeSession = (redisClient) => {
 
         // Use routes after session is initialized
         app.use(router);
+
+        // Initialize Google login
+        initializeLoginWithGoogleService();
+        app.use(passport.initialize());
+        app.use(passport.session());
 
         app.get("/", (req, res) => {
             res.render("index");

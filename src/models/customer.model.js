@@ -14,7 +14,8 @@ const customerSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
+            required: false,
+            default: null,
         },
         avatar: {
             type: String,
