@@ -32,6 +32,7 @@ export async function restoreBrand(req, res) {
         console.error("Error deleting brand:", error);
     }
 }
+
 export async function updateBrand(req, res) {
     try {
         const id = req.body.id;
