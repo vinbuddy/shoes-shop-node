@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
 
 const khachHangSchema = new mongoose.Schema({
     maKhachHang: {
-        type: String,
-        default: uuidv4,
+        type: mongoose.Schema.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId(),
         unique: true,
     },
     tenKhachHang: {
