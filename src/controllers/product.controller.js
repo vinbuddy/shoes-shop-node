@@ -23,20 +23,21 @@ export async function renderProductPage(req, res) {
 
     if (brand) {
         const brandIds = Array.isArray(brand) ? brand : [brand];
-        // const brandObjectIds = brandIds.map((id) => new mongoose.Types.ObjectId(id));
-        filters.maHangSanXuat = { $in: brandIds };
+        const brandObjectIds = brandIds.map((id) => new mongoose.Types.ObjectId(id));
+        filters.maHangSanXuat = { $in: brandObjectIds };
     }
 
     if (category) {
         const categoryIds = Array.isArray(category) ? category : [category];
-        // const categoryObjectIds = categoryIds.map((id) => new mongoose.Types.ObjectId(id));
-        filters.danhSachDanhMuc = { $in: categoryIds };
+        const categoryObjectIds = categoryIds.map((id) => new mongoose.Types.ObjectId(id));
+        console.log("Category IDs: ", categoryObjectIds);
+        filters.danhSachDanhMuc = { $in: categoryObjectIds };
     }
 
     if (size) {
         const sizeIds = Array.isArray(size) ? size : [size];
-        // const sizeObjectIds = sizeIds.map((id) => new mongoose.Types.ObjectId(id));
-        filters["danhSachKichCo.maKichCo"] = { $in: sizeIds };
+        const sizeObjectIds = sizeIds.map((id) => new mongoose.Types.ObjectId(id));
+        filters["danhSachKichCo.maKichCo"] = { $in: sizeObjectIds };
     }
 
     if (minPrice || maxPrice) {
@@ -68,6 +69,8 @@ export async function renderProductPage(req, res) {
         }
     }
 
+    console.log("Filters: ", filters);
+
     const products = await ProductModel.find(filters)
         .populate("maHangSanXuat")
         .populate("danhSachDanhMuc")
@@ -76,6 +79,7 @@ export async function renderProductPage(req, res) {
         .skip((page - 1) * pageSize);
 
     const totalProducts = await ProductModel.countDocuments(filters);
+    console.log("totalProducts: ", totalProducts);
 
     return res.render("product/index", {
         layout: "./layouts/main",

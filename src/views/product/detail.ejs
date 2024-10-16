@@ -4,7 +4,7 @@
         <div class="breadcrumbs text-sm mb-5">
             <ul>
                 <li><a href="/">Trang chủ</a></li>
-                <li><a href="/">Danh sách sản phẩm</a></li>
+                <li><a href="/product">Danh sách sản phẩm</a></li>
                 <li><%= product ? product.tenSanPham : "Unknown Name" %></li>
             </ul>
         </div>
@@ -24,28 +24,6 @@
                             </div>
                         <% }) 
                     } %>
-                        
-                    <!-- <div class="swiper-slide">
-                        <img
-                            class="object-cover h-full w-full rounded-2xl"
-                            src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b7d9211c-26e7-431a-ac24-b0540fb3c00f/AIR+FORCE+1+%2707.png"
-                            alt=""
-                        />
-                    </div>
-                    <div class="swiper-slide">
-                        <img
-                            class="object-cover h-full w-full rounded-2xl"
-                            src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/3cc96f43-47b6-43cb-951d-d8f73bb2f912/AIR+FORCE+1+%2707.png"
-                            alt=""
-                        />
-                    </div>
-                    <div class="swiper-slide">
-                        <img
-                            class="object-cover h-full w-full rounded-2xl"
-                            src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/ef92df87-6098-4fa5-bc88-7107492febcf/AIR+FORCE+1+%2707.png"
-                            alt=""
-                        />
-                    </div> -->
                 </div>
                 <div class="swiper-button-next"></div>
                 <div class="swiper-button-prev"></div>
@@ -57,7 +35,7 @@
                 
                 <p class="mt-2 text-gray-500"><%= product ? product.moTaSanPham : "Unknown Description" %></p>
 
-                <div class="mt-5">
+                <div class="mt-7">
                     <h2 class="text-lg font-semibold mb-2">Kích cỡ</h2>
                     <ul class="grid grid-cols-4 gap-3">
                         <% if (product && product.danhSachKichCo.length > 0) { %>
@@ -74,6 +52,21 @@
                     </ul>
                 </div>
 
+                <div class="mt-7">
+                    <h2 class="text-lg font-semibold mb-2">Chọn số lượng</h2>
+                    <div class="flex items-center h-[50px] text-neutral-700">
+                        <button class="w-[50px] h-full border rounded-tl-xl rounded-bl-xl decrease decrease-btn">
+                            <i class='bx bx-minus'></i>
+                        </button>
+                        <div class="inline-flex justify-center items-center w-[50px] h-full border-t border-b quantity-select-value">
+                            1
+                        </div>
+                        <button class="w-[50px] h-full border rounded-tr-xl rounded-br-xl increase increase-btn">
+                            <i class='bx bx-plus'></i>
+                        </button>
+                    </div>
+                </div>
+
                 <p class="mt-5">
                     <span class="text-lg font-semibold">Giá mua:</span> &nbsp;
                     <span class="text-xl font-bold text-primary ">
@@ -82,7 +75,7 @@
                 </p>
 
                 <div>
-                    <button class="mt-5 w-full bg-primary text-white py-3 rounded-full font-semibold">
+                    <button class="mt-7 w-full bg-primary text-white py-3 rounded-full font-semibold">
                         Thêm vào giỏ hàng
                     </button>
                 </div>
@@ -99,4 +92,27 @@
             prevEl: ".swiper-button-prev",
         },
     });
+</script>
+<script>
+    const increaseBtn = document.querySelectorAll('.increase-btn')
+    const decreaseBtn = document.querySelectorAll('.decrease-btn')
+    const selectedQuantity = document.querySelectorAll('.quantity-select-value')
+
+    increaseBtn.forEach(btn => {
+        btn.onclick = function () {
+            selectedQuantity.forEach(selectValue => {
+                selectValue.innerHTML++
+            })
+        }
+    })
+
+    decreaseBtn.forEach(btn => {
+        btn.onclick = function () {
+            selectedQuantity.forEach(selectValue => {
+                if (selectValue.innerHTML > 1) {
+                    selectValue.innerHTML--
+                }
+            })
+        }
+    })
 </script>
