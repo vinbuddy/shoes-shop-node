@@ -41,13 +41,13 @@ const sanPhamSchema = new mongoose.Schema({
     },
     maHangSanXuat: {
         type: String,
-        ref: "Brand",
+        ref: "HangSanXuat",
         required: true,
     },
     danhSachDanhMuc: [
         {
             type: String,
-            ref: "Category",
+            ref: "DanhMuc",
         },
     ],
     danhSachKichCo: [kichCoSanPham],

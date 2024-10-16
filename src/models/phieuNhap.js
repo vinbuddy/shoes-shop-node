@@ -34,8 +34,8 @@ const phieuNhapSchema = new mongoose.Schema({
         unique: true,
     },
     nhaCungCap: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Supplier",
+        type: String,
+        ref: "NhaCungCap",
         required: true,
     },
     ngayNhap: {
