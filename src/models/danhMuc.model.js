@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const danhMucSchema = new mongoose.Schema({
     maDanhMuc: {
-        type: String,
-        default: uuidv4,
+        type: mongoose.Schema.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId(),
         unique: true,
     },
     tenDanhMuc: {

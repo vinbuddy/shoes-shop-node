@@ -3,9 +3,10 @@ import CategoryModel from "../models/danhMuc.model.js";
 import ProductModel from "../models/sanPham.model.js";
 import SizeModel from "../models/kichCo.model.js";
 import { formatVNCurrency } from "../utils/format.js";
+import mongoose from "mongoose";
 
 export async function renderProductPage(req, res) {
-    const brands = await BrandModel.find(); // Change this line after merge code
+    const brands = await BrandModel.find({ trangThaiXoa: false }); // Change this line after merge code
     const categories = await CategoryModel.find({ trangThaiXoa: false });
     const sizes = await SizeModel.find();
 
@@ -91,17 +92,18 @@ export async function renderProductPage(req, res) {
     });
 }
 
-export function renderProductDetailPage(req, res) {
-    // get product id from request params
+export async function renderProductDetailPage(req, res) {
+    const productId = req.params.id;
 
-    // const productId = req.params.id;
-
-    const product = {};
+    const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(productId) }).populate({
+        path: "danhSachKichCo.maKichCo",
+    });
 
     return res.render("product/detail", {
         layout: "./layouts/main",
         page: "product-detail",
         title: "Product detail",
         product: product,
+        formatVNCurrency: formatVNCurrency,
     });
 }

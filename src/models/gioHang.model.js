@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const monHangSchema = new mongoose.Schema({
     maSanPham: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "SanPham",
         required: true,
     },
     kichCoSanPham: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "KichCo",
         required: true,
     },
@@ -25,8 +24,8 @@ const monHangSchema = new mongoose.Schema({
 
 const gioHangSchema = new mongoose.Schema({
     maGioHang: {
-        type: String,
-        default: uuidv4,
+        type: mongoose.Schema.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId(),
         unique: true,
     },
     maKhachHang: {

@@ -1,69 +1,31 @@
-<!-- <h1 class="text-primary">Detail product</h1>
-<% if (product) { %>
-<h2><%= product.name %></h2>
-<p><%= product.price %></p>
-<p><%= product.description %></p>
-<% } else { %>
-<p>Product not found</p>
-<% } %> -->
 <div class="container mt-[83px]">
     <div>
         <!-- Breadcumbs -->
-        <ol class="flex items-center whitespace-nowrap">
-            <li class="inline-flex items-center">
-                <a
-                    class="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:outline-none focus:text-blue-600"
-                    href="#"
-                >
-                    Home
-                </a>
-                <svg
-                    class="shrink-0 mx-2 size-4 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <path d="m9 18 6-6-6-6"></path>
-                </svg>
-            </li>
-            <li class="inline-flex items-center">
-                <a
-                    class="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:outline-none focus:text-blue-600"
-                    href="#"
-                >
-                    Products
-                    <svg
-                        class="shrink-0 mx-2 size-4 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                </a>
-            </li>
-            <li class="inline-flex items-center text-sm font-semibold text-gray-800 truncate" aria-current="page">
-                Nike Air Force 1 '07
-            </li>
-        </ol>
+        <div class="breadcrumbs text-sm mb-5">
+            <ul>
+                <li><a href="/">Trang chủ</a></li>
+                <li><a href="/">Danh sách sản phẩm</a></li>
+                <li><%= product ? product.tenSanPham : "Unknown Name" %></li>
+            </ul>
+        </div>
     </div>
     <div class="grid grid-cols-12 mt-5 gap-10">
         <section class="col-span-7">
             <div class="swiper swiper-product-images [&_.swiper-slide]:rounded-2xl">
                 <div class="swiper-wrapper h-[500px]">
-                    <div class="swiper-slide">
+                    <% if (product && product.danhSachHinhAnh.length > 0) { %>
+                        <% product.danhSachHinhAnh.forEach((image, index) => { %>
+                            <div class="swiper-slide">
+                                <img
+                                    class="object-cover h-full w-full rounded-2xl"
+                                    src="<%= image %>"
+                                    alt=""
+                                />
+                            </div>
+                        <% }) 
+                    } %>
+                        
+                    <!-- <div class="swiper-slide">
                         <img
                             class="object-cover h-full w-full rounded-2xl"
                             src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b7d9211c-26e7-431a-ac24-b0540fb3c00f/AIR+FORCE+1+%2707.png"
@@ -83,7 +45,7 @@
                             src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/ef92df87-6098-4fa5-bc88-7107492febcf/AIR+FORCE+1+%2707.png"
                             alt=""
                         />
-                    </div>
+                    </div> -->
                 </div>
                 <div class="swiper-button-next"></div>
                 <div class="swiper-button-prev"></div>
@@ -91,30 +53,37 @@
         </section>
         <section class="col-span-5">
             <div>
-                <h1 class="text-2xl font-bold">Nike Air Force 1 '07</h1>
-                <p class="text-xl font-semibold text-primary mt-2">$90.00</p>
-
-                <p class="mt-2 text-gray-500">
-                    The radiance lives on in the Nike Air Force 1 '07, the b-ball OG that puts a fresh spin on what you
-                    know best: crisp leather, bold colors and the perfect amount of flash to make you shine. This
-                    iteration features a mix of leather and synthetic materials for added texture and durability.
-                </p>
+                <h1 class="text-3xl font-bold"><%= product ? product.tenSanPham : "Unknown Name" %></h1>
+                
+                <p class="mt-2 text-gray-500"><%= product ? product.moTaSanPham : "Unknown Description" %></p>
 
                 <div class="mt-5">
-                    <h2 class="text-lg font-semibold mb-2">Select size</h2>
-                    <ul class="grid grid-cols-5 gap-3">
-                        <li class="text-center border p-2 rounded-lg">EU 40</li>
-                        <li class="text-center border p-2 rounded-lg">EU 41</li>
-                        <li class="text-center border p-2 rounded-lg">EU 42</li>
-                        <li class="text-center border p-2 rounded-lg">EU 43</li>
-                        <li class="text-center border p-2 rounded-lg">EU 44</li>
-                        <li class="text-center border p-2 rounded-lg">EU 45</li>
+                    <h2 class="text-lg font-semibold mb-2">Kích cỡ</h2>
+                    <ul class="grid grid-cols-4 gap-3">
+                        <% if (product && product.danhSachKichCo.length > 0) { %>
+                            <% product.danhSachKichCo.forEach((size, index) => { %>
+                                <li class="text-center border p-2 rounded-xl">
+                                    <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
+
+                                    <span>
+                                        <%= formatVNCurrency(size.giaKichCo) %>
+                                    </span>
+                                </li>
+                            <% }) 
+                        } %>
                     </ul>
                 </div>
 
+                <p class="mt-5">
+                    <span class="text-lg font-semibold">Giá mua:</span> &nbsp;
+                    <span class="text-xl font-bold text-primary ">
+                        9.000.000 đ
+                    </span>
+                </p>
+
                 <div>
                     <button class="mt-5 w-full bg-primary text-white py-3 rounded-full font-semibold">
-                        Add to cart
+                        Thêm vào giỏ hàng
                     </button>
                 </div>
             </div>

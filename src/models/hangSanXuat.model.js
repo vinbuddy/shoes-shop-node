@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 const hangSanXuatSchema = new mongoose.Schema({
     maHangSanXuat: {
-        type: String,
-        default: uuidv4,
+        type: mongoose.Schema.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId(),
         unique: true,
     },
     tenHangSanXuat: {
