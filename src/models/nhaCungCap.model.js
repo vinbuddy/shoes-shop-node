@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
-const nhaSanXuatSchema = new mongoose.Schema({
+const NhaCungCapSchema = new mongoose.Schema({
     maNhaCungCap: {
         type: String,
         default: uuidv4,
@@ -33,6 +33,6 @@ const nhaSanXuatSchema = new mongoose.Schema({
     },
 });
 
-const NhaSanXuatModel = mongoose.model("NhaSanXuat", nhaSanXuatSchema);
+const NhaSanXuatModel = mongoose.model("NhaCungCap", NhaCungCapSchema);
 
 export default NhaSanXuatModel;

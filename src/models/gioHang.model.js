@@ -42,6 +42,6 @@ const gioHangSchema = new mongoose.Schema({
     },
 });
 
-const CartModel = mongoose.model("GioHang", gioHangSchema);
+const GioHangModel = mongoose.model("GioHang", gioHangSchema);
 
-export default CartModel;
+export default GioHangModel;

@@ -78,6 +78,11 @@ const donHangSchema = new mongoose.Schema({
         ref: "KhachHang",
         default: null,
     },
+    maNguoiTao: {
+        type: String,
+        ref: "NguoiDung",
+        required: true,
+    },
     chiTiet: [chiTietDonHangSchema],
     thongTinGiaoHang: thongTinGiaoHangSchema,
     tongTienThanhToan: {
