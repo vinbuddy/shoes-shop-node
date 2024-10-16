@@ -2,7 +2,7 @@ import otpGenerator from "otp-generator";
 import bcrypt from "bcrypt";
 import env from "dotenv";
 
-import CustomerModel from "../models/customer.model.js";
+import KhachHangModel from "../models/khachHang.model.js";
 import { getRedis } from "../utils/redis.js";
 import { sendEmail } from "../utils/mail.js";
 
@@ -54,12 +54,12 @@ export async function registerHandler(req, res) {
     try {
         const { email, password, username } = req.body;
 
-        const customer = await CustomerModel.findOne({
+        const customer = await KhachHangModel.findOne({
             email: email,
         });
 
         // Check if email already exists, redirect to register page with error message
-        if (customer && customer.isVerified) {
+        if (customer && customer.trangThaiXacThuc) {
             throw new Error("Người dùng đã tồn tại.");
         }
 
@@ -82,10 +82,10 @@ export async function registerHandler(req, res) {
         await redisClient.setEx(email, 300, otp);
 
         // Create new customer with isVerified: false
-        const newCustomer = new CustomerModel({
+        const newCustomer = new KhachHangModel({
             email,
-            password,
-            username,
+            matKhau: password,
+            tenKhachHang: username,
         });
 
         await newCustomer.save();
@@ -138,10 +138,10 @@ export async function verifyOTPHandler(req, res) {
         await redisClient.del(email);
 
         // Update isVerified to true
-        await CustomerModel.updateOne({ email: email }, { isVerified: true });
+        await KhachHangModel.updateOne({ email: email }, { trangThaiXacThuc: true });
 
         // Create session
-        const customer = await CustomerModel.findOne({ email: email });
+        const customer = await KhachHangModel.findOne({ email: email });
         req.session.customer = customer;
 
         req.session.save((err) => {
@@ -178,7 +178,7 @@ export async function loginHandler(req, res) {
     try {
         const { email, password } = req.body;
 
-        const customer = await CustomerModel.findOne({
+        const customer = await KhachHangModel.findOne({
             email: email,
         });
 
@@ -191,7 +191,7 @@ export async function loginHandler(req, res) {
         }
 
         // Compare password with hashed password
-        const isMatch = await bcrypt.compare(password, customer.password);
+        const isMatch = await bcrypt.compare(password, customer.matKhau);
 
         if (!isMatch) {
             throw new Error("Mật khẩu không chính xác.");
@@ -227,7 +227,7 @@ export async function forgotPasswordHandler(req, res) {
     try {
         const { email } = req.body;
 
-        const user = await CustomerModel.findOne({ email });
+        const user = await KhachHangModel.findOne({ email });
 
         if (!user) {
             throw new Error("Email không tồn tại");
@@ -311,7 +311,7 @@ export async function resetPasswordHandler(req, res) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        await CustomerModel.updateOne({ email }, { password: hashedPassword });
+        await KhachHangModel.updateOne({ email }, { matKhau: hashedPassword });
 
         return res.redirect("/auth/login");
     } catch (error) {

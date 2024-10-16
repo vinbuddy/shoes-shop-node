@@ -1,4 +1,4 @@
-import BrandModel from "../models/brand.model.js";
+import BrandModel from "../models/kichCo.model.js";
 
 export async function renderBrandPage(req, res) {
     try {

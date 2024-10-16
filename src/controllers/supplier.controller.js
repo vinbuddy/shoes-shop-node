@@ -1,4 +1,4 @@
-import SupplierModel from "../models/supplier.model.js";
+import SupplierModel from "../models/nhaCungCap.model.js";
 
 export async function deleteSupplier(req, res) {
     try {

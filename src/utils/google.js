@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy } from "passport-google-oauth20";
-import CustomerModel from "../models/customer.model.js";
+import KhachHangModel from "../models/khachHang.model.js";
 
 import env from "dotenv";
 env.config();
@@ -15,7 +15,7 @@ export function initializeLoginWithGoogleService() {
             },
             async (accessToken, refreshToken, profile, done) => {
                 try {
-                    const customerFound = await CustomerModel.findOne({
+                    const customerFound = await KhachHangModel.findOne({
                         email: profile.emails?.[0].value,
                     }).lean();
 
@@ -28,7 +28,7 @@ export function initializeLoginWithGoogleService() {
 
                     // Login and update googleId
                     if (customerFound && !customerFound.googleId) {
-                        const user = await CustomerModel.findByIdAndUpdate(
+                        const user = await KhachHangModel.findByIdAndUpdate(
                             customerFound._id,
                             {
                                 googleId: profile.id,
@@ -41,11 +41,11 @@ export function initializeLoginWithGoogleService() {
 
                     // Register new user
                     if (!customerFound) {
-                        const customer = await CustomerModel.create({
+                        const customer = await KhachHangModel.create({
                             googleId: profile.id,
-                            username: profile.displayName,
+                            tenKhachHang: profile.displayName,
                             email: profile.emails?.[0].value,
-                            avatar: profile.photos?.[0].value,
+                            anhDaiDien: profile.photos?.[0].value,
                         });
 
                         done(null, customer);
