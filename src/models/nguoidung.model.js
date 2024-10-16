@@ -1,39 +1,40 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
-const userSchema = new mongoose.Schema(
-    {
-        username: {
-            type: String,
-            required: true,
-        },
-        email: {
-            type: String,
-            required: false,
-            default: null,
-        },
-        password: {
-            type: String,
-            required: true,
-        },
-        avatar: {
-            type: String,
-            default:
-                "https://res.cloudinary.com/dtbhvc4p4/image/upload/v1720978549/profile/344060599-e8733bc3-ac77-42c6-b036-b9f1fb31b21c_hlh6by.png",
-        },
-        role: {
-            type: Schema.Types.ObjectId,
-            ref: "Role",
-        },
-        isDeleted: {
-            type: Boolean,
-            default: false,
-        },
+const nguoiDungSchema = new mongoose.Schema({
+    maNguoiDung: {
+        type: String,
+        default: uuidv4,
+        unique: true,
     },
-    {
-        timestamps: true,
-    }
-);
+    tenNguoiDung: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: false,
+        default: null,
+    },
+    matKhau: {
+        type: String,
+        required: true,
+    },
+    anhDaiDien: {
+        type: String,
+        default:
+            "https://res.cloudinary.com/dtbhvc4p4/image/upload/v1720978549/profile/344060599-e8733bc3-ac77-42c6-b036-b9f1fb31b21c_hlh6by.png",
+    },
+    maVaiTro: {
+        type: String,
+        ref: "VaiTro",
+    },
+    trangThaiXoa: {
+        type: Boolean,
+        default: false,
+    },
+});
 
-const UserModel = mongoose.model("User", userSchema);
+const NguoiDungModel = mongoose.model("NguoiDung", nguoiDungSchema);
 
-export default UserModel;
+export default NguoiDungModel;
