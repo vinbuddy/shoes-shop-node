@@ -111,3 +111,25 @@ export async function renderProductDetailPage(req, res) {
         formatVNCurrency: formatVNCurrency,
     });
 }
+
+// ADMIN PAGE
+export async function renderAdminProductPage(req, res) {
+    return res.render("admin/product/index", {
+        layout: "./layouts/admin",
+        page: "product",
+        title: "Danh sách sản phẩm",
+    });
+}
+
+export async function renderAdminCreateProductPage(req, res) {
+    const brands = await BrandModel.find({ trangThaiXoa: false });
+    const categories = await CategoryModel.find({ trangThaiXoa: false });
+
+    return res.render("admin/product/create", {
+        layout: "./layouts/admin",
+        page: "product",
+        title: "Thêm sản phẩm",
+        brands: brands,
+        categories: categories,
+    });
+}
