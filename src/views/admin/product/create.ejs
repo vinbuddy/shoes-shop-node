@@ -1,10 +1,19 @@
 <div>
+   <% if (locals.error)  { %>
+    <div role="alert" class="alert alert-error text-white mb-5">
+        <i class='bx bxs-error-circle'></i>
+        <span>
+            <%= error %>
+        </span>
+    </div>
+    <% } %>
+
     <div class="flex justify-between items-center mb-5">
         <h3 class="text-xl font-bold mb-5">Thêm mới sản phẩm</h3>
     </div>
 
     <div>
-        <form id="create-product-form" action="">
+        <form id="create-product-form" action="/admin/product/create" method="post" enctype="multipart/form-data">
             <div class="grid grid-cols-12 gap-5">
                 <div class="col-span-8">
                     <section>
@@ -12,7 +21,7 @@
                             <div class="label">
                                 <span class="label-text">Nhập tên sản phẩm</span>
                             </div>
-                            <input id="name" type="text" class="input input-bordered w-full max-w-full" />
+                            <input id="name" name="name" type="text" class="input input-bordered w-full max-w-full" />
                         </label>
                     </section>
                 </div>
@@ -64,9 +73,28 @@
             </section>
 
             <section class="mt-10">
-                <p class="mb-5">Chọn hình ảnh</p>
-                <ul id="upload-images" class="grid grid-cols-4 gap-5">
-                    <input id="product-image-files" hidden type="file" accept="image/png, image/jpeg" multiple />
+                <p class="mb-5">Chọn hình ảnh đại diện</p>
+                <ul id="uploadImageThumnail" class="grid grid-cols-4 gap-5">
+                    <input id="product-image-thumbnail" name="productImageThumbnail" hidden type="file" accept="image/png, image/jpeg" />
+                    <label
+                        for="product-image-thumbnail"
+                        class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
+                    >
+                        <div>
+                            <div class="btn bg-primary text-white hover:bg-primary btn-circle mb-5 mx-auto text-xl">
+                                <i class="bx bx-plus"></i>
+                            </div>
+
+                            <p class="text-primary">Thêm hình ảnh</p>
+                        </div>
+                    </label>
+                </ul>
+            </section>
+
+            <section class="mt-10">
+                <p class="mb-5">Chọn danh sách hình ảnh</p>
+                <ul id="uploadImages" class="grid grid-cols-4 gap-5">
+                    <input id="product-image-files" name="productImageFiles" hidden type="file" accept="image/png, image/jpeg" multiple />
                     <label
                         for="product-image-files"
                         class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
@@ -94,7 +122,6 @@
 <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
 <script>
     const validation = new JustValidate("#create-product-form");
-
     validation
         .addField("#name", [
             {
@@ -115,17 +142,31 @@
         ]);
 
     validation.onSuccess((event) => {
+        if (productImageInputFiles.files.length === 0) {
+            alert("Vui lòng chọn ít nhất một hình ảnh sản phẩm");
+            return;
+        }
         event.target.submit(); // Gửi form khi không có lỗi
     });
 </script>
 
 <script>
     const productImageInputFiles = document.getElementById("product-image-files");
-    const productImageUploads = document.getElementById("upload-images");
+    const productImageUploads = document.getElementById("uploadImages");
+
+    const productImageThumbnailInputFile = document.getElementById("product-image-thumbnail");
+    const productImageThumbnailUpload = document.getElementById("uploadImageThumnail");
 
     const fileListTransfer = new DataTransfer();
 
     const renderImageFiles = (files) => {
+        
+        const lis = productImageUploads.querySelectorAll("li");
+        
+        lis.forEach(li => {
+            li.remove();
+        });
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const reader = new FileReader();
@@ -140,7 +181,7 @@
                         <div class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
                             <img src="${e.target.result}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
                         </div>
-                        <button type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                        <button data-index="${i}" type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
                             <i class="bx bx-x"></i>
                         </button>
                     </div>
@@ -148,13 +189,16 @@
 
                 productImageUploads.appendChild(li);
 
-                li.querySelector(".btn-remove-preview-image").addEventListener("click", (event) => {
-                    const index = Array.from(productImageUploads.children).indexOf(li);
-                    fileListTransfer.items.remove(index); // Xóa file khỏi DataTransfer
-                    li.remove(); // Xóa hình ảnh khỏi giao diện
+                const removeBtns = li.querySelectorAll(".btn-remove-preview-image");
+                removeBtns.forEach((btn) => {
+                    btn.addEventListener("click", function(event) {
+                        const removeIndex = parseInt(this.getAttribute("data-index"));
 
-                    // Cập nhật lại input với các file còn lại
-                    productImageInputFiles.files = fileListTransfer.files;
+                        fileListTransfer.items.remove(removeIndex);
+                        li.remove();
+
+                        productImageInputFiles.files = fileListTransfer.files;
+                    });
                 });
             };
 
@@ -171,6 +215,52 @@
 
         productImageInputFiles.files = fileListTransfer.files;
 
-        renderImageFiles(files);
+        renderImageFiles(productImageInputFiles.files);
     });
-</script>
+
+
+    productImageThumbnailInputFile.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const url = URL.createObjectURL(file);
+
+        const lis = productImageThumbnailUpload.querySelectorAll("li");
+        
+        lis.forEach(li => {
+            li.remove();
+        });
+
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <div class="preview-image relative group border rounded-2xl">
+                <div class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                    <img src="${url}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
+                </div>
+                <button data-url="${url}" type="button" class="btn-remove-thumbnail-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        `;
+
+        productImageThumbnailUpload.appendChild(li);
+
+        const removeBtn = li.querySelector(".btn-remove-thumbnail-image");
+
+        removeBtn.addEventListener("click", function(event) {
+            const url = this.getAttribute("data-url");
+            console.log("url: ", url);
+
+            URL.revokeObjectURL(url);
+
+            this.closest("li").remove();
+
+            productImageThumbnailInputFile.value = null;
+        })
+        
+    })
+</script> 

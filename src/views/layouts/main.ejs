@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
     <head>
         <meta charset="UTF-8" />
@@ -6,7 +6,7 @@
         <title><%= typeof title !== 'undefined' ? title : 'Default Title' %></title>
 
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.13/dist/full.min.css" rel="stylesheet" type="text/css" />
-        <%- include("../partials/import-meta.ejs", { page: page }) %> <%- include('../partials/tailwind-config.ejs') %>
+        <%- include("../partials/import-meta.ejs") %> <%- include('../partials/tailwind-config.ejs') %>
     </head>
     <body>
         <%- include('../partials/header.ejs') %>

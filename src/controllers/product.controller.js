@@ -4,9 +4,29 @@ import ProductModel from "../models/sanPham.model.js";
 import SizeModel from "../models/kichCo.model.js";
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
+
+const VIEW_OPTIONS = {
+    ADMIN_CREATE: {
+        layout: "./layouts/admin",
+        title: "Thêm sản phẩm",
+    },
+    ADMIN_LIST: {
+        layout: "./layouts/admin",
+        title: "Danh sách sản phẩm",
+    },
+    PRODUCT_DETAIL: {
+        layout: "./layouts/main",
+        title: "Product detail",
+    },
+    PRODUCT_LIST: {
+        layout: "./layouts/main",
+        title: "Danh sách sản phẩm",
+    },
+};
 
 export async function renderProductPage(req, res) {
-    const brands = await BrandModel.find({ trangThaiXoa: false }); // Change this line after merge code
+    const brands = await BrandModel.find({ trangThaiXoa: false });
     const categories = await CategoryModel.find({ trangThaiXoa: false });
     const sizes = await SizeModel.find();
 
@@ -30,7 +50,6 @@ export async function renderProductPage(req, res) {
     if (category) {
         const categoryIds = Array.isArray(category) ? category : [category];
         const categoryObjectIds = categoryIds.map((id) => new mongoose.Types.ObjectId(id));
-        console.log("Category IDs: ", categoryObjectIds);
         filters.danhSachDanhMuc = { $in: categoryObjectIds };
     }
 
@@ -69,8 +88,6 @@ export async function renderProductPage(req, res) {
         }
     }
 
-    console.log("Filters: ", filters);
-
     const products = await ProductModel.find(filters)
         .populate("maHangSanXuat")
         .populate("danhSachDanhMuc")
@@ -79,12 +96,9 @@ export async function renderProductPage(req, res) {
         .skip((page - 1) * pageSize);
 
     const totalProducts = await ProductModel.countDocuments(filters);
-    console.log("totalProducts: ", totalProducts);
 
     return res.render("product/index", {
-        layout: "./layouts/main",
-        page: "product",
-        title: "Danh sách sản phẩm",
+        ...VIEW_OPTIONS.PRODUCT_LIST,
         brands: brands,
         categories: categories,
         sizes: sizes,
@@ -104,9 +118,7 @@ export async function renderProductDetailPage(req, res) {
     });
 
     return res.render("product/detail", {
-        layout: "./layouts/main",
-        page: "product-detail",
-        title: "Product detail",
+        ...VIEW_OPTIONS.PRODUCT_DETAIL,
         product: product,
         formatVNCurrency: formatVNCurrency,
     });
@@ -114,10 +126,23 @@ export async function renderProductDetailPage(req, res) {
 
 // ADMIN PAGE
 export async function renderAdminProductPage(req, res) {
+    const { page = 1 } = req.query;
+    const pageSize = 10;
+
+    const products = await ProductModel.find({ trangThaiXoa: false })
+        .populate("maHangSanXuat")
+        .populate("danhSachDanhMuc")
+        .limit(pageSize)
+        .skip((page - 1) * pageSize);
+
+    const totalProducts = await ProductModel.countDocuments({ trangThaiXoa: false });
+
     return res.render("admin/product/index", {
-        layout: "./layouts/admin",
-        page: "product",
-        title: "Danh sách sản phẩm",
+        ...VIEW_OPTIONS.ADMIN_LIST,
+        products: products,
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / pageSize),
+        filters: req.query,
     });
 }
 
@@ -126,10 +151,73 @@ export async function renderAdminCreateProductPage(req, res) {
     const categories = await CategoryModel.find({ trangThaiXoa: false });
 
     return res.render("admin/product/create", {
-        layout: "./layouts/admin",
-        page: "product",
-        title: "Thêm sản phẩm",
+        ...VIEW_OPTIONS.ADMIN_CREATE,
         brands: brands,
         categories: categories,
     });
+}
+
+export async function createProductHandler(req, res) {
+    try {
+        const { name, brand, category, description } = req.body;
+
+        // Check duplicate product name
+        const existingProduct = await ProductModel.findOne({ tenSanPham: name });
+
+        if (existingProduct) {
+            throw new Error("Tên sản phẩm đã tồn tại");
+        }
+
+        const files = req.files;
+
+        const productImageFiles = files["productImageFiles"];
+        const thumbnailImageFile = files["productImageThumbnail"];
+        let uploadedFiles = [];
+        let thumbnailUrl = null;
+
+        if (productImageFiles && productImageFiles.length > 0) {
+            const uploadPromises = productImageFiles.map((file) => {
+                let uploadPromise = uploadToCloudinary(file, "products");
+                return uploadPromise;
+            });
+            uploadedFiles = await Promise.all(uploadPromises);
+        }
+
+        if (thumbnailImageFile && thumbnailImageFile.length > 0) {
+            const thumbnailUpload = await uploadToCloudinary(thumbnailImageFile[0], "thumbnails");
+            thumbnailUrl = thumbnailUpload.url;
+        }
+
+        const categoryIds = Array.isArray(category) ? category : [category];
+        const categoryObjectIds = categoryIds.map((id) => new mongoose.Types.ObjectId(id));
+
+        const brandObjectId = new mongoose.Types.ObjectId(brand);
+
+        const product = new ProductModel({
+            tenSanPham: name,
+            maHangSanXuat: brandObjectId,
+            danhSachDanhMuc: categoryObjectIds,
+            moTaSanPham: description,
+            danhSachHinhAnh: uploadedFiles.map((file) => file.url),
+            hinhAnhDaiDien: thumbnailUrl,
+        });
+
+        await product.save();
+
+        await ProductModel.updateOne(
+            { _id: product._id },
+            {
+                $set: {
+                    maSanPham: product._id,
+                },
+            }
+        );
+
+        return res.redirect("/admin/product");
+    } catch (error) {
+        return res.render("admin/product/create", {
+            ...VIEW_OPTIONS.ADMIN_CREATE,
+            error: error.message,
+        });
+    }
 }

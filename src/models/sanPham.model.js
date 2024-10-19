@@ -28,6 +28,10 @@ const sanPhamSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    hinhAnhDaiDien: {
+        type: String,
+        default: null,
+    },
     danhSachHinhAnh: [
         {
             type: String,

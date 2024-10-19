@@ -1,4 +1,12 @@
 <div>
+    <% if (locals.message)  { %>
+        <div role="alert" class="alert alert-success text-white mb-5">
+            <i class='bx bx-check-circle'></i>
+            <span>
+                <%= message %>
+            </span>
+        </div>
+        <% } %>
     <div class="flex justify-between items-center mb-5">
         <h3 class="text-xl font-bold mb-5">Danh sách sản phẩm</h3>
 
@@ -21,131 +29,77 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- row 1 -->
-                <tr>
-                    <td>1</td>
-                    <td>
-                        <div class="flex items-center gap-3">
-                            <div class="avatar">
-                                <div class="mask mask-squircle h-12 w-12">
-                                    <img
-                                        src="https://img.daisyui.com/images/profile/demo/2@94.webp"
-                                        alt="Avatar Tailwind CSS Component"
-                                    />
+                <% products && products.forEach(product => { %>
+                    <tr>
+                        <td><%= product.maSanPham %></td>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="avatar">
+                                    <div class="mask mask-squircle h-12 w-12">
+                                        <img
+                                            src="<%= product.hinhAnhDaiDien || '/images/no-result.png' %>"
+                                            alt="<%= product.tenSanPham %>"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-semibold"><%= product.tenSanPham %></div>
+                                    <div class="text-sm opacity-50"><%= product.moTaSanPham.substring(0, 50) %>...</div> <!-- Show a short description -->
                                 </div>
                             </div>
-                            <div>
-                                <div class="font-bold">Hart Hagerty</div>
-                                <div class="text-sm opacity-50">United States</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        Zemlak, Daniel and Leannon
-                        <br />
-                        <span class="badge badge-ghost badge-sm">Desktop Support Technician</span>
-                    </td>
-                    <td>Purple</td>
-                    <th class="flex items-center gap-3">
-                        <button class="btn btn-ghost btn-sm">
-                            <i class="bx bx-detail"></i>
-                        </button>
-                        <button class="btn btn-ghost btn-sm">
-                            <i class="bx bx-edit"></i>
-                        </button>
-                        <button class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm">
-                            <i class="bx bx-trash"></i>
-                        </button>
-                    </th>
-                </tr>
-                <!-- row 2 -->
-                <tr>
-                    <td>1</td>
-                    <td>
-                        <div class="flex items-center gap-3">
-                            <div class="avatar">
-                                <div class="mask mask-squircle h-12 w-12">
-                                    <img
-                                        src="https://img.daisyui.com/images/profile/demo/3@94.webp"
-                                        alt="Avatar Tailwind CSS Component"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <div class="font-bold">Brice Swyre</div>
-                                <div class="text-sm opacity-50">China</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        Carroll Group
-                        <br />
-                        <span class="badge badge-ghost badge-sm">Tax Accountant</span>
-                    </td>
-                    <td>Red</td>
-                    <th>
-                        <button class="btn btn-ghost btn-xs">details</button>
-                    </th>
-                </tr>
-                <!-- row 3 -->
-                <tr>
-                    <td>1</td>
-                    <td>
-                        <div class="flex items-center gap-3">
-                            <div class="avatar">
-                                <div class="mask mask-squircle h-12 w-12">
-                                    <img
-                                        src="https://img.daisyui.com/images/profile/demo/4@94.webp"
-                                        alt="Avatar Tailwind CSS Component"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <div class="font-bold">Marjy Ferencz</div>
-                                <div class="text-sm opacity-50">Russia</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        Rowe-Schoen
-                        <br />
-                        <span class="badge badge-ghost badge-sm">Office Assistant I</span>
-                    </td>
-                    <td>Crimson</td>
-                    <th>
-                        <button class="btn btn-ghost btn-xs">details</button>
-                    </th>
-                </tr>
-                <!-- row 4 -->
-                <tr>
-                    <td>1</td>
-                    <td>
-                        <div class="flex items-center gap-3">
-                            <div class="avatar">
-                                <div class="mask mask-squircle h-12 w-12">
-                                    <img
-                                        src="https://img.daisyui.com/images/profile/demo/5@94.webp"
-                                        alt="Avatar Tailwind CSS Component"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <div class="font-bold">Yancy Tear</div>
-                                <div class="text-sm opacity-50">Brazil</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        Wyman-Ledner
-                        <br />
-                        <span class="badge badge-ghost badge-sm">Community Outreach Specialist</span>
-                    </td>
-                    <td>Indigo</td>
-                    <th>
-                        <button class="btn btn-ghost btn-xs">details</button>
-                    </th>
-                </tr>
+                        </td>
+                        <td><%= product.maHangSanXuat.tenHangSanXuat %></td>
+                        <td>
+                            <% product.danhSachDanhMuc.forEach(category => { %>
+                                <span class="badge badge-ghost badge-sm"><%= category.tenDanhMuc %></span>
+                            <% }) %>
+                        </td>
+                        <th class="flex items-center gap-3">
+                            <a href="/admin/product/details/<%= product.maSanPham %>" class="btn btn-ghost btn-sm">
+                                <i class="bx bx-detail"></i>
+                            </a>
+                            <a href="/admin/product/edit/<%= product.maSanPham %>" class="btn btn-ghost btn-sm">
+                                <i class="bx bx-edit"></i>
+                            </a>
+                            <form action="/admin/product/delete/<%= product.maSanPham %>" method="POST" class="inline">
+                                <button type="submit" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </form>
+                        </th>
+                    </tr>
+                <% }) %>
+                
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+        <nav class="mt-10 flex justify-center">
+            <ul class="list-style-none flex">
+                <li>
+                    <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                    
+                    <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                        class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                        Trang trước
+                     </a>
+                </li>
+                
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                       class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                        <%= i %>
+                    </a>
+                <% } %>
+               
+                <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                    class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                     Trang sau
+                 </a>
+            </ul>
+        </nav>
+    <% } %>
 </div>
