@@ -172,9 +172,9 @@
                 selectedSizeQuantity = Number(item.getAttribute('data-sizeQuantity'))
                 selectedSizePrice = Number(item.getAttribute('data-sizePrice'))
                 selectedSizeId = item.getAttribute('data-sizeId')
-
+                
                 renderSizePrice(Number(selectedQuantity[0].innerHTML));
-
+                
                 // Remove disabled attribute from button
                 addToCartBtn.removeAttribute('disabled')
             })
@@ -219,17 +219,24 @@
                       duration: 3000, 
                       gravity: "bottom", 
                       position: "right",
-                      backgroundColor: "#45D483", 
-                      close: true, 
+                      style: {
+                        background: "#45D483"
+                      },
+                      close: false, 
                     }).showToast();
+
+                    // Reset quantity to 1
+                    selectedQuantity.forEach(selectValue => {
+                        selectValue.innerHTML = 1
+                    })
                 } else {
                     Toastify({
                       text: "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng!",
                       duration: 3000,
                       gravity: "bottom",
                       position: "right",
-                      backgroundColor: "#F54180", 
                       style: {
+                        background: "#F54180", 
                         color: "#FFFFFF" 
                       },
                       close: false,
@@ -243,8 +250,8 @@
                   duration: 3000,
                   gravity: "bottom",
                   position: "right",
-                  backgroundColor: "#F54180", 
                   style: {
+                    background: "#F54180", 
                     color: "#FFFFFF" // Màu chữ trắng
                   },
                   close: false,
