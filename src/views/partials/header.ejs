@@ -95,7 +95,7 @@
 
                 <span
                     class="absolute top-[-10px] right-[-10px] flex justify-center items-center bg-danger text-white rounded-full text-sm size-5"
-                    >2</span
+                    >0</span
                 >
             </a>
             <input id="search-input" class="hidden outline-none" placeholder="Tìm kiếm sản phẩm" type="text" />
@@ -143,3 +143,28 @@
         </div>
     </div>
 </header>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const cartIcon = document.getElementById("cart-icon");
+        const cartBadge = cartIcon.querySelector("span");
+
+        // Send request to get cart items
+        const response = await fetch("/cart/api/total");
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        const totalItems = data?.totalItems;
+        
+        // Render total items and if greater than 99, show 99+
+        if (totalItems > 99) {
+            cartBadge.innerText = "99+";
+        } else {
+            cartBadge.innerText = totalItems;
+        }
+        
+    })
+</script>

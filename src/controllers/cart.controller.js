@@ -10,9 +10,11 @@ export function renderCartPage(req, res) {
 
 export async function getTotalCartItemsRequest(req, res) {
     try {
-        const { maKhachHang } = req.session;
+        const { maKhachHang } = req.session.customer;
+        console.log("maKhachHang: ", maKhachHang);
 
         const cart = await GioHangModel.findOne({ maKhachHang: new mongoose.Types.ObjectId(maKhachHang) });
+        console.log("cart: ", cart);
 
         if (!cart) {
             return res.json({ totalItems: 0 });

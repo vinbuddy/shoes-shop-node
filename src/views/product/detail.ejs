@@ -83,7 +83,6 @@
                     <button 
                         data-productId="<%= product ? product.maSanPham : '' %>"
                         data-loginUrl="<%= loginUrl %>" 
-                        data-requestUrl="<%= addToCartRequestUrl %>" 
                         id="add-to-cart-btn" 
                         disabled 
                         class="disabled:opacity-70 disabled:cursor-not-allowed mt-7 w-full bg-primary text-white py-3 rounded-full font-semibold">
@@ -182,7 +181,6 @@
 
         // Add to cart button event listener
         addToCartBtn.addEventListener('click', async function () {
-            const apiURL = this.getAttribute('data-requestUrl')
             const loginURL = this.getAttribute('data-loginUrl')
 
             if (loginURL) {
@@ -204,7 +202,7 @@
 
                 addToCartLoader.classList.remove('hidden')
                 
-                const response = await fetch(apiURL, {
+                const response = await fetch("/cart/api/add", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
