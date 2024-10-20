@@ -36,24 +36,29 @@
                 <p class="mt-2 text-gray-500"><%= product ? product.moTaSanPham : "Unknown Description" %></p>
 
                 <div class="mt-7">
-                    <h2 class="text-lg font-semibold mb-2">Kích cỡ</h2>
-                    <ul class="grid grid-cols-4 gap-3">
+                    <h2 class="text-base font-semibold mb-2">Kích cỡ</h2>
+                    <div id="size-list" class="grid grid-cols-4 gap-3">
                         <% if (product && product.danhSachKichCo.length > 0) { %>
                             <% product.danhSachKichCo.forEach((size, index) => { %>
-                                <li class="text-center border p-2 rounded-xl">
-                                    <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
+                                <button 
+                                    data-sizeQuantity="<%= size.soLuongKichCo %>" 
+                                    data-sizePrice="<%= size.giaKichCo %>" 
+                                    data-sizeId="<%= size.maKichCo.maKichCo%>" 
+                                    <%= size.soLuongKichCo === 0 ? 'disabled' : '' %>
+                                    class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-center border p-2 rounded-xl">
+                                        <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
 
-                                    <span>
-                                        <%= formatVNCurrency(size.giaKichCo) %>
-                                    </span>
-                                </li>
+                                        <span>
+                                            <%= formatVNCurrency(size.giaKichCo) %>
+                                        </span>
+                                </button>
                             <% }) 
                         } %>
                     </ul>
                 </div>
 
                 <div class="mt-7">
-                    <h2 class="text-lg font-semibold mb-2">Chọn số lượng</h2>
+                    <h2 class="text-base font-semibold mb-2">Chọn số lượng ( Vui lòng chọn kích cỡ trước )</h2>
                     <div class="flex items-center h-[50px] text-neutral-700">
                         <button class="w-[50px] h-full border rounded-tl-xl rounded-bl-xl decrease decrease-btn">
                             <i class='bx bx-minus'></i>
@@ -68,15 +73,23 @@
                 </div>
 
                 <p class="mt-5">
-                    <span class="text-lg font-semibold">Giá mua:</span> &nbsp;
-                    <span class="text-xl font-bold text-primary ">
-                        9.000.000 đ
+                    <span class="text-base font-semibold">Giá mua:</span> &nbsp;
+                    <span id="order-price" class="text-xl font-bold text-primary ">
+                        0 đ
                     </span>
                 </p>
 
                 <div>
-                    <button class="mt-7 w-full bg-primary text-white py-3 rounded-full font-semibold">
-                        Thêm vào giỏ hàng
+                    <button 
+                        data-productId="<%= product ? product.maSanPham : '' %>"
+                        data-loginUrl="<%= loginUrl %>" 
+                        data-requestUrl="<%= addToCartRequestUrl %>" 
+                        id="add-to-cart-btn" 
+                        disabled 
+                        class="disabled:opacity-70 disabled:cursor-not-allowed mt-7 w-full bg-primary text-white py-3 rounded-full font-semibold">
+                       
+                        <i id="add-to-cart-loader" class='animate-spin hidden bx bx-loader-alt'></i>
+                        <span class="ms-2">Thêm vào giỏ hàng</span>
                     </button>
                 </div>
             </div>
@@ -85,6 +98,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
     var swiper = new Swiper(".swiper-product-images", {
         navigation: {
@@ -94,25 +108,151 @@
     });
 </script>
 <script>
-    const increaseBtn = document.querySelectorAll('.increase-btn')
-    const decreaseBtn = document.querySelectorAll('.decrease-btn')
-    const selectedQuantity = document.querySelectorAll('.quantity-select-value')
+    document.addEventListener("DOMContentLoaded", () => {
+        const increaseBtn = document.querySelectorAll('.increase-btn')
+        const decreaseBtn = document.querySelectorAll('.decrease-btn')
+        const selectedQuantity = document.querySelectorAll('.quantity-select-value')
 
-    increaseBtn.forEach(btn => {
-        btn.onclick = function () {
-            selectedQuantity.forEach(selectValue => {
-                selectValue.innerHTML++
-            })
+        const sizeList = document.getElementById('size-list')
+        const sizeItems = sizeList.querySelectorAll('button')
+
+        const orderPrice = document.getElementById('order-price')
+
+        const addToCartBtn = document.getElementById('add-to-cart-btn')
+        const addToCartLoader = document.getElementById('add-to-cart-loader')
+
+        let selectedSizeQuantity = 0;
+        let selectedSizePrice = 0;
+        let selectedSizeId = null;
+
+        const renderSizePrice = (quantity) => {
+            orderPrice.innerHTML = formatVNCurrency(selectedSizePrice * quantity)
         }
-    })
 
-    decreaseBtn.forEach(btn => {
-        btn.onclick = function () {
-            selectedQuantity.forEach(selectValue => {
-                if (selectValue.innerHTML > 1) {
-                    selectValue.innerHTML--
+        increaseBtn.forEach(btn => {
+            btn.onclick = function () {
+                selectedQuantity.forEach(selectValue => {
+                   // Check if selected quantity is greater than size quantity
+                    if (selectValue.innerHTML >= selectedSizeQuantity) {
+                        return
+                    }
+                    selectValue.innerHTML++;
+
+                    renderSizePrice(Number(selectValue.innerHTML));
+                })
+            }
+        })
+
+        decreaseBtn.forEach(btn => {
+            btn.onclick = function () {
+                selectedQuantity.forEach(selectValue => {
+                    if (selectValue.innerHTML > 1) {
+                        selectValue.innerHTML--
+                        renderSizePrice(Number(selectValue.innerHTML));
+                    }
+                })
+            }
+        })
+
+        const formatVNCurrency = (value) => {
+            return value.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            });
+        };
+       
+        // Size items event listener
+        sizeItems.forEach(item => {
+            item.addEventListener("click", (event) => {
+                sizeItems.forEach(item => {
+                    item.classList.remove('border-primary')
+                })
+                item.classList.add('border-primary')
+
+                selectedSizeQuantity = Number(item.getAttribute('data-sizeQuantity'))
+                selectedSizePrice = Number(item.getAttribute('data-sizePrice'))
+                selectedSizeId = item.getAttribute('data-sizeId')
+
+                renderSizePrice(Number(selectedQuantity[0].innerHTML));
+
+                // Remove disabled attribute from button
+                addToCartBtn.removeAttribute('disabled')
+            })
+        })
+
+        // Add to cart button event listener
+        addToCartBtn.addEventListener('click', async function () {
+            const apiURL = this.getAttribute('data-requestUrl')
+            const loginURL = this.getAttribute('data-loginUrl')
+
+            if (loginURL) {
+                window.location.href = loginURL;
+                return;
+            }
+
+            const quantity = Number(selectedQuantity[0].innerHTML)
+            const productId = this.getAttribute('data-productId')
+
+            const body = {
+                productId: productId,
+                sizeId: selectedSizeId,
+                quantity: quantity,
+                selectedPrice: selectedSizePrice
+            }
+
+            try {
+
+                addToCartLoader.classList.remove('hidden')
+                
+                const response = await fetch(apiURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    Toastify({
+                      text: "Sản phẩm đã được thêm vào giỏ hàng thành công!",
+                      duration: 3000, 
+                      gravity: "bottom", 
+                      position: "right",
+                      backgroundColor: "#45D483", 
+                      close: true, 
+                    }).showToast();
+                } else {
+                    Toastify({
+                      text: "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng!",
+                      duration: 3000,
+                      gravity: "bottom",
+                      position: "right",
+                      backgroundColor: "#F54180", 
+                      style: {
+                        color: "#FFFFFF" 
+                      },
+                      close: false,
+                    }).showToast();
                 }
-            })
-        }
+
+                addToCartLoader.classList.add('hidden')
+            } catch (error) {
+                Toastify({
+                  text: "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng!",
+                  duration: 3000,
+                  gravity: "bottom",
+                  position: "right",
+                  backgroundColor: "#F54180", 
+                  style: {
+                    color: "#FFFFFF" // Màu chữ trắng
+                  },
+                  close: false,
+                }).showToast();
+            } finally {
+                addToCartLoader.classList.add('hidden')
+            }
+        })
+
     })
 </script>

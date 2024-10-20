@@ -5,6 +5,9 @@ import SizeModel from "../models/kichCo.model.js";
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
+import env from "dotenv";
+
+env.config();
 
 const VIEW_OPTIONS = {
     ADMIN_CREATE: {
@@ -119,6 +122,8 @@ export async function renderProductDetailPage(req, res) {
 
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
+        addToCartRequestUrl: process.env.BASE_URL + "/cart/api/add",
+        loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
         formatVNCurrency: formatVNCurrency,
     });

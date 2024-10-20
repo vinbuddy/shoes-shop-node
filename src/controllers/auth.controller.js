@@ -90,6 +90,16 @@ export async function registerHandler(req, res) {
 
         await newCustomer.save();
 
+        // Update maKhachHang
+        await KhachHangModel.updateOne(
+            { email },
+            {
+                $set: {
+                    maKhachHang: newCustomer._id,
+                },
+            }
+        );
+
         await sendEmail(
             process.env.EMAIL_APP_USER,
             email,
@@ -240,7 +250,8 @@ export async function forgotPasswordHandler(req, res) {
 
         await redisClient.setEx(email, tokenExpiry, token);
 
-        const resetLink = `${req.protocol}://${req.get("host")}/auth/reset-password?token=${token}&email=${email}`;
+        // const resetLink = `${req.protocol}://${req.get("host")}/auth/reset-password?token=${token}&email=${email}`;
+        const resetLink = `${process.env.BASE_URL}/auth/reset-password?token=${token}&email=${email}`;
 
         await sendEmail(
             process.env.EMAIL_APP_USER,
