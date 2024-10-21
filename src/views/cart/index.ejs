@@ -13,7 +13,11 @@
                     <div>
                         <% if (cart && cart.danhSachSanPham) { %>
                             <% cart.danhSachSanPham.forEach(item => { %>
-                                <div class="flex justify-between items-center mt-6 pt-6">
+                                <div  
+                                    data-productId="<%= item.maSanPham.maSanPham %>" 
+                                    data-productStockQuantity="<%= item.soLuongTon %>"
+                                    data-productPrice="<%= item.giaSanPham %>"
+                                    class="flex justify-between items-center mt-6 pt-6">
                                     <div class="flex items-center">
                                         <input
                                             type="checkbox"
@@ -31,32 +35,35 @@
                                             <span class="md:text-md font-medium">
                                                 <%= item.maSanPham.tenSanPham %>
                                             </span>
-                                            <span class="text-xs font-light text-gray-400">Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %></span>
+                                            <span class="text-sm font-light text-gray-500">
+                                                Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %>
+                                                - Giá: <%= formatVNCurrency(item.giaSanPham) %>
+                                            </span>
                                         </div>
                                     </div>
         
                                     <div class="flex justify-center items-center">
                                         <div class="pr-8">
-                                            <span>
-                                                <%= formatVNCurrency(item.giaSanPham) %>
+                                            <span class="total-price">
+                                                <%= formatVNCurrency(item.giaSanPham * item.soLuongSanPham) %>
                                             </span>
                                         </div>
         
                                         <div class="pr-8 flex items-center text-lg">
-                                            <button class="font-semibold p-2 cursor-pointer">
+                                            <button class="decrease-btn font-semibold p-2 cursor-pointer">
                                                 <i class="bx bx-minus"></i>
                                             </button>
                                             <div
-                                                class="flex justify-center items-center text-base focus:outline-none bg-gray-100 border px-3 rounded"
+                                                class="quantity-select-value flex justify-center items-center text-base focus:outline-none bg-gray-100 border px-3 rounded"
                                             >
                                                 <%= item.soLuongSanPham %>
                                             </div>
-                                            <button class="font-semibold p-2 cursor-pointer">
+                                            <button class="increase-btn font-semibold p-2 cursor-pointer">
                                                 <i class="bx bx-plus"></i>
                                             </button>
                                         </div>
         
-                                        <button class="text-red-500 text-lg">
+                                        <button class="delete-cart-item-btn text-red-500 text-lg">
                                             <i class="bx bx-trash-alt"></i>
                                         </button>
                                     </div>
@@ -99,3 +106,120 @@
         </div>
     </div>
 </div>
+
+<script>
+    const deleteCartItemBtns = document.querySelectorAll(".delete-cart-item-btn");
+
+    const increaseBtn = document.querySelectorAll('.increase-btn')
+    const decreaseBtn = document.querySelectorAll('.decrease-btn')
+
+    let updateCartTimeout;
+
+    const formatVNCurrency = (value) => {
+        return value.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+    };
+
+    // Delete cart item
+    deleteCartItemBtns.forEach(btn => {
+        btn.onclick = async function() {
+            const cartItem = this.closest("[data-productId]")
+            const productId = cartItem.getAttribute("data-productId");
+            
+            if (!productId) return;
+
+            // Call API to delete item from cart
+            const res = await fetch("/cart/api/delete/" + productId, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            if (res.ok) {
+                // Remove item from DOM
+                cartItem.remove();
+            }
+        }
+    })
+
+    increaseBtn.forEach(btn => {
+        btn.onclick = function () {
+            const selectedValue = this.parentElement.querySelector('.quantity-select-value');
+            const stockQuantity = this.closest("[data-productStockQuantity]").getAttribute("data-productStockQuantity");
+            const productId = this.closest("[data-productId]").getAttribute("data-productId");
+
+            const productPrice = this.closest("[data-productPrice]").getAttribute("data-productPrice");
+
+            // Find class total-price
+            const totalPrice = this.closest("[data-productPrice]").querySelector(".total-price");
+            
+            if (Number(selectedValue.innerText) >= Number(stockQuantity)) {
+                return
+            }
+            
+            // Increase the value
+            selectedValue.innerText = Number(selectedValue.innerText) + 1;
+
+            // Render total price
+
+            totalPrice.innerText = formatVNCurrency(Number(productPrice) * Number(selectedValue.innerText));
+            
+
+            debounceUpdateCart(productId, Number(selectedValue.innerText));
+        }
+    })
+
+    decreaseBtn.forEach(btn => {
+        btn.onclick = function () {
+            const selectedValue = this.parentElement.querySelector('.quantity-select-value');
+            const productId = this.closest("[data-productId]").getAttribute("data-productId");
+
+            const productPrice = this.closest("[data-productPrice]").getAttribute("data-productPrice");
+
+            // Find class total-price
+            const totalPrice = this.closest("[data-productPrice]").querySelector(".total-price");
+
+            // Decrease the value
+            if (Number(selectedValue.innerText) > 1) {
+                selectedValue.innerText = Number(selectedValue.innerText) - 1;
+
+                // Render total price
+                totalPrice.innerText = formatVNCurrency(Number(productPrice) * Number(selectedValue.innerText));
+
+                debounceUpdateCart(productId, Number(selectedValue.innerText));
+            }
+
+        }
+    })
+
+
+    const updateCartQuantityRequest = async (productId, newQuantity) => {
+        try {
+            const res = await fetch("/cart/api/update-quantity", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: newQuantity
+                })
+            })
+        } catch (error) {
+            console.log("error: ", error);
+        }
+    }
+
+    const debounceUpdateCart = (productId, newQuantity) => {
+        if (updateCartTimeout) {
+            clearTimeout(updateCartTimeout);
+        }
+        updateCartTimeout = setTimeout(() => {
+            updateCartQuantityRequest(productId, newQuantity);
+        }, 700); // Delay 0.7s before sending the request
+    };
+    
+</script>

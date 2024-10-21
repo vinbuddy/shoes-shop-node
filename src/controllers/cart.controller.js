@@ -27,9 +27,8 @@ export async function renderCartPage(req, res) {
     })
         .populate("maKhachHang")
         .populate("danhSachSanPham.maSanPham")
-        .populate("danhSachSanPham.maKichCoSanPham");
-
-    console.log("cart: ", cart);
+        .populate("danhSachSanPham.maKichCoSanPham")
+        .lean();
 
     if (!cart) {
         return res.render("cart/index", {
@@ -38,6 +37,25 @@ export async function renderCartPage(req, res) {
             formatVNCurrency: formatVNCurrency,
         });
     }
+
+    const productsWithStock = await Promise.all(
+        cart.danhSachSanPham.map(async (item) => {
+            const sanPham = await SanPhamModel.findOne({ maSanPham: item.maSanPham });
+
+            // Tìm kích cỡ sản phẩm phù hợp
+            const kichCo = sanPham.danhSachKichCo.find(
+                (kc) => kc.maKichCo.toString() === item.maKichCoSanPham.maKichCo.toString()
+            );
+
+            // Thêm soLuongTon từ kích cỡ sản phẩm vào đối tượng giỏ hàng
+            return {
+                ...item,
+                soLuongTon: kichCo ? kichCo.soLuongKichCo : 0, // Nếu không tìm thấy thì trả về 0
+            };
+        })
+    );
+
+    cart.danhSachSanPham = productsWithStock;
 
     return res.render("cart/index", {
         ...VIEW_OPTIONS.CART_LIST,
@@ -71,7 +89,13 @@ export async function getTotalCartItemsRequest(req, res) {
 
 export async function addToCartHandlerRequest(req, res) {
     try {
-        const { maKhachHang: userId } = req.session.customer;
+        const customer = req.session.customer;
+
+        if (!customer || !customer.maKhachHang) {
+            return res.redirect("/auth/login");
+        }
+
+        const { maKhachHang: userId } = customer;
 
         const { productId, sizeId, quantity, selectedPrice } = req.body;
 
@@ -142,6 +166,83 @@ export async function addToCartHandlerRequest(req, res) {
         return res.status(200).json({ message: "Product added to cart successfully", cart });
     } catch (error) {
         console.error("Error adding to cart:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function deleteCartItemHandlerRequest(req, res) {
+    try {
+        const { maKhachHang: userId } = req.session.customer;
+
+        if (!userId) {
+            return res.redirect("/auth/login");
+        }
+
+        const { productId } = req.params;
+
+        const cart = await GioHangModel.findOne({ maKhachHang: userId });
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found." });
+        }
+
+        const productIndex = cart.danhSachSanPham.findIndex((item) => item.maSanPham.equals(productId));
+
+        if (productIndex < 0) {
+            return res.status(404).json({ message: "Product not found in cart." });
+        }
+
+        cart.danhSachSanPham.splice(productIndex, 1);
+
+        // Recalculate the total price of the cart
+
+        cart.tongTien = cart.danhSachSanPham.reduce((total, item) => {
+            return total + item.soLuongSanPham * item.giaSanPham;
+        }, 0);
+
+        await cart.save();
+
+        return res.status(200).json({ message: "Cart item deleted successfully", cart });
+    } catch (error) {
+        console.error("Error deleting cart item:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function updateCartItemQuantityHandlerRequest(req, res) {
+    try {
+        const { maKhachHang: userId } = req.session.customer;
+
+        if (!userId) {
+            return res.redirect("/auth/login");
+        }
+
+        const { quantity, productId } = req.body;
+
+        const cart = await GioHangModel.findOne({ maKhachHang: userId });
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found." });
+        }
+
+        const productIndex = cart.danhSachSanPham.findIndex((item) => item.maSanPham.equals(productId));
+
+        if (productIndex < 0) {
+            return res.status(404).json({ message: "Product not found in cart." });
+        }
+
+        cart.danhSachSanPham[productIndex].soLuongSanPham = quantity;
+
+        // Recalculate the total price of the cart
+        cart.tongTien = cart.danhSachSanPham.reduce((total, item) => {
+            return total + item.soLuongSanPham * item.giaSanPham;
+        }, 0);
+
+        await cart.save();
+
+        return res.status(200).json({ message: "Cart item quantity updated successfully", cart });
+    } catch (error) {
+        console.error("Error updating cart item quantity:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }
