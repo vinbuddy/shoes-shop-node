@@ -3,14 +3,58 @@ import mongoose from "mongoose";
 import GioHangModel from "../models/gioHang.model.js";
 import SanPhamModel from "../models/sanPham.model.js";
 import KichCoModel from "../models/kichCo.model.js";
+import { formatVNCurrency } from "../utils/format.js";
 
-export function renderCartPage(req, res) {
-    return res.render("cart/index", { layout: "./layouts/main", page: "cart", title: "Cart page" });
+const VIEW_OPTIONS = {
+    CART_LIST: {
+        layout: "./layouts/main",
+        title: "Giỏ hàng của bạn",
+    },
+};
+
+export async function renderCartPage(req, res) {
+    const customer = req.session.customer;
+
+    if (!customer || !customer.maKhachHang) {
+        return res.redirect("/auth/login");
+    }
+
+    const { maKhachHang } = customer;
+
+    // Get the customer's cart
+    const cart = await GioHangModel.findOne({
+        maKhachHang: new mongoose.Types.ObjectId(maKhachHang),
+    })
+        .populate("maKhachHang")
+        .populate("danhSachSanPham.maSanPham")
+        .populate("danhSachSanPham.maKichCoSanPham");
+
+    console.log("cart: ", cart);
+
+    if (!cart) {
+        return res.render("cart/index", {
+            ...VIEW_OPTIONS.CART_LIST,
+            cart: null,
+            formatVNCurrency: formatVNCurrency,
+        });
+    }
+
+    return res.render("cart/index", {
+        ...VIEW_OPTIONS.CART_LIST,
+        cart: cart,
+        formatVNCurrency: formatVNCurrency,
+    });
 }
 
 export async function getTotalCartItemsRequest(req, res) {
     try {
-        const { maKhachHang } = req.session.customer;
+        const customer = req.session.customer;
+
+        if (!customer || !customer.maKhachHang) {
+            return res.status(401).json({ message: "User is not authenticated." });
+        }
+
+        const { maKhachHang } = customer;
 
         const cart = await GioHangModel.findOne({ maKhachHang: new mongoose.Types.ObjectId(maKhachHang) });
 
@@ -60,7 +104,7 @@ export async function addToCartHandlerRequest(req, res) {
 
         // Check if the product with the specific size is already in the cart
         const existingProductIndex = cart.danhSachSanPham.findIndex(
-            (item) => item.maSanPham.equals(productId) && item.kichCoSanPham.equals(sizeId)
+            (item) => item.maSanPham.equals(productId) && item.maKichCoSanPham.equals(sizeId)
         );
 
         if (existingProductIndex >= 0) {
@@ -71,7 +115,7 @@ export async function addToCartHandlerRequest(req, res) {
             // Add the new product to the cart
             cart.danhSachSanPham.push({
                 maSanPham: productId,
-                kichCoSanPham: sizeId,
+                maKichCoSanPham: sizeId,
                 soLuongSanPham: quantity,
                 giaSanPham: selectedPrice, // Assuming you store the price on the product
             });
