@@ -11,7 +11,7 @@
                 <!-- Cart -->
                 <div class="col-span-2">
                     <div>
-                        <% if (cart && cart.danhSachSanPham) { %>
+                        <% if (cart && cart.danhSachSanPham.length > 0) { %>
                             <% cart.danhSachSanPham.forEach(item => { %>
                                 <div  
                                     data-productId="<%= item.maSanPham.maSanPham %>" 
@@ -78,7 +78,9 @@
                                 </div>
                             <% }) %>
                         <% } else { %>
-                            <p>Không có sản phẩm nào trong giỏ hàng.</p>
+                            <div class="flex items-center justify-center">
+                                <img width="250" src="/images/empty-cart.png" />
+                            </div>
                         <% } %>
 
                         
@@ -93,7 +95,7 @@
                 </div>
 
                 <!-- SUMMARY -->
-                <div class="p-5 bg-gray-100 rounded-2xl overflow-visible">
+                <div class="p-5 bg-gray-100 rounded-2xl overflow-visible h-fit">
                     <span class="text-xl font-medium block mb-3">Tóm tắt</span>
 
                     <p class="flex items-center justify-between py-2 border-b">
@@ -156,6 +158,12 @@
             if (res.ok) {
                 // Remove item from DOM
                 cartItem.remove();
+
+                // Update cart badge
+                const cartIcon = document.getElementById("cart-icon");
+                const cartBadge = cartIcon.querySelector("span");
+
+                cartBadge.innerText = Number(cartBadge.innerText) - 1;
             }
         }
     })

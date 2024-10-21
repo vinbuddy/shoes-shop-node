@@ -227,6 +227,12 @@
                     selectedQuantity.forEach(selectValue => {
                         selectValue.innerHTML = 1
                     })
+
+                    // Update cart badge
+                    const cartIcon = document.getElementById("cart-icon");
+                    const cartBadge = cartIcon.querySelector("span");
+                    
+                    cartBadge.innerText = Number(cartBadge.innerText) - 1;
                 } else {
                     Toastify({
                       text: "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng!",
