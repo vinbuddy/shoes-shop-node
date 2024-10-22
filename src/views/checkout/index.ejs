@@ -1,0 +1,134 @@
+<div class="container">
+    <div class="breadcrumbs text-sm mb-7">
+        <ul>
+            <li><a href="/">Trang chủ</a></li>
+            <li><a href="/">Giỏ hàng</a></li>
+            <li>Thanh toán</li>
+        </ul>
+    </div>
+
+    <div class="grid grid-cols-12 gap-10">
+        <div class="col-span-6">
+            <div>
+                <section class="p-5 rounded-2xl">
+                    <h3 class="text-lg font-bold mb-4">Thông tin giao hàng</h3>
+                    <div class="grid grid-cols-12 gap-5">
+                        <div class="col-span-6">
+                            <label class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text">Nhập tên người nhận</span>
+                                </div>
+                                <input type="text" placeholder="VD: Nguyễn Văn A" class="input input-bordered w-full" />
+                            </label>
+                        </div>
+                        <div class="col-span-6">
+                            <label class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text">Nhập số điện thoại</span>
+                                </div>
+                                <input type="text" placeholder="VD: 0933691111" class="input input-bordered w-full" />
+                            </label>
+                        </div>
+                        <div class="col-span-12">
+                            <label class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text">Địa chỉ nhà</span>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="VD: 111/21 Hẻm A, đuờng B"
+                                    class="input input-bordered w-full"
+                                />
+                            </label>
+                        </div>
+                        <div class="col-span-12">
+                            <div class="grid grid-cols-3 gap-5">
+                                <div>
+                                    <label class="form-control w-full max-w-xs">
+                                        <div class="label">
+                                            <span class="label-text">Tỉnh thành</span>
+                                        </div>
+                                        <select class="select select-bordered">
+                                            <option>Star Wars</option>
+                                            <option>Harry Potter</option>
+                                            <option>Lord of the Rings</option>
+                                            <option>Planet of the Apes</option>
+                                            <option>Star Trek</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="form-control w-full max-w-xs">
+                                        <div class="label">
+                                            <span class="label-text">Quận huyện</span>
+                                        </div>
+                                        <select class="select select-bordered">
+                                            <option>Star Wars</option>
+                                            <option>Harry Potter</option>
+                                            <option>Lord of the Rings</option>
+                                            <option>Planet of the Apes</option>
+                                            <option>Star Trek</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="form-control w-full max-w-xs">
+                                        <div class="label">
+                                            <span class="label-text">Phường xã</span>
+                                        </div>
+                                        <select class="select select-bordered">
+                                            <option>Star Wars</option>
+                                            <option>Harry Potter</option>
+                                            <option>Lord of the Rings</option>
+                                            <option>Planet of the Apes</option>
+                                            <option>Star Trek</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="p-5 mt-5">
+                    <h3 class="text-lg font-bold mb-4">Phương thức thanh toán</h3>
+                    <div>
+                        <div class="flex items-center justify-between gap-4 p-3 border rounded-xl">
+                            <label for="cash-method" class="flex-1 flex items-center cursor-pointer">
+                                <img class="size-5 me-2" src="/images/money-icon.png" alt="" />
+                                Thanh toán tiền mặt
+                            </label>
+                            <input
+                                id="cash-method"
+                                type="radio"
+                                name="radio-10"
+                                class="radio checked:bg-primary"
+                                checked="checked"
+                            />
+                        </div>
+                        <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
+                            <label for="momo-method" class="flex-1 flex items-center cursor-pointer">
+                                <img class="size-5 me-2" src="/images/momo-icon.png" alt="" />
+                                Thanh toán MoMo
+                            </label>
+                            <input id="momo-method" type="radio" name="radio-10" class="radio checked:bg-primary" />
+                        </div>
+                        <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
+                            <label for="vnpay-method" class="flex-1 flex items-center cursor-pointer">
+                                <img class="size-5 me-2" src="/images/vnpay-icon.png" alt="" />
+                                Thanh toán VNPay
+                            </label>
+                            <input id="vnpay-method" type="radio" name="radio-10" class="radio checked:bg-primary" />
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="col-span-6">
+            <div>
+                <section class="p-5 rounded-2xl">
+                    <h3 class="text-lg font-bold mb-4">Các sản phẩm đã chọn</h3>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
