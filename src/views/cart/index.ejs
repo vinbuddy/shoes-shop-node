@@ -36,7 +36,7 @@
             
                                         <a href="/product/<%= item.maSanPham.maSanPham %>">
                                             <div class="fade flex flex-col ml-3">
-                                                <span class="md:text-md font-medium">
+                                                <span class="md:text-md font-medium max-w-[300px] truncate" title="<%= item.maSanPham.tenSanPham %>">
                                                     <%= item.maSanPham.tenSanPham %>
                                                 </span>
                                                 <span class="text-sm font-light text-gray-500">
@@ -109,7 +109,8 @@
                     </p>
 
                     <button disabled id="checkout-btn" class="disabled:opacity-60 mt-3 h-12 w-full bg-primary rounded-full focus:outline-none text-white">
-                        Thanh toán
+                        <i id="checkout-loader" class='animate-spin hidden bx bx-loader-alt'></i>
+                        <span class="ms-2">Thanh toán</span>
                     </button>
                 </div>
             </div>
@@ -131,6 +132,7 @@
 
     let updateCartTimeout;
     let totalSelectedItems = 0;
+    let selectedProductIds = [];
 
     const formatVNCurrency = (value) => {
         return value.toLocaleString("vi-VN", {
@@ -264,10 +266,16 @@
     checkBoxes.forEach(checkbox => {
         checkbox.onchange = function () {
             // Count total selected items
+            const productId = this.closest("[data-productId]").getAttribute("data-productId")
+
             if (this.checked) {
                 totalSelectedItems++;
+
+                selectedProductIds.push(productId);
             } else {
                 totalSelectedItems--;
+
+                selectedProductIds = selectedProductIds.filter(id => id !== productId);
             }
 
             totalSelectedItem.innerText = totalSelectedItems;
@@ -282,6 +290,38 @@
             // Calculate sub total
             renderSubTotal();
 
+
         }
     })
+
+    checkoutBtn.onclick = async function() {
+
+        const checkoutBtnLoader = checkoutBtn.querySelector("#checkout-loader");
+
+        if (selectedProductIds.length === 0) {
+            return;
+        }
+
+        checkoutBtnLoader.classList.remove("hidden");
+
+        try {
+            const res = await fetch("/cart/api/set-selected-items", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    selectedProductIds: selectedProductIds
+                })
+            }) 
+
+            if (res.ok) {
+                window.location.href = "/checkout";
+            }
+        } catch (error) {
+            console.log("error: ", error);
+        } finally {
+            checkoutBtnLoader.classList.add("hidden");
+        }
+    }
 </script>

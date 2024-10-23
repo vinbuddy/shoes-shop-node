@@ -1,4 +1,5 @@
 import env from "dotenv";
+import { formatVNCurrency } from "../utils/format.js";
 env.config();
 
 const VIEW_OPTIONS = {
@@ -10,6 +11,7 @@ const VIEW_OPTIONS = {
             shopId: process.env.GHN_SHOP_ID,
             baseUrl: process.env.GHN_BASE_URL,
         },
+        formatVNCurrency: formatVNCurrency,
     },
 };
 

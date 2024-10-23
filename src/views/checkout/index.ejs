@@ -60,7 +60,9 @@
                                             <div class="label">
                                                 <span class="label-text">Tỉnh thành</span>
                                             </div>
-                                            <select id="province-select" class="select select-bordered"></select>
+                                            <select id="province-select" class="select select-bordered">
+                                                <option disabled selected>Chọn tỉnh thành</option>
+                                            </select>
                                         </label>
                                     </div>
                                     <div>
@@ -68,7 +70,9 @@
                                             <div class="label">
                                                 <span class="label-text">Quận huyện</span>
                                             </div>
-                                            <select id="district-select" class="select select-bordered"></select>
+                                            <select id="district-select" class="select select-bordered">
+                                                <option disabled selected>Chọn quận huyện</option>
+                                            </select>
                                         </label>
                                     </div>
                                     <div>
@@ -76,7 +80,9 @@
                                             <div class="label">
                                                 <span class="label-text">Phường xã</span>
                                             </div>
-                                            <select id="ward-select" class="select select-bordered"></select>
+                                            <select id="ward-select" class="select select-bordered">
+                                                <option disabled selected>Chọn phường xã</option>
+                                            </select>
                                         </label>
                                     </div>
                                 </div>
@@ -94,7 +100,8 @@
                                 <input
                                     id="cash-method"
                                     type="radio"
-                                    name="radio-10"
+                                    value="Tiền mặt"
+                                    name="paymentMethod"
                                     class="radio checked:bg-primary"
                                     checked="checked"
                                 />
@@ -104,7 +111,13 @@
                                     <img class="size-5 me-2" src="/images/momo-icon.png" alt="" />
                                     Thanh toán MoMo
                                 </label>
-                                <input id="momo-method" type="radio" name="radio-10" class="radio checked:bg-primary" />
+                                <input
+                                    id="momo-method"
+                                    type="radio"
+                                    value="momo"
+                                    name="paymentMethod"
+                                    class="radio checked:bg-primary"
+                                />
                             </div>
                             <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
                                 <label for="vnpay-method" class="flex-1 flex items-center cursor-pointer">
@@ -114,7 +127,8 @@
                                 <input
                                     id="vnpay-method"
                                     type="radio"
-                                    name="radio-10"
+                                    value="vnpay"
+                                    name="paymentMethod"
                                     class="radio checked:bg-primary"
                                 />
                             </div>
@@ -127,32 +141,47 @@
                     <h3 class="text-lg font-semibold mb-5">Các sản phẩm đã chọn</h3>
                     <div>
                         <!-- Selected Item -->
-                        <div class="flex items-center mb-5 last:mb-0">
-                            <a class="fade" href="/product/">
-                                <img src="/images/no-result.png" width="60" class="rounded-xl border" />
-                            </a>
-
-                            <a class="flex-1">
-                                <div class="fade flex flex-col ml-3">
-                                    <span class="font-medium"> Nike Air Max 90 </span>
-                                    <div class="flex justify-between items-center mt-1">
-                                        <span class="text-sm font-light text-gray-500">
-                                            Kích cỡ: 40 - Giá: 1.500.000đ
-                                        </span>
-                                        <p class="text-sm font-light text-gray-500">
-                                            Số lượng: 1 - Thành tiền: 1.500.000đ
-                                        </p>
-                                    </div>
+                        <% if (locals?.session?.selectedItems && locals?.session?.selectedItems.length > 0) { %>
+                        
+                            <% locals.session.selectedItems.forEach((item) => { %>
+                                <div class="flex items-center mb-5 last:mb-0">
+                                    <a class="fade" href="/product/<%= item.maSanPham.maSanPham %>">
+                                        <img src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>" width="60" class="rounded-xl border" />
+                                    </a>
+        
+                                    <a class="flex-1">
+                                        <div class="fade flex flex-col ml-3">
+                                            <span class="font-medium max-w-full truncate">
+                                                <%= item.maSanPham.tenSanPham %>
+                                            </span>
+                                            <div class="flex justify-between items-center mt-1">
+                                                <span class="text-sm font-light text-gray-500">
+                                                    Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %> - Giá:  <%= formatVNCurrency(item.giaSanPham) %>
+                                                </span>
+                                                <p class="text-sm font-light text-gray-500">
+                                                    Số lượng: <%= item.soLuongSanPham %> - Thành tiền:  <%= formatVNCurrency(item.giaSanPham * item.soLuongSanPham) %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
-                            </a>
-                        </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="flex items-center justify-center">
+                                <img width="200" src="/images/empty-cart.png" />
+                            </div>
+                        <% } %>
+                            
                     </div>
 
                     <h3 class="text-lg font-semibold mt-10 mb-1">Thanh toán</h3>
                     <ul>
                         <li class="flex items-center justify-between py-4 border-b">
                             <span>Thành tiền</span>
-                            <span>1.500.000đ</span>
+                            <span>
+                                <% var totalPrice = locals.session.selectedItems.reduce((total, item) => total + item.giaSanPham * item.soLuongSanPham, 0)  %>
+                                <%= formatVNCurrency(totalPrice) %> 
+                            </span>
                         </li>
                         <li class="flex items-center justify-between py-3 border-b">
                             <span>Phí vận chuyển</span>
@@ -160,7 +189,9 @@
                         </li>
                         <li class="flex items-center justify-between py-3">
                             <span>Tổng thanh toán</span>
-                            <span class="font-semibold text-primary">1.500.000 đ</span>
+                            <span class="font-semibold text-primary">
+                                <%= formatVNCurrency(totalPrice) %>
+                            </span>
                         </li>
                     </ul>
 
@@ -222,6 +253,27 @@
                 value: 150,
                 errorMessage: "Địa chỉ nhà phải có tối đa 150 ký tự",
             },
+        ])
+        .addField("#province-select", [
+            {
+                rule: "customRegexp",
+                value: /^[^\s]+$/,
+                errorMessage: "Tỉnh thành là bắt buộc",
+            },
+        ])
+        .addField("#district-select", [
+            {
+                rule: "customRegexp",
+                value: /^[^\s]+$/,
+                errorMessage: "Quận huyện là bắt buộc",
+            },
+        ])
+        .addField("#ward-select", [
+            {
+                rule: "customRegexp",
+                value: /^[^\s]+$/,
+                errorMessage: "Phường xã là bắt buộc",
+            },
         ]);
 
     validation.onSuccess((event) => {
@@ -229,6 +281,7 @@
     });
 </script>
 
+<!-- API Province -->
 <script>
     const GHN_TOKEN = "<%= ghn.token %>";
     const GHN_SHOP_ID = "<%= ghn.shopId %>";
@@ -307,4 +360,21 @@
     });
 
     fetchProvinces();
+</script>
+
+<script>
+    // Handle checked payment method
+    const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+
+    paymentMethodRadios.forEach((radio) => {
+        radio.addEventListener("change", function () {
+            // Remove border from parent element
+            paymentMethodRadios.forEach((radio) => {
+                radio.parentElement.classList.remove("border");
+            });
+
+            // Add border to checked element
+            this.parentElement.classList.add("border");
+        });
+    });
 </script>
