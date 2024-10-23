@@ -7,128 +7,304 @@
         </ul>
     </div>
 
-    <div class="grid grid-cols-12 gap-10">
-        <div class="col-span-6">
-            <div>
-                <section class="p-5 rounded-2xl">
-                    <h3 class="text-lg font-bold mb-4">Thông tin giao hàng</h3>
-                    <div class="grid grid-cols-12 gap-5">
-                        <div class="col-span-6">
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text">Nhập tên người nhận</span>
-                                </div>
-                                <input type="text" placeholder="VD: Nguyễn Văn A" class="input input-bordered w-full" />
-                            </label>
-                        </div>
-                        <div class="col-span-6">
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text">Nhập số điện thoại</span>
-                                </div>
-                                <input type="text" placeholder="VD: 0933691111" class="input input-bordered w-full" />
-                            </label>
-                        </div>
-                        <div class="col-span-12">
-                            <label class="form-control w-full">
-                                <div class="label">
-                                    <span class="label-text">Địa chỉ nhà</span>
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="VD: 111/21 Hẻm A, đuờng B"
-                                    class="input input-bordered w-full"
-                                />
-                            </label>
-                        </div>
-                        <div class="col-span-12">
-                            <div class="grid grid-cols-3 gap-5">
-                                <div>
-                                    <label class="form-control w-full max-w-xs">
-                                        <div class="label">
-                                            <span class="label-text">Tỉnh thành</span>
-                                        </div>
-                                        <select class="select select-bordered">
-                                            <option>Star Wars</option>
-                                            <option>Harry Potter</option>
-                                            <option>Lord of the Rings</option>
-                                            <option>Planet of the Apes</option>
-                                            <option>Star Trek</option>
-                                        </select>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label class="form-control w-full max-w-xs">
-                                        <div class="label">
-                                            <span class="label-text">Quận huyện</span>
-                                        </div>
-                                        <select class="select select-bordered">
-                                            <option>Star Wars</option>
-                                            <option>Harry Potter</option>
-                                            <option>Lord of the Rings</option>
-                                            <option>Planet of the Apes</option>
-                                            <option>Star Trek</option>
-                                        </select>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label class="form-control w-full max-w-xs">
-                                        <div class="label">
-                                            <span class="label-text">Phường xã</span>
-                                        </div>
-                                        <select class="select select-bordered">
-                                            <option>Star Wars</option>
-                                            <option>Harry Potter</option>
-                                            <option>Lord of the Rings</option>
-                                            <option>Planet of the Apes</option>
-                                            <option>Star Trek</option>
-                                        </select>
-                                    </label>
+    <form id="checkout-form">
+        <div class="grid grid-cols-12 gap-10">
+            <div class="col-span-6">
+                <div>
+                    <section>
+                        <h3 class="text-lg font-semibold mb-4">Thông tin giao hàng</h3>
+                        <div class="grid grid-cols-12 gap-5">
+                            <div class="col-span-6">
+                                <label class="form-control w-full">
+                                    <div class="label">
+                                        <span class="label-text">Nhập tên người nhận</span>
+                                    </div>
+                                    <input
+                                        id="receiver-name"
+                                        type="text"
+                                        placeholder="VD: Nguyễn Văn A"
+                                        class="input input-bordered w-full"
+                                    />
+                                </label>
+                            </div>
+                            <div class="col-span-6">
+                                <label class="form-control w-full">
+                                    <div class="label">
+                                        <span class="label-text">Nhập số điện thoại</span>
+                                    </div>
+                                    <input
+                                        id="phone-number"
+                                        type="text"
+                                        placeholder="VD: 0933691111"
+                                        class="input input-bordered w-full"
+                                    />
+                                </label>
+                            </div>
+                            <div class="col-span-12">
+                                <label class="form-control w-full">
+                                    <div class="label">
+                                        <span class="label-text">Địa chỉ nhà</span>
+                                    </div>
+                                    <input
+                                        id="address"
+                                        type="text"
+                                        placeholder="VD: 111/21 Hẻm A, đuờng B"
+                                        class="input input-bordered w-full"
+                                    />
+                                </label>
+                            </div>
+                            <div class="col-span-12">
+                                <div class="grid grid-cols-3 gap-5">
+                                    <div>
+                                        <label class="form-control w-full max-w-xs">
+                                            <div class="label">
+                                                <span class="label-text">Tỉnh thành</span>
+                                            </div>
+                                            <select id="province-select" class="select select-bordered"></select>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label class="form-control w-full max-w-xs">
+                                            <div class="label">
+                                                <span class="label-text">Quận huyện</span>
+                                            </div>
+                                            <select id="district-select" class="select select-bordered"></select>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label class="form-control w-full max-w-xs">
+                                            <div class="label">
+                                                <span class="label-text">Phường xã</span>
+                                            </div>
+                                            <select id="ward-select" class="select select-bordered"></select>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
-                <section class="p-5 mt-5">
-                    <h3 class="text-lg font-bold mb-4">Phương thức thanh toán</h3>
+                    </section>
+                    <section class="mt-10">
+                        <h3 class="text-lg font-semibold mb-4">Phương thức thanh toán</h3>
+                        <div>
+                            <div class="flex items-center justify-between gap-4 p-3 border rounded-xl">
+                                <label for="cash-method" class="flex-1 flex items-center cursor-pointer">
+                                    <img class="size-5 me-2" src="/images/money-icon.png" alt="" />
+                                    Thanh toán tiền mặt
+                                </label>
+                                <input
+                                    id="cash-method"
+                                    type="radio"
+                                    name="radio-10"
+                                    class="radio checked:bg-primary"
+                                    checked="checked"
+                                />
+                            </div>
+                            <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
+                                <label for="momo-method" class="flex-1 flex items-center cursor-pointer">
+                                    <img class="size-5 me-2" src="/images/momo-icon.png" alt="" />
+                                    Thanh toán MoMo
+                                </label>
+                                <input id="momo-method" type="radio" name="radio-10" class="radio checked:bg-primary" />
+                            </div>
+                            <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
+                                <label for="vnpay-method" class="flex-1 flex items-center cursor-pointer">
+                                    <img class="size-5 me-2" src="/images/vnpay-icon.png" alt="" />
+                                    Thanh toán VNPay
+                                </label>
+                                <input
+                                    id="vnpay-method"
+                                    type="radio"
+                                    name="radio-10"
+                                    class="radio checked:bg-primary"
+                                />
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="col-span-6">
+                <section class="rounded-2xl p-5 bg-gray-100/70">
+                    <h3 class="text-lg font-semibold mb-5">Các sản phẩm đã chọn</h3>
                     <div>
-                        <div class="flex items-center justify-between gap-4 p-3 border rounded-xl">
-                            <label for="cash-method" class="flex-1 flex items-center cursor-pointer">
-                                <img class="size-5 me-2" src="/images/money-icon.png" alt="" />
-                                Thanh toán tiền mặt
-                            </label>
-                            <input
-                                id="cash-method"
-                                type="radio"
-                                name="radio-10"
-                                class="radio checked:bg-primary"
-                                checked="checked"
-                            />
-                        </div>
-                        <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
-                            <label for="momo-method" class="flex-1 flex items-center cursor-pointer">
-                                <img class="size-5 me-2" src="/images/momo-icon.png" alt="" />
-                                Thanh toán MoMo
-                            </label>
-                            <input id="momo-method" type="radio" name="radio-10" class="radio checked:bg-primary" />
-                        </div>
-                        <div class="flex items-center justify-between gap-4 p-3 mt-3 rounded-xl">
-                            <label for="vnpay-method" class="flex-1 flex items-center cursor-pointer">
-                                <img class="size-5 me-2" src="/images/vnpay-icon.png" alt="" />
-                                Thanh toán VNPay
-                            </label>
-                            <input id="vnpay-method" type="radio" name="radio-10" class="radio checked:bg-primary" />
+                        <!-- Selected Item -->
+                        <div class="flex items-center mb-5 last:mb-0">
+                            <a class="fade" href="/product/">
+                                <img src="/images/no-result.png" width="60" class="rounded-xl border" />
+                            </a>
+
+                            <a class="flex-1">
+                                <div class="fade flex flex-col ml-3">
+                                    <span class="font-medium"> Nike Air Max 90 </span>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="text-sm font-light text-gray-500">
+                                            Kích cỡ: 40 - Giá: 1.500.000đ
+                                        </span>
+                                        <p class="text-sm font-light text-gray-500">
+                                            Số lượng: 1 - Thành tiền: 1.500.000đ
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     </div>
+
+                    <h3 class="text-lg font-semibold mt-10 mb-1">Thanh toán</h3>
+                    <ul>
+                        <li class="flex items-center justify-between py-4 border-b">
+                            <span>Thành tiền</span>
+                            <span>1.500.000đ</span>
+                        </li>
+                        <li class="flex items-center justify-between py-3 border-b">
+                            <span>Phí vận chuyển</span>
+                            <span> 25.000 đ </span>
+                        </li>
+                        <li class="flex items-center justify-between py-3">
+                            <span>Tổng thanh toán</span>
+                            <span class="font-semibold text-primary">1.500.000 đ</span>
+                        </li>
+                    </ul>
+
+                    <button
+                        class="btn bg-primary text-white hover:bg-primary hover:opacity-70 w-full rounded-full mt-5"
+                    >
+                        Xác nhận thanh toán
+                    </button>
                 </section>
             </div>
         </div>
-        <div class="col-span-6">
-            <div>
-                <section class="p-5 rounded-2xl">
-                    <h3 class="text-lg font-bold mb-4">Các sản phẩm đã chọn</h3>
-                </section>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+<script>
+    const validation = new JustValidate("#checkout-form");
+
+    validation
+        .addField("#receiver-name", [
+            {
+                rule: "required",
+                errorMessage: "Tên người nhận là bắt buộc",
+            },
+            {
+                rule: "minLength",
+                value: 6,
+                errorMessage: "Tên người nhận phải có ít nhất 6 ký tự",
+            },
+            {
+                rule: "maxLength",
+                value: 50,
+                errorMessage: "Tên người nhận phải có tối đa 50 ký tự",
+            },
+        ])
+        .addField("#phone-number", [
+            {
+                rule: "required",
+                errorMessage: "Số điện thoại là bắt buộc",
+            },
+            {
+                rule: "customRegexp",
+                value: /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$/,
+                errorMessage: "Số điện thoại không hợp lệ",
+            },
+        ])
+        .addField("#address", [
+            {
+                rule: "required",
+                errorMessage: "Địa chỉ nhà là bắt buộc",
+            },
+            {
+                rule: "minLength",
+                value: 7,
+                errorMessage: "Địa chỉ nhà phải có ít nhất 7 ký tự",
+            },
+            {
+                rule: "maxLength",
+                value: 150,
+                errorMessage: "Địa chỉ nhà phải có tối đa 150 ký tự",
+            },
+        ]);
+
+    validation.onSuccess((event) => {
+        event.target.submit(); // Gửi form khi không có lỗi
+    });
+</script>
+
+<script>
+    const GHN_TOKEN = "<%= ghn.token %>";
+    const GHN_SHOP_ID = "<%= ghn.shopId %>";
+    const GHN_BASE_URL = "<%= ghn.baseUrl %>";
+
+    function fetchProvinces() {
+        fetch(`${GHN_BASE_URL}/master-data/province`, {
+            method: "GET",
+            headers: {
+                Token: GHN_TOKEN,
+                ShopId: GHN_SHOP_ID,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const provinceSelect = document.getElementById("province-select");
+                data.data.forEach((province) => {
+                    const option = document.createElement("option");
+                    option.value = province.ProvinceID;
+                    option.textContent = province.ProvinceName;
+                    provinceSelect.appendChild(option);
+                });
+            });
+    }
+
+    function fetchDistricts(provinceId) {
+        fetch(`${GHN_BASE_URL}/master-data/district?province_id=${provinceId}`, {
+            method: "GET",
+            headers: {
+                Token: GHN_TOKEN,
+                ShopId: GHN_BASE_URL,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const districtSelect = document.getElementById("district-select"); // Reset district options
+                data.data.forEach((district) => {
+                    const option = document.createElement("option");
+                    option.value = district.DistrictID;
+                    option.textContent = district.DistrictName;
+                    districtSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Fetch wards based on selected district
+    function fetchWards(districtId) {
+        fetch(`${GHN_BASE_URL}/master-data/ward?district_id=${districtId}`, {
+            method: "GET",
+            headers: {
+                Token: GHN_TOKEN,
+                ShopId: GHN_SHOP_ID,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const wardSelect = document.getElementById("ward-select");
+                console.log("wardSelect: ", wardSelect);
+                data.data.forEach((ward) => {
+                    const option = document.createElement("option");
+                    option.value = ward.WardCode;
+                    option.textContent = ward.WardName;
+                    wardSelect.appendChild(option);
+                });
+            });
+    }
+
+    document.getElementById("province-select").addEventListener("change", function () {
+        const provinceId = this.value;
+        fetchDistricts(provinceId);
+    });
+
+    document.getElementById("district-select").addEventListener("change", function () {
+        const districtId = this.value;
+        fetchWards(districtId);
+    });
+
+    fetchProvinces();
+</script>
