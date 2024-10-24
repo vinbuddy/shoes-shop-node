@@ -185,7 +185,7 @@
                         </li>
                         <li class="flex items-center justify-between py-3 border-b">
                             <span>Phí vận chuyển</span>
-                            <span> 25.000 đ </span>
+                            <span id="shipping-fee"> 0 đ </span>
                         </li>
                         <li class="flex items-center justify-between py-3">
                             <span>Tổng thanh toán</span>
@@ -287,6 +287,42 @@
     const GHN_SHOP_ID = "<%= ghn.shopId %>";
     const GHN_BASE_URL = "<%= ghn.baseUrl %>";
 
+    const totalQuantity = "<%= locals.session.selectedItems.reduce((total, item) => total + item.soLuongSanPham, 0) %>";
+
+    const formatVNCurrency = (value) => {
+        return value.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+    };
+
+    async function fetchShippingFee() {
+        try {
+            const wardCode = document.getElementById("ward-select").value;
+            const districtId = document.getElementById("district-select").value;
+
+
+            const response = await fetch(`/checkout/api/calculate-shipping-fee`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    toWardCode: wardCode,
+                    toDistrictId: districtId,
+                    quantity: totalQuantity,
+                }),
+            });
+
+            const data = await response.json();
+            const shippingFee = data.shippingFee;
+            document.getElementById("shipping-fee").textContent = formatVNCurrency(shippingFee);
+        } catch (error) {
+            console.log("error: ", error);
+            
+        }
+    }
+
     function fetchProvinces() {
         fetch(`${GHN_BASE_URL}/master-data/province`, {
             method: "GET",
@@ -318,6 +354,8 @@
             .then((response) => response.json())
             .then((data) => {
                 const districtSelect = document.getElementById("district-select"); // Reset district options
+                
+                districtSelect.innerHTML = "<option disabled selected>Chọn quận huyện</option>";
                 data.data.forEach((district) => {
                     const option = document.createElement("option");
                     option.value = district.DistrictID;
@@ -339,7 +377,8 @@
             .then((response) => response.json())
             .then((data) => {
                 const wardSelect = document.getElementById("ward-select");
-                console.log("wardSelect: ", wardSelect);
+
+                wardSelect.innerHTML = "<option disabled selected>Chọn phường xã</option>";
                 data.data.forEach((ward) => {
                     const option = document.createElement("option");
                     option.value = ward.WardCode;
@@ -357,6 +396,10 @@
     document.getElementById("district-select").addEventListener("change", function () {
         const districtId = this.value;
         fetchWards(districtId);
+    });
+
+    document.getElementById("ward-select").addEventListener("change", function () {
+        fetchShippingFee();
     });
 
     fetchProvinces();
