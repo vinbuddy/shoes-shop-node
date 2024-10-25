@@ -2,12 +2,12 @@
     <div class="breadcrumbs text-sm mb-7">
         <ul>
             <li><a href="/">Trang chủ</a></li>
-            <li><a href="/">Giỏ hàng</a></li>
+            <li><a href="/cart">Giỏ hàng</a></li>
             <li>Thanh toán</li>
         </ul>
     </div>
 
-    <form id="checkout-form">
+    <form id="checkout-form" action="/checkout" method="post">
         <div class="grid grid-cols-12 gap-10">
             <div class="col-span-6">
                 <div>
@@ -21,6 +21,7 @@
                                     </div>
                                     <input
                                         id="receiver-name"
+                                        name="receiverName"
                                         type="text"
                                         placeholder="VD: Nguyễn Văn A"
                                         class="input input-bordered w-full"
@@ -34,6 +35,7 @@
                                     </div>
                                     <input
                                         id="phone-number"
+                                        name="phoneNumber"
                                         type="text"
                                         placeholder="VD: 0933691111"
                                         class="input input-bordered w-full"
@@ -87,6 +89,10 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Full Address Input -->
+                            <input type="hidden" name="fullAddress" id="full-address">
+                            <input type="hidden" name="shippingFee">
                         </div>
                     </section>
                     <section class="mt-10">
@@ -114,7 +120,7 @@
                                 <input
                                     id="momo-method"
                                     type="radio"
-                                    value="momo"
+                                    value="MoMo"
                                     name="paymentMethod"
                                     class="radio checked:bg-primary"
                                 />
@@ -127,7 +133,7 @@
                                 <input
                                     id="vnpay-method"
                                     type="radio"
-                                    value="vnpay"
+                                    value="VNPay"
                                     name="paymentMethod"
                                     class="radio checked:bg-primary"
                                 />
@@ -185,7 +191,7 @@
                         </li>
                         <li class="flex items-center justify-between py-3 border-b">
                             <span>Phí vận chuyển</span>
-                            <span id="shipping-fee"> 0 đ </span>
+                            <span id="shipping-fee"> 0 ₫ </span>
                         </li>
                         <li class="flex items-center justify-between py-3">
                             <span>Tổng thanh toán</span>
@@ -289,6 +295,13 @@
 
     const totalQuantity = "<%= locals.session.selectedItems.reduce((total, item) => total + item.soLuongSanPham, 0) %>";
 
+    let selectedProvince = "";
+    let selectedDistrict = "";
+    let selectedWard = "";
+    let address = "";
+    let fullAddress = "";
+
+
     const formatVNCurrency = (value) => {
         return value.toLocaleString("vi-VN", {
             style: "currency",
@@ -316,7 +329,9 @@
 
             const data = await response.json();
             const shippingFee = data.shippingFee;
+            
             document.getElementById("shipping-fee").textContent = formatVNCurrency(shippingFee);
+            document.querySelector('input[name="shippingFee"]').value = shippingFee;
         } catch (error) {
             console.log("error: ", error);
             
@@ -388,18 +403,36 @@
             });
     }
 
+    function updateFullAddress() {
+        address = document.getElementById("address").value;
+
+        fullAddress = `${address}, ${selectedWard}, ${selectedDistrict}, ${selectedProvince}`;
+
+        // Display the full address on the page (optional)
+        document.getElementById("full-address").value = fullAddress;
+    }
+
     document.getElementById("province-select").addEventListener("change", function () {
         const provinceId = this.value;
         fetchDistricts(provinceId);
+
+        selectedProvince = this.options[this.selectedIndex].text;
+        updateFullAddress();
     });
 
     document.getElementById("district-select").addEventListener("change", function () {
         const districtId = this.value;
         fetchWards(districtId);
+
+        selectedDistrict = this.options[this.selectedIndex].text;
+        updateFullAddress();
     });
 
     document.getElementById("ward-select").addEventListener("change", function () {
         fetchShippingFee();
+
+        selectedWard = this.options[this.selectedIndex].text;
+        updateFullAddress();
     });
 
     fetchProvinces();
