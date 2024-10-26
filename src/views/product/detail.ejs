@@ -212,6 +212,31 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Reset quantity to 1
+                    selectedQuantity.forEach(selectValue => {
+                        selectValue.innerHTML = 1
+                    })
+
+                    // Update cart badge
+                    const cartIcon = document.getElementById("cart-icon");
+                    const cartBadge = cartIcon.querySelector("span");
+
+                    const response = await fetch("/cart/api/total");
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const data = await response.json();
+                    const totalItems = data?.totalItems;
+                    
+                    // Render total items and if greater than 99, show 99+
+                    if (totalItems > 99) {
+                        cartBadge.innerText = "99+";
+                    } else {
+                        cartBadge.innerText = totalItems;
+                    }
+
                     Toastify({
                       text: "Sản phẩm đã được thêm vào giỏ hàng thành công!",
                       duration: 3000, 
@@ -222,11 +247,6 @@
                       },
                       close: false, 
                     }).showToast();
-
-                    // Reset quantity to 1
-                    selectedQuantity.forEach(selectValue => {
-                        selectValue.innerHTML = 1
-                    })
                 } else {
                     Toastify({
                       text: "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng!",
