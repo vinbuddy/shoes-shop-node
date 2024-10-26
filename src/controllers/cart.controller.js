@@ -246,3 +246,45 @@ export async function updateCartItemQuantityHandlerRequest(req, res) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function setSelectedItemsHandlerRequest(req, res) {
+    try {
+        const { selectedProductIds } = req.body;
+
+        const customer = req.session.customer;
+
+        if (!customer || !customer.maKhachHang) {
+            throw new Error("User is not authenticated.");
+        }
+
+        const { maKhachHang } = customer;
+
+        const cart = await GioHangModel.findOne({
+            maKhachHang: new mongoose.Types.ObjectId(maKhachHang),
+        })
+            .populate("maKhachHang")
+            .populate("danhSachSanPham.maSanPham")
+            .populate("danhSachSanPham.maKichCoSanPham");
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found." });
+        }
+
+        // Lọc ra các sản phẩm đã chọn từ selectedProductIds
+        const selectedItems = cart.danhSachSanPham.filter((item) =>
+            selectedProductIds.includes(item.maSanPham.maSanPham.toString())
+        );
+
+        req.session.selectedItems = selectedItems;
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+
+        return res.status(200).json({ message: "Set selected items successfully", selectedItems });
+    } catch (error) {
+        console.error("Error going to checkout:", error);
+        return res.status(500).json({ message: error.message });
+    }
+}

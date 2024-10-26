@@ -5,6 +5,7 @@ import {
     addToCartHandlerRequest,
     deleteCartItemHandlerRequest,
     updateCartItemQuantityHandlerRequest,
+    setSelectedItemsHandlerRequest,
 } from "../controllers/cart.controller.js";
 
 const router = express.Router();
@@ -15,5 +16,5 @@ router.get("/api/total", getTotalCartItemsRequest);
 router.post("/api/add", addToCartHandlerRequest);
 router.delete("/api/delete/:productId", deleteCartItemHandlerRequest);
 router.put("/api/update-quantity", updateCartItemQuantityHandlerRequest);
-
+router.post("/api/set-selected-items", setSelectedItemsHandlerRequest);
 export default router;
