@@ -48,6 +48,17 @@ export function initializeLoginWithGoogleService() {
                             anhDaiDien: profile.photos?.[0].value,
                         });
 
+                        if (customer) {
+                            // Update maKhachHang
+                            await KhachHangModel.findByIdAndUpdate(
+                                customer._id,
+                                {
+                                    maKhachHang: customer._id,
+                                },
+                                { new: true }
+                            );
+                        }
+
                         done(null, customer);
                     }
                 } catch (error) {

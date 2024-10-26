@@ -6,7 +6,7 @@ const monHangSchema = new mongoose.Schema({
         ref: "SanPham",
         required: true,
     },
-    kichCoSanPham: {
+    maKichCoSanPham: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "KichCo",
         required: true,

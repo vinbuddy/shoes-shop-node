@@ -1,76 +1,327 @@
 <div class="container">
-    <div class="md:flex">
+    <div class="md:flex min-h-[300px]">
         <div class="w-full">
-            <div class="md:grid md:grid-cols-3 gap-2">
+            <div class="breadcrumbs text-sm">
+                <ul>
+                    <li><a href="/">Trang chủ</a></li>
+                    <li>Giỏ hàng của bạn</li>
+                </ul>
+            </div>
+            <div class="md:grid md:grid-cols-3 gap-10">
                 <!-- Cart -->
-                <div class="col-span-2 p-5">
-                    <h1 class="text-xl font-medium">Shopping Cart</h1>
-
-                    <div class="flex justify-between items-center mt-6 pt-6">
-                        <div class="flex items-center">
-                            <img
-                                src="https://images.stockx.com/360/Air-Jordan-1-Retro-High-Travis-Scott/Images/Air-Jordan-1-Retro-High-Travis-Scott/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1635191289&h=384&fm=avif&q=57"
-                                width="60"
-                                class="rounded-xl"
-                            />
-
-                            <div class="flex flex-col ml-3">
-                                <span class="md:text-md font-medium">Jordan 1 Retro High OG SP</span>
-                                <span class="text-xs font-light text-gray-400">Size: EU 40</span>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-center items-center">
-                            <div class="pr-8 flex items-center text-;g">
-                                <button class="font-semibold p-2 cursor-pointer">
-                                    <i class="bx bx-minus"></i>
-                                </button>
-                                <div
-                                    class="flex justify-center items-center focus:outline-none bg-gray-100 border px-3 rounded"
-                                >
-                                    1
+                <div class="col-span-2">
+                    <div>
+                        <% if (cart && cart.danhSachSanPham.length > 0) { %>
+                            <% cart.danhSachSanPham.forEach(item => { %>
+                                <div  
+                                    data-productId="<%= item.maSanPham.maSanPham %>" 
+                                    data-productStockQuantity="<%= item.soLuongTon %>"
+                                    data-productPrice="<%= item.giaSanPham %>"
+                                    class="<%= item.soLuongTon == 0 ? "[&_.fade]:opacity-60" : ""  %> flex justify-between items-center mt-6 pt-6">
+                                    <div class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id=""
+                                            name="item[]"
+                                            class="checkbox checkbox-sm [--chkbg:#0578f8]"
+                                            <%= item.soLuongTon == 0 ? "disabled" : "" %>
+                                        />
+                                        <a class="fade" href="/product/<%= item.maSanPham.maSanPham %>">
+                                            <img
+                                                src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
+                                                width="60"
+                                                class="rounded-xl ms-2"
+                                            />
+                                        </a>
+            
+                                        <a href="/product/<%= item.maSanPham.maSanPham %>">
+                                            <div class="fade flex flex-col ml-3">
+                                                <span class="md:text-md font-medium max-w-[300px] truncate" title="<%= item.maSanPham.tenSanPham %>">
+                                                    <%= item.maSanPham.tenSanPham %>
+                                                </span>
+                                                <span class="text-sm font-light text-gray-500">
+                                                    Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %>
+                                                    - Giá: <%= formatVNCurrency(item.giaSanPham) %>
+                                                </span>
+                                            </div>
+                                            <% if(item.soLuongTon == 0) { %>
+                                                <span class="ml-3 text-red-500 text-sm">Hết hàng</span>
+                                            <% } %>
+                                        </a>
+                                    </div>
+        
+                                    <div class="flex justify-center items-center">
+                                        <div class="fade pr-8">
+                                            <span class="total-price" data-totalPrice="<%= item.giaSanPham * item.soLuongSanPham %>">
+                                                <%= formatVNCurrency(item.giaSanPham * item.soLuongSanPham) %>
+                                            </span>
+                                        </div>
+        
+                                        <div class="fade pr-8 flex items-center text-lg">
+                                            <button class="decrease-btn font-semibold p-2 cursor-pointer">
+                                                <i class="bx bx-minus"></i>
+                                            </button>
+                                            <div
+                                                class="quantity-select-value flex justify-center items-center text-base focus:outline-none bg-gray-100 border px-3 rounded"
+                                            >
+                                                <%= item.soLuongSanPham %>
+                                            </div>
+                                            <button class="increase-btn font-semibold p-2 cursor-pointer">
+                                                <i class="bx bx-plus"></i>
+                                            </button>
+                                        </div>
+        
+                                        <button class="delete-cart-item-btn text-red-500 text-lg">
+                                            <i class="bx bx-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <button class="font-semibold p-2 cursor-pointer">
-                                    <i class="bx bx-plus"></i>
-                                </button>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="flex items-center justify-center">
+                                <img width="250" src="/images/empty-cart.png" />
                             </div>
+                        <% } %>
 
-                            <div class="pr-8">
-                                <span class="text-xs font-medium">$10.50</span>
-                            </div>
-                            <button class="text-red-500 text-lg">
-                                <i class="bx bx-trash-alt"></i>
-                            </button>
-                        </div>
+                        
                     </div>
 
                     <div class="flex justify-between items-center mt-6 pt-6 border-t">
                         <div class="flex items-center">
                             <i class="fa fa-arrow-left text-sm pr-2"></i>
-                            <a href="" class="text-md font-medium text-blue-500">Continue Shopping</a>
+                            <a href="/product" class="text-md font-medium text-blue-500">Tiếp tục mua sắm</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- SUMMARY -->
-                <div class="p-5 bg-gray-100 rounded-xl overflow-visible">
-                    <span class="text-xl font-medium block mb-3">Summary</span>
+                <div class="p-5 bg-gray-100 rounded-2xl overflow-visible h-fit">
+                    <span class="text-xl font-medium block mb-3">Tóm tắt</span>
 
                     <p class="flex items-center justify-between py-2 border-b">
-                        <span class="text-gray-400">Item count</span>
-                        <span class="block text">1</span>
+                        <span class="text-neutral-600">Số sản phẩm đã chọn</span>
+                        <span id="total-selected-item" class="block text">0</span>
                     </p>
 
                     <p class="flex items-center justify-between py-2">
-                        <span class="text-gray-400">Subtotal</span>
-                        <span class="block text">$10.50</span>
+                        <span class="text-neutral-600">Tạm tính</span>
+                        <span id="sub-total" class="block text">0</span>
                     </p>
 
-                    <button class="mt-3 h-12 w-full bg-primary rounded-full focus:outline-none text-white">
-                        Check Out
+                    <button disabled id="checkout-btn" class="disabled:opacity-60 mt-3 h-12 w-full bg-primary rounded-full focus:outline-none text-white">
+                        <i id="checkout-loader" class='animate-spin hidden bx bx-loader-alt'></i>
+                        <span class="ms-2">Thanh toán</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    const deleteCartItemBtns = document.querySelectorAll(".delete-cart-item-btn");
+
+    const increaseBtn = document.querySelectorAll('.increase-btn')
+    const decreaseBtn = document.querySelectorAll('.decrease-btn')
+
+    const checkBoxes = document.querySelectorAll(".checkbox");
+    const totalSelectedItem = document.getElementById("total-selected-item");
+    const subTotal = document.getElementById("sub-total");
+
+    const checkoutBtn = document.getElementById("checkout-btn");
+
+    let updateCartTimeout;
+    let totalSelectedItems = 0;
+    let selectedProductIds = [];
+
+    const formatVNCurrency = (value) => {
+        return value.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+    };
+
+    // Delete cart item
+    deleteCartItemBtns.forEach(btn => {
+        btn.onclick = async function() {
+            const cartItem = this.closest("[data-productId]")
+            const productId = cartItem.getAttribute("data-productId");
+            
+            if (!productId) return;
+
+            // Call API to delete item from cart
+            const res = await fetch("/cart/api/delete/" + productId, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            if (res.ok) {
+                // Remove item from DOM
+                cartItem.remove();
+
+                // Update cart badge
+                const cartIcon = document.getElementById("cart-icon");
+                const cartBadge = cartIcon.querySelector("span");
+
+                cartBadge.innerText = Number(cartBadge.innerText) - 1;
+            }
+        }
+    })
+
+    increaseBtn.forEach(btn => {
+        btn.onclick = function () {
+            const selectedValue = this.parentElement.querySelector('.quantity-select-value');
+            const stockQuantity = this.closest("[data-productStockQuantity]").getAttribute("data-productStockQuantity");
+            const productId = this.closest("[data-productId]").getAttribute("data-productId");
+
+            const productPrice = this.closest("[data-productPrice]").getAttribute("data-productPrice");
+
+            // Find class total-price
+            const totalPrice = this.closest("[data-productPrice]").querySelector(".total-price");
+            
+            if (Number(selectedValue.innerText) >= Number(stockQuantity)) {
+                return
+            }
+            
+            // Increase the value
+            selectedValue.innerText = Number(selectedValue.innerText) + 1;
+
+            // Render total price
+
+            totalPrice.innerText = formatVNCurrency(Number(productPrice) * Number(selectedValue.innerText));
+            
+
+            debounceUpdateCart(productId, Number(selectedValue.innerText));
+        }
+    })
+
+    decreaseBtn.forEach(btn => {
+        btn.onclick = function () {
+            const selectedValue = this.parentElement.querySelector('.quantity-select-value');
+            const productId = this.closest("[data-productId]").getAttribute("data-productId");
+
+            const productPrice = this.closest("[data-productPrice]").getAttribute("data-productPrice");
+
+            // Find class total-price
+            const totalPrice = this.closest("[data-productPrice]").querySelector(".total-price");
+
+            // Decrease the value
+            if (Number(selectedValue.innerText) > 1) {
+                selectedValue.innerText = Number(selectedValue.innerText) - 1;
+
+                // Render total price
+                totalPrice.innerText = formatVNCurrency(Number(productPrice) * Number(selectedValue.innerText));
+
+                debounceUpdateCart(productId, Number(selectedValue.innerText));
+            }
+
+        }
+    })
+
+
+    const updateCartQuantityRequest = async (productId, newQuantity) => {
+        try {
+            const res = await fetch("/cart/api/update-quantity", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: newQuantity
+                })
+            })
+        } catch (error) {
+            console.log("error: ", error);
+        }
+    }
+
+    const debounceUpdateCart = (productId, newQuantity) => {
+        if (updateCartTimeout) {
+            clearTimeout(updateCartTimeout);
+        }
+        updateCartTimeout = setTimeout(() => {
+            updateCartQuantityRequest(productId, newQuantity);
+        }, 700); // Delay 0.7s before sending the request
+    };
+    
+    const renderSubTotal = () => {
+        const totalPrices = document.querySelectorAll(".total-price");
+        let subTotalValue = 0;
+
+        totalPrices.forEach(price => {
+            let totalPrice = Number(price.getAttribute("data-totalPrice"))
+            let isChecked = price.closest("[data-productId]").querySelector(".checkbox").checked;
+
+            // If the item is checked, add its price to sub total
+            if (isChecked) {
+                subTotalValue += totalPrice;
+            }
+        })
+        subTotal.innerText = formatVNCurrency(subTotalValue);
+    }
+
+    checkBoxes.forEach(checkbox => {
+        checkbox.onchange = function () {
+            // Count total selected items
+            const productId = this.closest("[data-productId]").getAttribute("data-productId")
+
+            if (this.checked) {
+                totalSelectedItems++;
+
+                selectedProductIds.push(productId);
+            } else {
+                totalSelectedItems--;
+
+                selectedProductIds = selectedProductIds.filter(id => id !== productId);
+            }
+
+            totalSelectedItem.innerText = totalSelectedItems;
+
+            // Enable checkout button if there is at least 1 item selected
+            if (totalSelectedItems > 0) {
+                checkoutBtn.removeAttribute("disabled");
+            } else {
+                checkoutBtn.setAttribute("disabled", true);
+            }
+
+            // Calculate sub total
+            renderSubTotal();
+
+
+        }
+    })
+
+    checkoutBtn.onclick = async function() {
+
+        const checkoutBtnLoader = checkoutBtn.querySelector("#checkout-loader");
+
+        if (selectedProductIds.length === 0) {
+            return;
+        }
+
+        checkoutBtnLoader.classList.remove("hidden");
+
+        try {
+            const res = await fetch("/cart/api/set-selected-items", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    selectedProductIds: selectedProductIds
+                })
+            }) 
+
+            if (res.ok) {
+                window.location.href = "/checkout";
+            }
+        } catch (error) {
+            console.log("error: ", error);
+        } finally {
+            checkoutBtnLoader.classList.add("hidden");
+        }
+    }
+</script>
