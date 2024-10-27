@@ -3,11 +3,9 @@ window.addEventListener("scroll", () => {
     const scrollPosition = window.scrollY;
 
     if (scrollPosition > 0) {
-        header.classList.add("backdrop-blur");
-        header.classList.add("bg-white/30");
+        header.classList.add("border-b");
     } else {
-        header.classList.remove("backdrop-blur");
-        header.classList.remove("bg-white/30");
+        header.classList.remove("border-b");
     }
 });
 
