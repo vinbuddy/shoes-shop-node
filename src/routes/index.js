@@ -9,6 +9,7 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import adminRoutes from "./admin.route.js";
 import checkoutRoutes from "./checkout.route.js";
+
 const router = express.Router();
 
 router.use("/", homeRoutes);
