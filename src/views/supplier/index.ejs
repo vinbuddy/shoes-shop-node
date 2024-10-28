@@ -1,8 +1,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="flex flex-col sm:flex-row justify-between sm:fixed left-4 right-4 z-10">
     <form action="/supplier/search" method="GET" class="fixed sm:static left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
-        <input type="text" name="name" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof name !== 'undefined' ? name : '' %>">
-        <select name="isDeleted" class="border border-gray-300 rounded px-4 py-2 flex-1">
+        <input type="text" name="tenNhaCungCap" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof tenNhaCungCap !== 'undefined' ? tenNhaCungCap : '' %>">
+        <select name="trangThaiXoa" class="border border-gray-300 rounded px-4 py-2 flex-1">
             <option value="">Tất cả trạng thái</option>
             <option value="false">Đang hoạt động</option>
             <option value="true">Dừng hoạt động</option>
@@ -23,30 +23,30 @@
         <li class="sm:rounded-md bg-white shadow mb-4">
             <div class="px-4 py-5 sm:px-6">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900"><%= supplier.name %></h3>
-                    <p class="mt-1 max-w-2xl text-sm font-semibold text-gray-800">Đại diện: <%= supplier.contactPerson %></p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900"><%= supplier.tenNhaCungCap %></h3>
+                    <p class="mt-1 max-w-2xl text-sm font-semibold text-gray-800">Đại diện: <%= supplier.nguoiLienHe %></p>
                 </div>
                 <div class="mt-4 flex gap-8">
-                    <p><a href="tel:<%= supplier.phone %>" class="text-blue-500 hover:underline"><i class="fas fa-phone-alt"></i> <%= supplier.phone %></a></p>
+                    <p><a href="tel:<%= supplier.soDienThoai %>" class="text-blue-500 hover:underline"><i class="fas fa-phone-alt"></i> <%= supplier.soDienThoai %></a></p>
                     <p><a href="mailto:<%= supplier.email %>" class="text-blue-500 hover:underline"><i class="fas fa-envelope"></i> <%= supplier.email %></a></p>
-                    <p><a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(supplier.address) %>" target="_blank" class="text-blue-500 hover:underline"><i class="fas fa-map-marker-alt"></i> <%= supplier.address %></a></p>
+                    <p><a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(supplier.diaChi) %>" target="_blank" class="text-blue-500 hover:underline"><i class="fas fa-map-marker-alt"></i> <%= supplier.diaChi %></a></p>
                 </div>
                 <div class="mt-4 flex items-center justify-between">
-                    <p class="text-sm font-medium text-gray-500"><span class="text-green-600"><% if (supplier.isDeleted) { %>
+                    <p class="text-sm font-medium text-gray-500"><span class="text-green-600"><% if (supplier.trangThaiXoa) { %>
                         <span class="bg-gray-200 text-red-500 px-2 py-1 rounded text-sm font-semibold">Dừng hoạt động</span>
                     <% } else { %>
                         <span class="bg-gray-200 text-green-500 px-2 py-1 rounded text-sm font-semibold">Đang hoạt động</span>
                     <% } %></span></p>
                     <div>
-                        <% if (!supplier.isDeleted) { %>
-                            <a href="/supplier/edit/<%= supplier.id %>" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded">
+                        <% if (!supplier.trangThaiXoa) { %>
+                            <a href="/supplier/edit/<%= supplier.maNhaCungCap %>" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded">
                                 <i class="fas fa-edit"></i> Sửa
                             </a>
-                            <a href="/supplier/delete/<%= supplier.id %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                            <a href="/supplier/delete/<%= supplier.maNhaCungCap %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
                                 <i class="fas fa-trash-alt"></i> Xoá
                             </a>
                         <% } else { %>
-                            <a href="/supplier/restore/<%= supplier.id %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                            <a href="/supplier/restore/<%= supplier.maNhaCungCap %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
                                 <i class="fas fa-undo"></i> Khôi phục
                             </a>
                         <% } %>
