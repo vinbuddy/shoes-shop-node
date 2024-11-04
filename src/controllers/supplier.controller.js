@@ -4,7 +4,7 @@ export async function deleteSupplier(req, res) {
     try {
         const { id } = req.params;
         await NhaSanXuatModel.findByIdAndUpdate(id, { trangThaiXoa: true });
-        return res.redirect("/supplier");
+        return res.redirect("/admin/supplier");
     } catch (error) {
         console.error("Error deleting supplier:", error);
     }
@@ -13,7 +13,7 @@ export async function restoreSupplier(req, res) {
     try {
         const { id } = req.params;
         await NhaSanXuatModel.findByIdAndUpdate(id, { trangThaiXoa: false });
-        return res.redirect("/supplier");
+        return res.redirect("/admin/supplier");
     } catch (error) {
         console.error("Error deleting brand:", error);
     }
@@ -25,14 +25,14 @@ export async function updateSupplier(req, res) {
         const updatedData = { tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi };
 
         await NhaSanXuatModel.findByIdAndUpdate(id, updatedData);
-        return res.redirect("/supplier");
+        return res.redirect("/admin/supplier");
     } catch (error) {
         console.error("Error updating supplier:", error);
     }
 }
 export function renderCreatePage(req, res) {
-    return res.render("supplier/create", {
-        layout: "./layouts/main",
+    return res.render("admin/supplier/create", {
+        layout: "./layouts/admin",
         page: "supplier",
         title: "create supplier",
     });
@@ -41,8 +41,8 @@ export async function renderUpdatePage(req, res) {
     const { id } = req.params;
     const supplier = await NhaSanXuatModel.findById(id);
     console.log(supplier);
-    return res.render("supplier/edit", {
-        layout: "./layouts/main",
+    return res.render("admin/supplier/edit", {
+        layout: "./layouts/admin",
         page: "supplier",
         title: "Update supplier",
         supplier: supplier,
@@ -53,8 +53,8 @@ export async function createSupplier(req, res) {
         const { tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi } = req.body;
         const existingSupplier = await NhaSanXuatModel.findOne({ tenNhaCungCap });
         if (existingSupplier) {
-            return res.render("supplier/create", {
-                layout: "./layouts/main",
+            return res.render("admin/supplier/create", {
+                layout: "./layouts/admin",
                 page: "Supplier",
                 title: "create supplier",
                 error: "Nhà cung cấp này đã tồn tại",
@@ -62,10 +62,10 @@ export async function createSupplier(req, res) {
         }
         const newSupplier = new NhaSanXuatModel({ tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi });
         await newSupplier.save();
-        return res.redirect("/supplier");
+        return res.redirect("/admin/supplier");
     } catch (error) {
-        return res.render("supplier/create", {
-            layout: "./layouts/main",
+        return res.render("admin/supplier/create", {
+            layout: "./layouts/admin",
             page: "supplier",
             title: "create supplier",
             error: error.message,
@@ -75,19 +75,19 @@ export async function createSupplier(req, res) {
 
 const getPagination = (req) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 3;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     return { page, limit, skip };
 };
 
 const renderSupplierPage = async (res, suppliers, page, totalSuppliers) => {
-    return res.render("supplier/index", {
-        layout: "./layouts/main",
+    return res.render("admin/supplier/index", {
+        layout: "./layouts/admin",
         page: "supplier",
         title: "supplier page",
         suppliers: suppliers,
         currentPage: page,
-        totalPages: Math.ceil(totalSuppliers / 3),
+        totalPages: Math.ceil(totalSuppliers / 10),
     });
 };
 

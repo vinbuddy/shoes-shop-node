@@ -4,16 +4,11 @@ import {
     renderAdminProductPage,
     createProductHandler,
 } from "../controllers/product.controller.js";
-import {
-    renderCategoryPageWithPagination,
-    deleteCategory,
-    updateCategory,
-    renderCreateCategoryPage,
-    createCategory,
-    renderUpdateCategoryPage,
-    restoreCategory,
-    searchCategory,
-} from "../controllers/category.controller.js";
+
+import brandRoutes from "./brand.route.js";
+import supplierRoutes from "./supplier.route.js";
+import categoryRoutes from "./category.route.js";
+
 import multer from "multer";
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
@@ -32,16 +27,10 @@ router.post(
     ]),
     createProductHandler
 );
-
+router.use("/brand", brandRoutes);
+router.use("/supplier", supplierRoutes);
+router.use("/category", categoryRoutes);
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
-router.get("/category", renderCategoryPageWithPagination);
-router.get("/category/create", renderCreateCategoryPage);
-router.get("/category/edit/:id", renderUpdateCategoryPage);
-router.get("/category/delete/:id", deleteCategory);
-router.get("/category/restore/:id", restoreCategory);
-router.post("/category/edit/:id", updateCategory);
-router.post("/category/create", createCategory);
-router.get("/category/search", searchCategory);
 
 export default router;

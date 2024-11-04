@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="flex flex-col sm:flex-row justify-between left-4 right-4 z-10">
-    <form action="/supplier/search" method="GET" class=" self-start left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
+    <form action="/admin/supplier/search" method="GET" class=" self-start left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
         <input type="text" name="tenNhaCungCap" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof tenNhaCungCap !== 'undefined' ? tenNhaCungCap : '' %>">
         <select name="trangThaiXoa" class="border border-gray-300 rounded px-4 py-2 flex-1">
             <option value="">Tất cả trạng thái</option>
@@ -33,14 +33,14 @@
                         <% } %></span></p>
                         <div>
                             <% if (!supplier.trangThaiXoa) { %>
-                                <a href="/supplier/edit/<%= supplier.maNhaCungCap %>" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded">
+                                <a href="/admin/supplier/edit/<%= supplier.maNhaCungCap %>" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded">
                                     <i class="fas fa-edit"></i> Sửa
                                 </a>
-                                <a href="/supplier/delete/<%= supplier.maNhaCungCap %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                                <a href="/admin/supplier/delete/<%= supplier.maNhaCungCap %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
                                     <i class="fas fa-trash-alt"></i> Xoá
                                 </a>
                             <% } else { %>
-                                <a href="/supplier/restore/<%= supplier.maNhaCungCap %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                                <a href="/admin/supplier/restore/<%= supplier.maNhaCungCap %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
                                     <i class="fas fa-undo"></i> Khôi phục
                                 </a>
                             <% } %>
@@ -52,7 +52,7 @@
         </ul>
     </div>
     <div class="sm:ml-4 sm:mt-0 mt-24">
-        <a href="/supplier/create" class=" float-right inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
+        <a href="/admin/supplier/create" class=" float-right inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
             <i class="fas fa-plus"></i> Thêm nhà cung cấp
         </a>
     </div>
