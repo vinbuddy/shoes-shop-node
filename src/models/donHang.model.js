@@ -66,7 +66,18 @@ const thongTinGiaoHangSchema = new mongoose.Schema({
         required: true,
     },
 });
-
+const trangThaiDonHangSchema = new mongoose.Schema({
+    maTrangThai: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TrangThai",
+        default: () => new mongoose.Types.ObjectId(),
+        unique: true,
+    },
+    thoiGian: {
+        type: Date,
+        default: Date.now,
+    },
+});
 const donHangSchema = new mongoose.Schema({
     maDonHang: {
         type: mongoose.Schema.Types.ObjectId,
@@ -90,27 +101,7 @@ const donHangSchema = new mongoose.Schema({
         required: true,
     },
     thongTinThanhToan: thongTinThanhToanSchema,
-    trangThaiDonHang: [
-        {
-            tenTrangThai: {
-                type: String,
-                enum: [
-                    "Chờ xác nhận",
-                    "Đang chuẩn bị hàng",
-                    "Đang giao",
-                    "Đã giao",
-                    "Hoàn thành",
-                    "Đã hủy",
-                    "Đã trả hàng",
-                ],
-                required: true,
-            },
-            thoiGian: {
-                type: Date,
-                default: Date.now,
-            },
-        },
-    ],
+    trangThaiDonHang: [trangThaiDonHangSchema],
     ngayDatHang: {
         type: Date,
         default: Date.now,

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Order Management</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <div class="container mt-5">
+            <h2>Danh sách đơn hàng của tôi</h2>
+            <ul class="nav nav-tabs" id="orderStatusTabs" role="tablist" style="margin-bottom: 20px;">
+                <li class="nav-item">
+                    <a
+                        class="nav-link active"
+                        id="all-orders-tab"
+                        data-toggle="tab"
+                        href="#all-orders"
+                        role="tab"
+                        aria-controls="all-orders"
+                        aria-selected="true"
+                        style="color: #007bff; font-weight: bold;"
+                        >Tất cả đơn</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        id="pending-orders-tab"
+                        data-toggle="tab"
+                        href="#pending-orders"
+                        role="tab"
+                        aria-controls="pending-orders"
+                        aria-selected="false"
+                        style="color: #ffc107; font-weight: bold;"
+                        >Chờ xác nhận</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        id="shipped-orders-tab"
+                        data-toggle="tab"
+                        href="#shipped-orders"
+                        role="tab"
+                        aria-controls="shipped-orders"
+                        aria-selected="false"
+                        style="color: #17a2b8; font-weight: bold;"
+                        >Đang giao</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        id="delivered-orders-tab"
+                        data-toggle="tab"
+                        href="#delivered-orders"
+                        role="tab"
+                        aria-controls="delivered-orders"
+                        aria-selected="false"
+                        style="color: #28a745; font-weight: bold;"
+                        >Đã giao</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        id="completed-orders-tab"
+                        data-toggle="tab"
+                        href="#completed-orders"
+                        role="tab"
+                        aria-controls="completed-orders"
+                        aria-selected="false"
+                        style="color: #28a745; font-weight: bold;"
+                        >Hoàn thành</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        id="cancelled-orders-tab"
+                        data-toggle="tab"
+                        href="#cancelled-orders"
+                        role="tab"
+                        aria-controls="cancelled-orders"
+                        aria-selected="false"
+                        style="color: #dc3545; font-weight: bold;"
+                        >Đã huỷ</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        id="refunded-orders-tab"
+                        data-toggle="tab"
+                        href="#refunded-orders"
+                        role="tab"
+                        aria-controls="refunded-orders"
+                        aria-selected="false"
+                        style="color: #dc3545; font-weight: bold;"
+                        >Trả hàng</a
+                    >
+                </li>
+            </ul>
+            <div class="tab-content" id="orderStatusTabsContent">
+                <div class="tab-pane fade show active" id="all-orders" role="tabpanel" aria-labelledby="all-orders-tab">
+                    <!-- All orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                   </div>             
+                <div class="tab-pane fade" id="pending-orders" role="tabpanel" aria-labelledby="pending-orders-tab">
+                    <!-- Pending orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% pendingOrders.forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="shipped-orders" role="tabpanel" aria-labelledby="shipped-orders-tab">
+                    <!-- Shipped orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.filter(order => order.status === 'Đang giao').forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="delivered-orders" role="tabpanel" aria-labelledby="delivered-orders-tab">
+                    <!-- Delivered orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.filter(order => order.status === 'delivered').forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="completed-orders" role="tabpanel" aria-labelledby="completed-orders-tab">
+                    <!-- Delivered orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.filter(order => order.status === 'completed').forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="cancelled-orders" role="tabpanel" aria-labelledby="cancelled-orders-tab">
+                    <!-- Cancelled orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.filter(order => order.status === 'cancelled').forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="refunded-orders" role="tabpanel" aria-labelledby="refunded-orders-tab">
+                    <!-- Cancelled orders content -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.filter(order => order.status === 'refunded').forEach(order => { %>
+                                <% order.chiTietDonHang.forEach(detail => { %>
+                                    <tr>
+                                        <td><img src="<%= detail.maSanPham.hinhAnhDaiDien %>" alt="" width="50" height="50"></td>
+                                        <td><%= detail.maSanPham.tenSanPham %></td>
+                                        <td><%= detail.soLuongDaChon %></td>
+                                        <td><%= detail.giaDaChon * detail.soLuongDaChon %></td>
+                                        <td><%= new Date(order.ngayDatHang).toLocaleDateString() %></td>
+                                    </tr>
+                                <% }) %>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>
