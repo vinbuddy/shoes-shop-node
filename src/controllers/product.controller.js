@@ -116,9 +116,11 @@ export async function renderProductPage(req, res) {
 export async function renderProductDetailPage(req, res) {
     const productId = req.params.id;
 
-    const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(productId) }).populate({
-        path: "danhSachKichCo.maKichCo",
-    });
+    const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(productId) })
+        .populate({
+            path: "danhSachKichCo.maKichCo",
+        })
+        .populate("danhSachDanhMuc");
 
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,

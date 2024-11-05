@@ -72,11 +72,21 @@
                 </ul>
             </section>
 
-            <section class="mt-10">
-                <p class="mb-5">Chọn hình ảnh đại diện</p>
-                <ul id="uploadImageThumnail" class="grid grid-cols-4 gap-5">
-                    <input id="product-image-thumbnail" name="productImageThumbnail" hidden type="file" accept="image/png, image/jpeg" />
-                    <label
+            <div class="grid grid-cols-12 gap-5">
+                <section class="col-span-4 mt-10">
+                    <div class="flex items-center gap-2 mb-5">
+                        <p>Chọn hình ảnh đại diện</p>
+    
+                        <label class="btn btn-sm" for="product-image-thumbnail">
+                            <i class='bx bx-upload'></i>
+                            Thêm
+                        </label>
+                    </div>
+                   
+                    <ul id="uploadImageThumnail">
+                        <input id="product-image-thumbnail" name="productImageThumbnail" hidden type="file" accept="image/png, image/jpeg" />
+                        
+                        <!-- <label
                         for="product-image-thumbnail"
                         class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
                     >
@@ -87,28 +97,28 @@
 
                             <p class="text-primary">Thêm hình ảnh</p>
                         </div>
-                    </label>
-                </ul>
-            </section>
+                    </label> -->
+                    </ul>
+                </section>
+    
+                <section class="col-span-8 mt-10">
+                    <!-- <p class="mb-5">Chọn danh sách hình ảnh</p> -->
 
-            <section class="mt-10">
-                <p class="mb-5">Chọn danh sách hình ảnh</p>
-                <ul id="uploadImages" class="grid grid-cols-4 gap-5">
-                    <input id="product-image-files" name="productImageFiles" hidden type="file" accept="image/png, image/jpeg" multiple />
-                    <label
-                        for="product-image-files"
-                        class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
-                    >
-                        <div>
-                            <div class="btn bg-primary text-white hover:bg-primary btn-circle mb-5 mx-auto text-xl">
-                                <i class="bx bx-plus"></i>
-                            </div>
+                    <div class="flex items-center gap-2 mb-5">
+                        <p>Chọn danh sách hình ảnh</p>
+    
+                        <label class="btn btn-sm" for="product-image-files">
+                            <i class='bx bx-upload'></i>
+                            Thêm
+                        </label>
+                    </div>
 
-                            <p class="text-primary">Thêm hình ảnh</p>
-                        </div>
-                    </label>
-                </ul>
-            </section>
+                    <ul id="uploadImages" class="grid grid-cols-4 gap-2 max-h-[400px] overflow-y-auto scrollbar">
+                        <input id="product-image-files" name="productImageFiles" hidden type="file" accept="image/png, image/jpeg" multiple />
+                        
+                    </ul>
+                </section>
+            </div>
 
             <section class="mt-14">
                 <button class="w-full btn btn-lg bg-primary text-white hover:bg-primary rounded-xl">
@@ -177,8 +187,8 @@
 
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <div class="preview-image relative group border rounded-2xl">
-                        <div class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                    <div class="preview-image relative group border rounded-2xl h-full">
+                        <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
                             <img src="${e.target.result}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
                         </div>
                         <button data-index="${i}" type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
@@ -237,9 +247,9 @@
 
         const li = document.createElement("li");
         li.innerHTML = `
-            <div class="preview-image relative group border rounded-2xl">
-                <div class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
-                    <img src="${url}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
+            <div class="preview-image relative group border rounded-2xl h-full">
+                <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                    <img src="${url}" class="h-[400px] w-full object-cover object-center group-hover:opacity-75" />
                 </div>
                 <button data-url="${url}" type="button" class="btn-remove-thumbnail-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
                     <i class="bx bx-x"></i>
@@ -264,3 +274,16 @@
         
     })
 </script> 
+
+<!-- <label
+                        for="product-image-thumbnail"
+                        class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
+                    >
+                        <div>
+                            <div class="btn bg-primary text-white hover:bg-primary btn-circle mb-5 mx-auto text-xl">
+                                <i class="bx bx-plus"></i>
+                            </div>
+
+                            <p class="text-primary">Thêm hình ảnh</p>
+                        </div>
+                    </label> -->

@@ -36,6 +36,15 @@
                 <p class="mt-2 text-gray-500"><%= product ? product.moTaSanPham : "Unknown Description" %></p>
 
                 <div class="mt-7">
+                    <h2 class="text-base font-semibold mb-2">Danh mục</h2>
+                    <div class="flex items-center gap-2">
+                        <% product.danhSachDanhMuc.forEach(category => { %>
+                            <span class="badge badge-ghost badge-md"><%= category.tenDanhMuc %></span>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <div class="mt-7">
                     <h2 class="text-base font-semibold mb-2">Kích cỡ</h2>
                     <div id="size-list" class="grid grid-cols-4 gap-3">
                         <% if (product && product.danhSachKichCo.length > 0) { %>

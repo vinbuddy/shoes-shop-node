@@ -1,148 +1,131 @@
-<header id="header" class="fixed top-0 left-0 right-0 z-10 bg-white">
-    <div class="container flex justify-between items-center py-4">
-        <div class="flex items-center gap-4">
-            <img class="size-10" src="/images/logo.png" alt="" />
-            <h1 class="font-bold text-xl text-primary">Shoes Shop</h1>
-        </div>
-
-        <nav class="py-2 px-3.5 rounded-full">
-            <ul class="flex items-center gap-5">
+<div class="relative">
+    <header id="header" class="fixed top-0 left-0 right-0 z-10 bg-white">
+        <div class="container flex justify-between items-center py-4">
+            <div class="flex items-center gap-4">
+                <img class="size-10" src="/images/logo.png" alt="" />
+                <h1 class="font-bold text-xl text-primary">Shoes Shop</h1>
+            </div>
+    
+            <ul class="flex items-center justify-between h-16 [&_li]:cursor-pointer">
                 <li class="rounded-full px-2 text-black bg-[#E4E4E7]">
                     <a href="/">Trang chủ</a>
                 </li>
-                <li class="relative group">
-                    <a href="#">Thương hiệu</a>
-                    <span>
-                        <i class="bx bx-chevron-down"></i>
-                    </span>
-
-                    <ul
-                        class="group-hover:visible invisible transition-all duration-200 ease-in-out transform group-hover:opacity-100 group-hover:scale-100 scale-75 opacity-0 absolute top-full w-auto min-w-[160px] left-1/2 -translate-x-1/2 bg-white rounded-lg border shadow-md overflow-hidden"
-                    >
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Nike</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Adidas</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Puma</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content">
-                            <a class="block" href="#">Vans</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="relative group">
-                    <a href="#">Nam</a>
-                    <span>
-                        <i class="bx bx-chevron-down"></i>
-                    </span>
-
-                    <ul
-                        class="group-hover:visible invisible transition-all duration-200 ease-in-out transform group-hover:opacity-100 group-hover:scale-100 scale-75 opacity-0 absolute w-auto min-w-[160px] top-full bg-white rounded-lg border shadow overflow-hidden"
-                    >
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Nike</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Adidas</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Puma</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content">
-                            <a class="block" href="#">Vans</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="relative group">
-                    <a href="#">Nữ</a>
-                    <span>
-                        <i class="bx bx-chevron-down"></i>
-                    </span>
-
-                    <ul
-                        class="group-hover:visible invisible transition-all duration-200 ease-in-out transform group-hover:opacity-100 group-hover:scale-100 scale-75 opacity-0 absolute w-auto min-w-[160px] top-full bg-white rounded-lg border shadow overflow-hidden"
-                    >
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Nike</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Adidas</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content border-b">
-                            <a class="block" href="#">Puma</a>
-                        </li>
-                        <li class="py-2 px-4 hover:bg-content">
-                            <a class="block" href="#">Vans</a>
-                        </li>
-                    </ul>
-                </li>
-                <li><a href="#">Liên hệ</a></li>
-            </ul>
-        </nav>
-
-        <div
-            class="relative text-base flex items-center gap-3 rounded-full py-1 ps-3 pe-2 transition-all duration-300 ease-in"
-        >
-            <a id="search-icon" href="javascript:void(0);" class="text-2xl">
-                <i id="search-icon-inner" class="bx bx-search"></i>
-            </a>
-
-            <a id="cart-icon" class="relative text-2xl" href="/cart">
-                <i class="bx bx-cart-alt"></i>
-
-                <span
-                    class="absolute top-[-10px] right-[-10px] flex justify-center items-center bg-danger text-white rounded-full text-sm size-5"
-                    >0</span
-                >
-            </a>
-            <input id="search-input" class="hidden outline-none" placeholder="Tìm kiếm sản phẩm" type="text" />
-
-            <% if (locals?.session?.customer) { %>
-                <div  class="group/customer relative">
-                    <img
-                        id="current-user-avatar"
-                        class="w-8 h-8 rounded-full cursor-pointer"
-                        src="<%= session.customer.anhDaiDien %>"
-                        alt="Rounded Avatar"
-                    />
-                    <div class="absolute overflow-hidden right-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 invisible transition-opacity duration-300 ease-in-out group-hover/customer:opacity-100 group-hover/customer:visible">
-                        <a href="/user/profile" class="flex items-center gap-2 px-4 py-2 text-neutral-600 hover:bg-gray-100">
-                            <i class='bx bx-user'></i>
-                            Trang cá nhân
-                        </a>
-                        <a href="/auth/logout" class="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-gray-100">
-                            <i class='bx bx-log-out'></i>
-                            Đăng xuất
-                        </a>
+                <li class="px-2 text-black group">
+                  <a href="#" class="flex items-center px-2">Shop  <i class="bx bx-chevron-down"></i>
+                  </a>
+                  <div class="absolute left-0 w-screen hidden group-hover:block before:absolute before:top-[-10px] before:h-20 before:w-full">
+                    <div class="bg-white shadow-lg">
+                      <div class="container mx-auto px-4 py-8">
+                        <div class="grid grid-cols-4 gap-x-8 gap-y-10">
+                          <div class="col-span-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
+                            <ul class="space-y-2">
+                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Running</a></li>
+                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Basketball</a></li>
+                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Lifestyle</a></li>
+                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Soccer</a></li>
+                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Training</a></li>
+                            </ul>
+                          </div>
+                          <div class="col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Products</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                              <a href="#" class="group">
+                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+                                  <img src="/placeholder.svg?height=200&width=200" alt="Featured Sneaker 1" class="object-center object-cover group-hover:opacity-75" />
+                                </div>
+                                <h4 class="mt-2 text-sm text-gray-700">Air Max 2023</h4>
+                                <p class="mt-1 text-sm font-medium text-gray-900">$129.99</p>
+                              </a>
+                              <a href="#" class="group">
+                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+                                  <img src="/placeholder.svg?height=200&width=200" alt="Featured Sneaker 2" class="object-center object-cover group-hover:opacity-75" />
+                                </div>
+                                <h4 class="mt-2 text-sm text-gray-700">Ultra Boost Pro</h4>
+                                <p class="mt-1 text-sm font-medium text-gray-900">$159.99</p>
+                              </a>
+                            </div>
+                          </div>
+                          <div class="col-span-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Special Offer</h3>
+                            <a href="#" class="block rounded-lg overflow-hidden">
+                              <img src="/placeholder.svg?height=300&width=200" alt="Promo Image" class="w-full h-auto object-center object-cover" />
+                              <div class="bg-gray-900 bg-opacity-75 p-4">
+                                <h4 class="text-white text-lg font-semibold">Summer Sale</h4>
+                                <p class="text-white mt-2">Up to 50% off on selected items</p>
+                              </div>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                </div>
-                
-            <% } %>
-
-            <% if (!locals?.session?.customer) { %>
-                <a
-                    id="sign-in-btn"
-                    class="inline-block rounded-full px-3 py-1 text-sm bg-[#E4E4E7] text-black focus:outline-none focus:ring"
-                    href="/auth/login"
-                >
-                    Đăng nhập
-                </a>
-            <% } %>
-             
-            <button
-                id="search-btn"
-                class="hidden rounded-full px-3 py-1 text-sm bg-primary text-white focus:outline-none focus:ring"
+                  </div>
+                </li>
+                <li><a href="#" class="hover:text-gray-800 px-2 text-black">Về chúng tôi</a></li>
+                <li><a href="#" class="hover:text-gray-800 px-2 text-black">Liên hệ</a></li>
+              </ul>
+    
+            <div
+                class="relative text-base flex items-center gap-3 rounded-full py-1 ps-3 pe-2 transition-all duration-300 ease-in"
             >
-                <i class="bx bx-search relative top-[1px]"></i>
-                <span>Tìm</span>
-            </button>
-            
+                <a id="search-icon" href="javascript:void(0);" class="text-2xl">
+                    <i id="search-icon-inner" class="bx bx-search"></i>
+                </a>
+    
+                <a id="cart-icon" class="relative text-2xl" href="/cart">
+                    <i class="bx bx-cart-alt"></i>
+    
+                    <span
+                        class="absolute top-[-10px] right-[-10px] flex justify-center items-center bg-danger text-white rounded-full text-sm size-5"
+                        >0</span
+                    >
+                </a>
+                <input id="search-input" class="hidden outline-none" placeholder="Tìm kiếm sản phẩm" type="text" />
+    
+                <% if (locals?.session?.customer) { %>
+                    <div  class="group/customer relative">
+                        <img
+                            id="current-user-avatar"
+                            class="w-8 h-8 rounded-full cursor-pointer"
+                            src="<%= session.customer.anhDaiDien %>"
+                            alt="Rounded Avatar"
+                        />
+                        <div class="absolute overflow-hidden right-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 invisible transition-opacity duration-300 ease-in-out group-hover/customer:opacity-100 group-hover/customer:visible">
+                            <a href="/user/profile" class="flex items-center gap-2 px-4 py-2 text-neutral-600 hover:bg-gray-100">
+                                <i class='bx bx-user'></i>
+                                Trang cá nhân
+                            </a>
+                            <a href="/auth/logout" class="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-gray-100">
+                                <i class='bx bx-log-out'></i>
+                                Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                    
+                <% } %>
+    
+                <% if (!locals?.session?.customer) { %>
+                    <a
+                        id="sign-in-btn"
+                        class="inline-block rounded-full px-3 py-1 text-sm bg-[#E4E4E7] text-black focus:outline-none focus:ring"
+                        href="/auth/login"
+                    >
+                        Đăng nhập
+                    </a>
+                <% } %>
+                 
+                <button
+                    id="search-btn"
+                    class="hidden rounded-full px-3 py-1 text-sm bg-primary text-white focus:outline-none focus:ring"
+                >
+                    <i class="bx bx-search relative top-[1px]"></i>
+                    <span>Tìm</span>
+                </button>
+                
+            </div>
         </div>
-    </div>
-</header>
+    </header>
+</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
