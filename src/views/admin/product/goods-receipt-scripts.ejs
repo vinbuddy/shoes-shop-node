@@ -1,0 +1,283 @@
+<script defer>
+    $("#productSelect").on("change", function () {
+        const productId = $(this).val();
+
+        if (productId !== "null") {
+            $.ajax({
+                url: `/api/product/${productId}`,
+                type: "GET",
+                dataType: "json",
+                success: async function (data) {
+                    await updateProductInfo(data);
+                },
+                error: function (error) {
+                    console.log("Error:", error);
+                },
+            });
+        }
+    });
+
+    // lst là mảng chứa các obj như sau:
+    // [{
+    //     'product_name': tên sản phẩm,
+    //     'total_buy': tổng số lượng đôi giày các size đã nhập trên 1 sản phẩm,
+    //     'sizeArray': [{
+    //          'size_id': id size,
+    //          'size_name': tên size,
+    //          'quantity' : số lượng đã nhập,
+    //      }],
+    //     'size_lst' : chuỗi các size giày đã nhập,
+    // }]
+
+    const lst = [];
+    let productData = null;
+    let inputEntryPrice;
+    // Cập nhật bảng thông tin size giày, dép
+    async function updateProductInfo(product) {
+        productData = product;
+        $("#product_size_price").html("");
+        $("#product_name").text(product.tenSanPham);
+
+        for (const size of product.danhSachKichCo) {
+            // Lấy toàn bộ thông tin size giày hiện tại
+            const data = await getProductSizeById(size);
+
+            if (data == null) return;
+            $("#product_size_price").append(`
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="flex mt-2 mb-2 m-auto">
+                        <input type="checkbox" name="" id="${data.maKichCo}" class="product-checkbox hidden peer">
+                        <label for="${data.maKichCo}" class="text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white">Size ${data.tenKichCo}</label>
+                    </div>
+                    <div class="mt-2 mb-2 m-auto">
+                        <input type="text" name="" id="${data.maKichCo}-quantity" class="w-20 border-2 rounded outline-none py-1 px-2">
+                    </div>
+                    <div class=" mt-2 mb-2 m-auto">
+                        <input type="text" name="" id="${data.maKichCo}-entry-price" class="entry-price w-32 border-2 rounded outline-none py-1 px-2">
+                    </div>
+                </div>
+            `);
+        }
+
+        // Kiểm tra sản phẩm đã chọn hay chưa
+        for (const item of lst) {
+            if (product.tenSanPham == item.product_name) {
+                item.sizeArray.forEach((size) => {
+                    $(`#${size.size_id}`).prop("checked", true);
+                    $(`#${size.size_id}-quantity`).val(size.quantity);
+                    $(`#${size.size_id}-entry-price`).val(size.price);
+                });
+            }
+        }
+        inputEntryPrice = $('.entry-price');
+    }
+
+    function handleSameEntryPrice(e) {
+
+        let newValue = e.target.value;
+        for (const input of inputEntryPrice) {
+            input.value = newValue;
+        }
+    }
+
+    $(`#same-entry-price`).on('click', function() {
+        
+        if ($(`#same-entry-price`).prop("checked") === true) {
+            
+            Array.from(inputEntryPrice).forEach(input => {
+                input.addEventListener('input', handleSameEntryPrice)
+            });
+        }
+        else{
+            Array.from(inputEntryPrice).forEach(input => {
+                input.removeEventListener('input', handleSameEntryPrice)
+            });
+        }
+    });
+
+    // Lấy thông tin size giày dép bằng ID
+    async function getProductSizeById(size) {
+        if (size !== "null") {
+            const response = await $.ajax({
+                url: `/api/product-size/${size.maKichCo}`,
+                type: "GET",
+                dataType: "json",
+            });
+            return response;
+        } else {
+            return null;
+        }
+    }
+
+    function removeProduct() {
+        let btnDemo = document.getElementsByClassName("remove_product");
+        Array.from(btnDemo).forEach((button) => {
+            button.addEventListener('click', (e) => {
+                console.log(lst)
+                for (const item of lst) {
+                    if (e.target.id == item.product_name)
+                    {
+                        let index = lst.findIndex(i => i.product_name == item.product_name);
+                        console.log(index)
+                        lst.splice(index, 1);
+                    }
+                }
+                renderInfoTable();
+            });
+        });
+    }
+
+    function renderInfoTable(){
+        // Xuất dữ liệu sang danh sách thông tin
+        $("#product_item_table tbody").html("");
+        lst.forEach((item) => {
+            $("#product_item_table tbody").append(`
+                <tr>
+                    <td class="text-center border-2 w-[30%] px-2 py-4">${item.product_name}</td>
+                    <td class="text-center border-2 w-[10%] px-2 py-4">${item.total_buy}</td>
+                    <td class="border-2 w-[30%] px-2 py-4">${item.size_lst}</td>
+                    <td class="text-center border-2 w-[10%] px-2 py-4"><i id="${item.product_name}" class='cursor-pointer text-red-600 text-xl bx bxs-trash remove_product'></i></td>
+                </tr>
+            `);
+        });
+
+        removeProduct();
+    }
+
+    // Khi nhấn nút 'Thêm vào danh sách'
+    $("#add_to_list").on("click", async function () {
+
+        $(`#same-entry-price`).prop("checked", false)
+
+        await saveTemporaryData();
+        // console.log(lst)
+        renderInfoTable();
+    });
+
+    // Tạo và chèn dữ liệu vào danh sách thông tin
+    async function saveTemporaryData() {
+        let sizeArray = [];
+        let total_buy = 0;
+        let size_lst = "";
+        // Nhận thông tin các size giày dép
+        for (const item of productData.danhSachKichCo) {
+            // Lấy thông tin những size giày được chọn
+            if ($(`#${item.maKichCo}`).prop("checked") === true) {
+                let size = await getProductSizeById(item);
+                let quantity = parseInt($(`#${item.maKichCo}-quantity`).val());
+                let price = parseInt($(`#${item.maKichCo}-entry-price`).val());
+                
+                let sizeObj = {
+                    size_id: item.maKichCo,
+                    size_name: size.tenKichCo,
+                    quantity: quantity,
+                    price: price,
+                };
+                sizeArray.push(sizeObj);
+            }
+        }
+        // Tính tổng số lượng đôi giày các size của 1 loại sản phẩm
+        productData.danhSachKichCo.forEach((item) => {
+            // Lấy thông tin những size giày được chọn
+            if ($(`#${item.maKichCo}`).prop("checked") === true) {
+                let quantity_order = parseInt($(`#${item.maKichCo}-quantity`).val());
+                if (quantity_order != 0) {
+                    total_buy += quantity_order;
+                }
+            }
+        });
+        // Tạo chuỗi danh sách các size
+        sizeArray.forEach((size) => {
+            size_lst += size.size_name + " ";
+        });
+
+        const info = {
+            product_name: productData.tenSanPham,
+            total_buy: total_buy,
+            sizeArray: sizeArray,
+            size_lst: size_lst,
+        };
+        if (sizeArray.length == 0) {
+            return;
+        }
+        // Tóm tắt thông tin sản phẩm
+        for (const item of lst) {
+            if (item.product_name == info.product_name) {
+                item.total_buy = info.total_buy;
+                item.sizeArray = info.sizeArray;
+                item.size_lst = info.size_lst;
+                return;
+            }
+        }
+        lst.push(info);
+    }
+
+    // function removeProduct(e) {
+    //     console.log(1)
+    //     for (const item of lst) {
+    //         if (e.target.id == item.product_name)
+    //         {
+    //             let index = lst.findIndex(i => i.product_name == item.product_name);
+    //             lst.splice(index, 1);
+    //             break;
+    //         }
+    //     }
+    //     renderInfoTable();
+    // }
+    
+    
+    // let supplierData = null;
+    // $('#supplierSelect').on('change', async function() {
+    //     try {
+    //         supplierData = await getSupplierInfo($(this));
+    //     } catch (error) {
+    //         console.log('Error:', error);
+    //     }
+    // });
+
+    //Get Supplier Infomation
+    // async function getSupplierInfo(element) {
+    //     const supplierId = element.val();
+    //     if (supplierId !== 'null') {
+    //         const response = await $.ajax({
+    //             url: `/api/supplier/${supplierId}`,
+    //             type: 'GET',
+    //             dataType: 'json'
+    //         });
+    //         return response;
+    //     } else {
+    //         return null;
+    //     }
+    // }
+</script>
+<script>
+    $(document).ready(function () {
+        // Nhập cùng một giá nhập
+        const useSamePriceCheckBox = $("#same-entry-price");
+        const entryPriceInputs = $(".entry-price");
+        const productCheckboxes = $(".product-checkbox");
+        // Cập nhật các ô input giá nhập
+        function updateAllEntryPrices(price) {
+            productCheckboxes.each(function () {
+                if ($(this).is(":checked")) {
+                    $(this).siblings(".price-input").val(price);
+                }
+            });
+        }
+        // Khi check box "cùng giá" thay đổi
+        useSamePriceCheckBox.on("change", function () {
+            if (useSamePriceCheckBox.is(":checked")) {
+                updateAllEntryPrices(entryPriceInputs.first().val());
+            }
+        });
+        // Khi thay đổi giá ở một ô input bất kỳ
+        entryPriceInputs.each(function (entryPriceInput) {
+            entryPriceInput.on("input", function () {
+                console.log(useSamePriceCheckBox.is(":checked"));
+                if (useSamePriceCheckBox.is(":checked")) {
+                    updateAllEntryPrices($(this).val());
+                }
+            });
+        });
+    });
+</script>
