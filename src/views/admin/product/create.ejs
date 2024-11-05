@@ -49,31 +49,64 @@
                 <textarea name="description" id="description" class="textarea textarea-bordered h-24"></textarea>
             </label>
 
-            <section class="mt-10">
-                <p class="mb-5">Chọn danh mục cho sản phẩm</p>
-                <ul>
-                    <% if (categories && categories.length > 0) { %>
-                        <% categories.forEach(category => { %>
-                            <li class="flex items-center gap-2 mb-3">
-                                <input type="checkbox" 
-                                    id="category-<%= category.maDanhMuc %>" 
-                                    name="category[]" 
-                                    value="<%= category.maDanhMuc %>" 
-                                    class="checkbox checkbox-sm [--chkbg:#0578f8]" 
-                                />
-                                <label class="cursor-pointer" for="category-<%= category.maDanhMuc %>">
-                                    <%= category.tenDanhMuc %>
-                                </label>
-                            </li>
-                        <% }) %>
-                    <% } else { %>
-                        <li class="mb-3">Không có danh mục nào.</li>
-                    <% } %>
-                </ul>
-            </section>
+            <div class="grid grid-cols-12 gap-5 mt-10">
+                <section class="col-span-5">
+                    <p class="mb-5">Chọn danh mục cho sản phẩm</p>
+                    <ul>
+                        <% if (categories && categories.length > 0) { %>
+                            <% categories.forEach(category => { %>
+                                <li class="flex items-center gap-3 mb-5 last:mb-0">
+                                    <input type="checkbox" 
+                                        id="category-<%= category.maDanhMuc %>" 
+                                        name="category[]" 
+                                        value="<%= category.maDanhMuc %>" 
+                                        class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                    />
+                                    <label class="cursor-pointer" for="category-<%= category.maDanhMuc %>">
+                                        <%= category.tenDanhMuc %>
+                                    </label>
+                                </li>
+                            <% }) %>
+                        <% } else { %>
+                            <li class="mb-3">Không có danh mục nào.</li>
+                        <% } %>
+                    </ul>
+                </section>
+                <section class="col-span-7">
+                    <p class="mb-5">Chọn kích cỡ cho sản phẩm</p>
+                    <ul id="size-list">
+                        <% if (sizes && sizes.length > 0) { %>
+                            <% sizes.forEach(size => { %>
+                                <li class="flex items-center justify-between mb-5 last:mb-0 gap-5">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" 
+                                            id="size-<%= size.maKichCo %>" 
+                                            name="sizes[<%= size.maKichCo %>][maKichCo]" 
+                                            value="<%= size.maKichCo %>" 
+                                            class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                        />
+                                        <label class="cursor-pointer" for="size-<%= size.maKichCo %>">
+                                            Kích cỡ <%= size.tenKichCo %>
+                                        </label>
+                                    </div>
 
-            <div class="grid grid-cols-12 gap-5">
-                <section class="col-span-4 mt-10">
+                                    <div class="flex-1 flex items-center gap-5">
+                                        <label for="" class="flex-1 text-right">Nhập giá kích cỡ <%= size.tenKichCo %></label>
+                                        <input disabled type="text" class="input input-sm input-bordered">
+                                        <input type="text" name="sizes[<%= size.maKichCo %>][giaKichCo]" hidden>
+                                    </div>
+                                   
+                                </li>
+                            <% }) %>
+                        <% } else { %>
+                            <li class="mb-3">Không có kích cỡ nào.</li>
+                        <% } %>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="grid grid-cols-12 gap-5 mt-20">
+                <section class="col-span-5">
                     <div class="flex items-center gap-2 mb-5">
                         <p>Chọn hình ảnh đại diện</p>
     
@@ -85,23 +118,11 @@
                    
                     <ul id="uploadImageThumnail">
                         <input id="product-image-thumbnail" name="productImageThumbnail" hidden type="file" accept="image/png, image/jpeg" />
-                        
-                        <!-- <label
-                        for="product-image-thumbnail"
-                        class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
-                    >
-                        <div>
-                            <div class="btn bg-primary text-white hover:bg-primary btn-circle mb-5 mx-auto text-xl">
-                                <i class="bx bx-plus"></i>
-                            </div>
-
-                            <p class="text-primary">Thêm hình ảnh</p>
-                        </div>
-                    </label> -->
+                   
                     </ul>
                 </section>
     
-                <section class="col-span-8 mt-10">
+                <section class="col-span-7">
                     <!-- <p class="mb-5">Chọn danh sách hình ảnh</p> -->
 
                     <div class="flex items-center gap-2 mb-5">
@@ -156,6 +177,32 @@
             alert("Vui lòng chọn ít nhất một hình ảnh sản phẩm");
             return;
         }
+
+        if (productImageThumbnailInputFile.files.length === 0) {
+            alert("Vui lòng chọn hình ảnh đại diện cho sản phẩm");
+            return;
+        }
+
+        // Kiểm tra nếu đã check kích cỡ thì phải nhập giá
+        const sizeCheckboxes = document.querySelectorAll("#size-list input[type='checkbox']");
+        const sizePrices = document.querySelectorAll("#size-list input[type='text']:not([hidden])");
+       
+        let isInValid = false;
+        
+        for (let i = 0; i < sizeCheckboxes.length; i++) {
+            const checkbox = sizeCheckboxes[i];
+            const priceInput = sizePrices[i];
+
+            if (checkbox.checked && priceInput.value.trim() === "") {
+                isInValid = true;
+                break;
+            }
+        }
+        if (isInValid) {
+            alert("Vui lòng nhập giá cho kích cỡ đã chọn");
+            return;
+        }
+
         event.target.submit(); // Gửi form khi không có lỗi
     });
 </script>
@@ -275,15 +322,51 @@
     })
 </script> 
 
-<!-- <label
-                        for="product-image-thumbnail"
-                        class="cursor-pointer border-2 border-dashed rounded-2xl border-primary h-full flex justify-center items-center py-5"
-                    >
-                        <div>
-                            <div class="btn bg-primary text-white hover:bg-primary btn-circle mb-5 mx-auto text-xl">
-                                <i class="bx bx-plus"></i>
-                            </div>
+<!-- Sizes -->
+<script>
+    // Toggle disable input price size
+    const sizeList = document.getElementById("size-list");
+    const sizeCheckboxes = sizeList.querySelectorAll("input[type='checkbox']");
 
-                            <p class="text-primary">Thêm hình ảnh</p>
-                        </div>
-                    </label> -->
+    sizeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", function(event) {
+            const isChecked = this.checked;
+            const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+
+            inputPrice.disabled = !isChecked;
+
+            // Focus input price
+            if (isChecked) {
+                inputPrice.focus();
+            }
+        });
+
+        // Get price input
+        const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+
+        // Format price input
+        inputPrice.addEventListener("input", formatVNCurrency);
+    });
+
+    function formatVNCurrency() {
+        let value = this.value.replace(/[^0-9]/g, '');
+        const numericValue = Number(value);
+
+        if (isNaN(numericValue)) {
+            this.value = ''; 
+            return;
+        } 
+
+        this.value = numericValue.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim();
+
+        // Update hidden input
+        const hiddenInput = this.closest("li").querySelector("[hidden]");
+        hiddenInput.value = numericValue;
+
+    }
+        
+
+</script>

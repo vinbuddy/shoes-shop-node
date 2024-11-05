@@ -155,17 +155,19 @@ export async function renderAdminProductPage(req, res) {
 export async function renderAdminCreateProductPage(req, res) {
     const brands = await BrandModel.find({ trangThaiXoa: false });
     const categories = await CategoryModel.find({ trangThaiXoa: false });
+    const sizes = await SizeModel.find();
 
     return res.render("admin/product/create", {
         ...VIEW_OPTIONS.ADMIN_CREATE,
         brands: brands,
         categories: categories,
+        sizes: sizes,
     });
 }
 
 export async function createProductHandler(req, res) {
     try {
-        const { name, brand, category, description } = req.body;
+        const { name, brand, category, description, sizes } = req.body;
 
         // Check duplicate product name
         const existingProduct = await ProductModel.findOne({ tenSanPham: name });
@@ -199,6 +201,18 @@ export async function createProductHandler(req, res) {
 
         const brandObjectId = new mongoose.Types.ObjectId(brand);
 
+        // Sử dụng Object.entries để chuyển object thành mảng các cặp key-value
+        const productSizes = Object.entries(sizes).map(([maKichCo, kichCo]) => {
+            if (!maKichCo || !kichCo.maKichCo || !kichCo.giaKichCo) {
+                return null; // Bỏ qua nếu thiếu maKichCo hoặc giaKichCo
+            }
+            return {
+                maKichCo: new mongoose.Types.ObjectId(maKichCo),
+                soLuongKichCo: 0,
+                giaKichCo: Number(kichCo.giaKichCo),
+            };
+        });
+
         const product = new ProductModel({
             tenSanPham: name,
             maHangSanXuat: brandObjectId,
@@ -206,6 +220,7 @@ export async function createProductHandler(req, res) {
             moTaSanPham: description,
             danhSachHinhAnh: uploadedFiles.map((file) => file.url),
             hinhAnhDaiDien: thumbnailUrl,
+            danhSachKichCo: productSizes.filter((size) => size !== null) || [],
         });
 
         await product.save();
@@ -221,8 +236,15 @@ export async function createProductHandler(req, res) {
 
         return res.redirect("/admin/product");
     } catch (error) {
+        const brands = await BrandModel.find({ trangThaiXoa: false });
+        const categories = await CategoryModel.find({ trangThaiXoa: false });
+        const sizes = await SizeModel.find();
+
         return res.render("admin/product/create", {
             ...VIEW_OPTIONS.ADMIN_CREATE,
+            brands: brands,
+            categories: categories,
+            sizes: sizes,
             error: error.message,
         });
     }
