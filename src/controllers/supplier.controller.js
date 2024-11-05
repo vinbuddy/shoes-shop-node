@@ -34,7 +34,7 @@ export function renderCreatePage(req, res) {
     return res.render("supplier/create", {
         layout: "./layouts/main",
         page: "supplier",
-        title: "create supplier",
+        title: "Tạo nhà cung cấp",
     });
 }
 export async function renderUpdatePage(req, res) {
@@ -43,7 +43,7 @@ export async function renderUpdatePage(req, res) {
     return res.render("supplier/edit", {
         layout: "./layouts/main",
         page: "supplier",
-        title: "Update supplier",
+        title: "Cập nhật nhà cung cấp",
         supplier: supplier,
     });
 }
