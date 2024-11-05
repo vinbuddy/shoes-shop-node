@@ -10,6 +10,10 @@ const trangThaiSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    trangThaiXoa: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const TrangThaiModel = mongoose.model("TrangThai", trangThaiSchema);
