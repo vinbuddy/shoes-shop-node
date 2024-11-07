@@ -454,3 +454,66 @@ export async function setSelectedItemsHandlerRequest(req, res) {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export async function syncCartItemsAfterLogin(req) {
+    try {
+        const customer = req.session.customer;
+        const userId = customer?.maKhachHang;
+
+        // Retrieve cartItems from cookies
+        let cartItems = req.cookies.cartItems ? JSON.parse(req.cookies.cartItems) : [];
+
+        let cart = await GioHangModel.findOne({ maKhachHang: userId });
+
+        if (!cart) {
+            // Create a new cart for the user if it doesn't exist
+            cart = new GioHangModel({
+                maKhachHang: userId,
+                danhSachSanPham: [],
+                tongTien: 0,
+            });
+        }
+
+        cartItems.forEach((cartItem) => {
+            const existingItemIndex = cart.danhSachSanPham.findIndex(
+                (dbItem) =>
+                    dbItem.maSanPham.toString() === cartItem.maSanPham &&
+                    dbItem.maKichCoSanPham.toString() === cartItem.maKichCoSanPham
+            );
+
+            if (existingItemIndex > -1) {
+                // Update quantity if the item already exists in the cart
+                cart.danhSachSanPham[existingItemIndex].soLuongSanPham += cartItem.soLuongSanPham;
+            } else {
+                // Add the item if it doesn't exist in the cart
+                cart.danhSachSanPham.push({
+                    maSanPham: cartItem.maSanPham,
+                    maKichCoSanPham: cartItem.maKichCoSanPham,
+                    soLuongSanPham: cartItem.soLuongSanPham,
+                    giaSanPham: cartItem.giaSanPham,
+                });
+            }
+        });
+
+        cart.tongTien = cart.danhSachSanPham.reduce((total, item) => {
+            return total + item.soLuongSanPham * item.giaSanPham;
+        }, 0);
+
+        // Save the updated cart
+        await cart.save();
+
+        // Update maGioHang
+        await GioHangModel.updateOne(
+            { _id: cart._id },
+            {
+                $set: {
+                    maGioHang: cart._id,
+                },
+            }
+        );
+
+        return true;
+    } catch (error) {
+        throw new Error("Error syncing cart items after login: " + error.message);
+    }
+}
