@@ -190,12 +190,12 @@
 
         // Add to cart button event listener
         addToCartBtn.addEventListener('click', async function () {
-            const loginURL = this.getAttribute('data-loginUrl')
+            // const loginURL = this.getAttribute('data-loginUrl')
 
-            if (loginURL) {
-                window.location.href = loginURL;
-                return;
-            }
+            // if (loginURL) {
+            //     window.location.href = loginURL;
+            //     return;
+            // }
 
             const quantity = Number(selectedQuantity[0].innerHTML)
             const productId = this.getAttribute('data-productId')
@@ -219,6 +219,8 @@
                     body: JSON.stringify(body)
                 });
                 const data = await response.json();
+                console.log("data: ", data);
+                console.log("response: ", response);
 
                 if (response.ok) {
                     // Reset quantity to 1
@@ -230,7 +232,10 @@
                     const cartIcon = document.getElementById("cart-icon");
                     const cartBadge = cartIcon.querySelector("span");
 
-                    const response = await fetch("/cart/api/total");
+                    const response = await fetch("/cart/api/total", {
+                        method: "GET",
+                        credentials: "include"  // Đảm bảo cookie hoặc thông tin xác thực được gửi
+                    });
 
                     if (!response.ok) {
                         return;
@@ -272,6 +277,7 @@
 
                 addToCartLoader.classList.add('hidden')
             } catch (error) {
+                console.log("error: ", error);
                 Toastify({
                   text: "Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng!",
                   duration: 3000,

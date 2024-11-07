@@ -133,7 +133,10 @@
         const cartBadge = cartIcon.querySelector("span");
 
         // Send request to get cart items
-        const response = await fetch("/cart/api/total");
+        const response = await fetch("/cart/api/total", {
+            method: "GET",
+            credentials: "include"  // Đảm bảo cookie hoặc thông tin xác thực được gửi
+        });
 
         if (!response.ok) {
             return;

@@ -13,6 +13,7 @@ import RedisStore from "connect-redis";
 import { connectToRedis, getRedis } from "./utils/redis.js";
 import { initializeLoginWithGoogleService } from "./utils/google.js";
 import passport from "passport";
+import cookieParser from "cookie-parser";
 
 const app = express();
 env.config();
@@ -32,6 +33,7 @@ app.set("layout extractScripts", true);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const initializeSession = (redisClient) => {
     app.use(
