@@ -15,6 +15,12 @@ import { initializeLoginWithGoogleService } from "./utils/google.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 
+import DanhMucModel from "./models/danhMuc.model.js";
+import HangSanXuatModel from "./models/hangSanXuat.model.js";
+import SanPhamModel from "./models/sanPham.model.js";
+
+import { formatVNCurrency } from "./utils/format.js";
+
 const app = express();
 env.config();
 
@@ -60,8 +66,19 @@ const initializeSession = (redisClient) => {
         console.log("Database connected 🚀");
 
         // Middleware to pass session to views
-        app.use((req, res, next) => {
+        app.use(async (req, res, next) => {
             res.locals.session = req.session;
+
+            // Pass categories and brands to views
+            const _categories = await DanhMucModel.find({ trangThaiXoa: false });
+            const _brands = await HangSanXuatModel.find({ trangThaiXoa: false });
+
+            const _featuredProducts = await SanPhamModel.find({ trangThaiNoiBat: true, trangThaiXoa: false }).limit(8);
+
+            res.locals.categoriesHeader = _categories;
+            res.locals.brandsHeader = _brands;
+            res.locals.featuredProductsHeader = _featuredProducts;
+            res.locals.formatVNCurrencyHeader = formatVNCurrency;
             next();
         });
 

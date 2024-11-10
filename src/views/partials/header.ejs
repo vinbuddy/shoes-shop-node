@@ -1,69 +1,104 @@
 <div class="relative">
     <header id="header" class="fixed top-0 left-0 right-0 z-10 bg-white">
         <div class="container flex justify-between items-center py-4">
-            <div class="flex items-center gap-4">
+            <a href="/" class="flex items-center gap-4">
                 <img class="size-10" src="/images/logo.png" alt="" />
                 <h1 class="font-bold text-xl text-primary">Shoes Shop</h1>
-            </div>
+            </a>
     
             <ul class="flex items-center justify-between h-16 [&_li]:cursor-pointer">
-                <li class="rounded-full px-2 text-black bg-[#E4E4E7]">
+                <li class="rounded-full px-3 text-black bg-[#E4E4E7]">
                     <a href="/">Trang chủ</a>
                 </li>
-                <li class="px-2 text-black group">
-                  <a href="#" class="flex items-center px-2">Shop  <i class="bx bx-chevron-down"></i>
-                  </a>
-                  <div class="absolute left-0 w-screen hidden group-hover:block before:absolute before:top-[-10px] before:h-20 before:w-full">
-                    <div class="bg-white shadow-lg">
-                      <div class="container mx-auto px-4 py-8">
-                        <div class="grid grid-cols-4 gap-x-8 gap-y-10">
-                          <div class="col-span-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
-                            <ul class="space-y-2">
-                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Running</a></li>
-                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Basketball</a></li>
-                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Lifestyle</a></li>
-                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Soccer</a></li>
-                              <li><a href="#" class="text-gray-600 hover:text-gray-800">Training</a></li>
-                            </ul>
-                          </div>
-                          <div class="col-span-2">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Products</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                              <a href="#" class="group">
-                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
-                                  <img src="/placeholder.svg?height=200&width=200" alt="Featured Sneaker 1" class="object-center object-cover group-hover:opacity-75" />
-                                </div>
-                                <h4 class="mt-2 text-sm text-gray-700">Air Max 2023</h4>
-                                <p class="mt-1 text-sm font-medium text-gray-900">$129.99</p>
-                              </a>
-                              <a href="#" class="group">
-                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
-                                  <img src="/placeholder.svg?height=200&width=200" alt="Featured Sneaker 2" class="object-center object-cover group-hover:opacity-75" />
-                                </div>
-                                <h4 class="mt-2 text-sm text-gray-700">Ultra Boost Pro</h4>
-                                <p class="mt-1 text-sm font-medium text-gray-900">$159.99</p>
-                              </a>
-                            </div>
-                          </div>
-                          <div class="col-span-1">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Special Offer</h3>
-                            <a href="#" class="block rounded-lg overflow-hidden">
-                              <img src="/placeholder.svg?height=300&width=200" alt="Promo Image" class="w-full h-auto object-center object-cover" />
-                              <div class="bg-gray-900 bg-opacity-75 p-4">
-                                <h4 class="text-white text-lg font-semibold">Summer Sale</h4>
-                                <p class="text-white mt-2">Up to 50% off on selected items</p>
-                              </div>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <li class="rounded-full px-3 text-black">
+                    <a href="/product">Sản phẩm</a>
                 </li>
-                <li><a href="#" class="hover:text-gray-800 px-2 text-black">Về chúng tôi</a></li>
-                <li><a href="#" class="hover:text-gray-800 px-2 text-black">Liên hệ</a></li>
-              </ul>
+                <li class="px-3 text-black group">
+					<a href="/product" class="flex items-center">Khám phá  <i class="bx bx-chevron-down"></i>
+					</a>
+					<div class="absolute left-0 top-[80%] w-screen hidden group-hover:block before:absolute before:top-[-20px] before:h-16 before:w-full">
+					  <div class="bg-white shadow-lg">
+						<div class="container mx-auto px-4 py-8">
+						  <div class="grid grid-cols-5 gap-x-8 gap-y-10">
+							<div class="col-span-1">
+							  	<h3 class="text-lg font-semibold text-gray-900 mb-4">Danh mục</h3>
+							  	<div class="space-y-2">
+								  <% if (locals?.categoriesHeader && categoriesHeader.length > 0)  { %>
+									  <% categoriesHeader.forEach((category) => { %>
+										  <div>
+											  <a href="/product?category[]=<%= category.maDanhMuc %>" class="text-gray-700 hover:text-gray-900">
+												  <%= category.tenDanhMuc %>
+											  </a>
+										  </div>
+									  <% }) %>
+								  <%  } else { %>
+									  <div>
+										  <a href="#" class="text-gray-700 hover:text-gray-900">Không có danh mục</a>
+									  </div>
+								  <% } %>
+  
+								</div>
+							</div>
+							<div class="col-span-1">
+							  <h3 class="text-lg font-semibold text-gray-900 mb-4">Hãng</h3>
+							  	<div class="space-y-2">
+								  
+								  <% if (locals?.brandsHeader && brandsHeader.length > 0)  { %>
+									  <% brandsHeader.forEach((brand) => { %>
+										  <div>
+											  <a href="/product?brand=<%= brand.maHangSanXuat %>" class="text-gray-700 hover:text-gray-900">
+												  <%= brand.tenHangSanXuat %>
+											  </a>
+										  </div>
+									  <% }) %>
+								  <%  } else { %>
+									  <div>
+										  <a href="#" class="text-gray-700 hover:text-gray-900">Không có danh mục</a>
+									  </div>
+								  <% } %>
+  
+								</div>
+							</div>
+							<div class="col-span-2">
+							  	<h3 class="text-lg font-semibold text-gray-900 mb-4">Sản phẩm nổi bật</h3>
+								<div class="grid grid-cols-2 gap-4">
+									  <% if (locals?.featuredProductsHeader && featuredProductsHeader.length > 0)  { %>
+										  <% featuredProductsHeader.slice(0, 2).forEach((product) => { %>
+											  <a href="#" class="group">
+												  <div class="aspect-w-1 aspect-h-1 min-h-[200px] max-h-[200px] rounded-lg overflow-hidden">
+													<img src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>" />
+												  </div>
+												  <h4 class="mt-2 text-sm text-gray-700">
+													  <%= product.tenSanPham %>
+												  </h4>
+											  </a>
+										  <% }) %>
+									  <%  } else { %>
+										  <div>
+											  <a href="#" class="text-gray-700 hover:text-gray-900">Không có sản phẩm</a>
+										  </div>
+									  <% } %>
+									
+								</div>
+							</div>
+							<div class="col-span-1">
+							  <h3 class="text-lg font-semibold text-gray-900 mb-4">Ưu đãi</h3>
+							  <a href="#" class="block rounded-xl overflow-hidden">
+								<img src="/images/sneaker-banner.jpg" alt="Promo Image" class="w-full h-auto object-center object-cover" />
+								<div class="bg-gray-900 bg-opacity-75 p-4">
+								  <h4 class="text-white text-lg font-semibold">Summer Sale</h4>
+								  <p class="text-white mt-2">Up to 50% off on selected items</p>
+								</div>
+							  </a>
+							</div>
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </li>
+                <li><a href="#" class="hover:text-gray-800 px-3 text-black">Về chúng tôi</a></li>
+                <li><a href="#" class="hover:text-gray-800 px-3 text-black">Liên hệ</a></li>
+            </ul>
     
             <div
                 class="relative text-base flex items-center gap-3 rounded-full py-1 ps-3 pe-2 transition-all duration-300 ease-in"
