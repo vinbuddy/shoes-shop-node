@@ -1,5 +1,5 @@
 import DonHangModel from "../models/donHang.model.js";
-
+import StatusModel from "../models/trangThai.model.js";
 // import NguoiDungModel from "../models/nguoidung.model.js";
 
 export async function renderUserProfilePage(req, res) {
@@ -33,6 +33,14 @@ export async function renderUserOrderPage(req, res) {
     const refundOrders = [];
     orders.forEach((order) => {
         const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
+        console.log(latestStatus);
+        const status = StatusModel.findById(latestStatus.maTrangThai)
+            .populate({
+                path: "maTrangThai",
+                select: "tenTrangThai",
+            })
+            .exec();
+        console.log(status.tenTrangThai);
         switch (latestStatus.tenTrangThai) {
             case "Chờ xác nhận":
                 pendingOrders.push(order);
