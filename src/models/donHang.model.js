@@ -6,7 +6,7 @@ const chiTietDonHangSchema = new mongoose.Schema({
         ref: "SanPham",
         required: true,
     },
-    maKichCo: {
+    maKichCoSanPham: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "KichCo",
         required: true,
@@ -25,7 +25,7 @@ const chiTietDonHangSchema = new mongoose.Schema({
 const thongTinThanhToanSchema = new mongoose.Schema({
     phuongThucThanhToan: {
         type: String,
-        enum: ["Momo", "VNPay", "Tiền mặt"],
+        enum: ["MoMo", "VNPay", "Tiền mặt"],
         required: true,
     },
     trangThaiThanhToan: {
@@ -35,6 +35,7 @@ const thongTinThanhToanSchema = new mongoose.Schema({
     },
     maGiaoDich: {
         type: String, // ID giao dịch từ hệ thống thanh toán
+        default: null,
     },
     trangThaiHoanTien: {
         type: String,
@@ -80,9 +81,9 @@ const donHangSchema = new mongoose.Schema({
     maNguoiTao: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "NguoiDung",
-        required: true,
+        default: null,
     },
-    chiTiet: [chiTietDonHangSchema],
+    chiTietDonHang: [chiTietDonHangSchema],
     thongTinGiaoHang: thongTinGiaoHangSchema,
     tongTienThanhToan: {
         type: Number,

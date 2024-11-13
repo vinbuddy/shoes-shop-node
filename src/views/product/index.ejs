@@ -27,9 +27,9 @@
                                                 <input type="checkbox" 
                                                     id="category-<%= category.maDanhMuc %>" 
                                                     name="category[]" 
-                                                    value="<%= category.maDanhMuc %>" 
+                                                    value="<%= category._id %>" 
                                                     class="checkbox checkbox-sm [--chkbg:#0578f8]" 
-                                                    <% if (filters.category && filters.category.includes(category.maDanhMuc.toString())) { %> 
+                                                    <% if (filters.category && filters.category.includes(category._id.toString())) { %> 
                                                        checked <% } %> 
                                                  />
                                                 <label class="cursor-pointer" for="category-<%= category.maDanhMuc %>">
@@ -54,9 +54,9 @@
                                                 <input type="checkbox" 
                                                     id="brand-<%= brand.maHangSanXuat %>" 
                                                     name="brand[]" 
-                                                    value="<%= brand.maHangSanXuat %>" 
+                                                    value="<%= brand._id %>" 
                                                     class="checkbox checkbox-sm [--chkbg:#0578f8]" 
-                                                       <% if (filters.brand && filters.brand.includes(brand.maHangSanXuat.toString())) { %> 
+                                                       <% if (filters.brand && filters.brand.includes(brand._id.toString())) { %> 
                                                        checked <% } %> />
                                                 <label class="cursor-pointer" for="brand-<%= brand.maHangSanXuat %>">
                                                     <%= brand.tenHangSanXuat %>
@@ -80,9 +80,9 @@
                                                 <input type="checkbox" 
                                                     id="size-<%= size.maKichCo %>" 
                                                     name="size[]" 
-                                                    value="<%= size.maKichCo %>" 
+                                                    value="<%= size._id %>" 
                                                     class="checkbox checkbox-sm [--chkbg:#0578f8]"
-                                                    <% if (filters.size && filters.size.includes(size.maKichCo.toString())) { %> 
+                                                    <% if (filters.size && filters.size.includes(size._id.toString())) { %> 
                                                     checked <% } %>/>
                                                 <label class="cursor-pointer" for="size-<%= size.maKichCo %>">
                                                     <%= size.tenKichCo %>
@@ -149,7 +149,7 @@
                                 class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
                             >
                                 <img
-                                    src="<%= product.danhSachHinhAnh[0] %>"
+                                    src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                     alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                                     class="h-full w-full object-cover object-center group-hover:opacity-75"
                                 />

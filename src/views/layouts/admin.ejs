@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= typeof title !== 'undefined' ? title : 'Default Title' %></title>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.13/dist/full.min.css" rel="stylesheet" type="text/css" />
+        <%- include("../partials/import-meta.ejs") %> <%- include('../partials/tailwind-config.ejs') %>
+    </head>
+    <body>
+        <div>
+            <div class="grid grid-cols-12 gap-5 h-full">
+                <section class="col-span-6 sm:col-span-6 md:col-span-3 lg:col-span-3 xl:col-span-2 2xl:col-span-2">
+                    <aside
+                        class="h-screen flex flex-col justify-between sticky top-0 z-[1] p-5 overflow-y-auto border-r scrollbar"
+                    >
+                        <div>
+                            <a href="" class="flex items-center gap-4">
+                                <img class="size-10" src="/images/logo.png" alt="" />
+                                <h1 class="font-bold text-xl text-primary">Shoes Shop</h1>
+                            </a>
+                            <ul class="mt-5 [&_li]:cursor-pointer">
+                                <li>
+                                    <a class="flex items-center py-4">
+                                        <i class="bx bxs-dashboard"></i>
+                                        <span class="ms-2.5"> Trang chủ </span>
+                                    </a>
+                                </li>
+                                <div class="join join-vertical w-full">
+                                    <div class="collapse collapse-arrow join-item">
+                                        <input type="checkbox" name="product" checked="checked" />
+                                        <div class="collapse-title flex items-center text-base px-0">
+                                            <i class="bx bxl-product-hunt me-2.5"></i>
+                                            Sản phẩm
+                                        </div>
+                                        <div class="collapse-content">
+                                            <ul>
+                                                <li>
+                                                    <a href="/admin/product" class="flex items-center py-4">
+                                                        <i class="bx bx-list-ul"></i>
+                                                        <span class="ms-2.5"> Sản phẩm </span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="flex items-center py-4">
+                                                        <i class="bx bx-category-alt"></i>
+                                                        <span class="ms-2.5"> Danh mục </span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="flex items-center py-4">
+                                                        <i class="bx bx-font-size"></i>
+                                                        <span class="ms-2.5"> Kích cỡ </span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="flex items-center py-4">
+                                                        <i class="bx bx-transfer-alt"></i>
+                                                        <span class="ms-2.5"> Nhập hàng </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <li>
+                                    <a class="flex items-center py-4">
+                                        <i class="bx bxs-package"></i>
+                                        <span class="ms-2.5"> Đơn hàng </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center py-4">
+                                        <i class="bx bxs-group"></i>
+                                        <span class="ms-2.5"> Khách hàng </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center py-4">
+                                        <i class="bx bxs-bar-chart-alt-2"></i>
+                                        <span class="ms-2.5"> Báo cáo </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center py-4">
+                                        <i class="bx bxs-user"></i>
+                                        <span class="ms-2.5"> Nhân viên </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 rounded-lg bg-gray-100 mt-5">
+                            <div class="flex items-center gap-2 mb-5 cursor-pointer">
+                                <img
+                                    class="size-8 object-cover rounded-full"
+                                    src="https://img.freepik.com/free-photo/horizontal-portrait-smiling-happy-young-pleasant-looking-female-wears-denim-shirt-stylish-glasses-with-straight-blonde-hair-expresses-positiveness-poses_176420-13176.jpg"
+                                    alt=""
+                                />
+
+                                <p class="text-[#a1a1aa] text-sm truncate ms-2">Nhân Viên 1</p>
+                            </div>
+
+                            <button class="w-full btn btn-sm btn-error text-white">Đăng xuất</button>
+                        </div>
+                    </aside>
+                </section>
+                <section class="col-span-6 sm:col-span-6 md:col-span-9 lg:col-span-9 xl:col-span-10 2xl:col-span-10">
+                    <div class="p-5"><%- body %></div>
+                </section>
+            </div>
+        </div>
+        <%- script %>
+    </body>
+</html>

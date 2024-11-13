@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title><%= typeof title !== 'undefined' ? title : 'Default Title' %></title>
 
-        <%- include("../partials/import-meta.ejs", { page: page }) %> <%- include('../partials/tailwind-config.ejs') %>
+        <%- include("../partials/import-meta.ejs") %> <%- include('../partials/tailwind-config.ejs') %>
     </head>
     <body>
         <%- include('../partials/header.ejs') %>
