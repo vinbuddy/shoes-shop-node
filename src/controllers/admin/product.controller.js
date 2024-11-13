@@ -11,7 +11,7 @@ export async function renderCreateGoodsReceipt (req, res, next) {
             'products': products,
         }
         return res.render("admin/product/goods-receipt", {
-            layout: "./layouts/main",
+            layout: "./layouts/admin",
             page: "goods-receipt",
             title: "Phiếu nhập hàng",
             data: data,
