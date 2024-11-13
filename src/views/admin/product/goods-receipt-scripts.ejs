@@ -16,8 +16,12 @@
             });
         }
     });
+    let supplierId = "";
+    $("#supplierSelect").on("change", function () {
+        supplierId = $(this).val();
+    });
 
-    // lst là mảng chứa các obj như sau:
+    // lst là mảng chứa các obj như sau để lưu vào trong database:
     // [{
     //     'product_name': tên sản phẩm,
     //     'total_buy': tổng số lượng đôi giày các size đã nhập trên 1 sản phẩm,
@@ -61,7 +65,7 @@
 
         // Kiểm tra sản phẩm đã chọn hay chưa
         for (const item of lst) {
-            if (product.tenSanPham == item.product_name) {
+            if (product.maSanPham == item.product.maSanPham) {
                 item.sizeArray.forEach((size) => {
                     $(`#${size.size_id}`).prop("checked", true);
                     $(`#${size.size_id}-quantity`).val(size.quantity);
@@ -69,28 +73,24 @@
                 });
             }
         }
-        inputEntryPrice = $('.entry-price');
+        inputEntryPrice = $(".entry-price");
     }
 
     function handleSameEntryPrice(e) {
-
         let newValue = e.target.value;
         for (const input of inputEntryPrice) {
             input.value = newValue;
         }
     }
 
-    $(`#same-entry-price`).on('click', function() {
-        
+    $(`#same-entry-price`).on("click", function () {
         if ($(`#same-entry-price`).prop("checked") === true) {
-            
-            Array.from(inputEntryPrice).forEach(input => {
-                input.addEventListener('input', handleSameEntryPrice)
+            Array.from(inputEntryPrice).forEach((input) => {
+                input.addEventListener("input", handleSameEntryPrice);
             });
-        }
-        else{
-            Array.from(inputEntryPrice).forEach(input => {
-                input.removeEventListener('input', handleSameEntryPrice)
+        } else {
+            Array.from(inputEntryPrice).forEach((input) => {
+                input.removeEventListener("input", handleSameEntryPrice);
             });
         }
     });
@@ -110,15 +110,14 @@
     }
 
     function removeProduct() {
-        let btnDemo = document.getElementsByClassName("remove_product");
-        Array.from(btnDemo).forEach((button) => {
-            button.addEventListener('click', (e) => {
-                console.log(lst)
+        let btnRemoveProduct = document.getElementsByClassName("remove_product");
+        Array.from(btnRemoveProduct).forEach((button) => {
+            button.addEventListener("click", (e) => {
+                // console.log(lst)
                 for (const item of lst) {
-                    if (e.target.id == item.product_name)
-                    {
-                        let index = lst.findIndex(i => i.product_name == item.product_name);
-                        console.log(index)
+                    if (e.target.id == item.product.maSanPham) {
+                        let index = lst.findIndex((i) => i.product.maSanPham == item.product.maSanPham);
+                        // console.log(index)
                         lst.splice(index, 1);
                     }
                 }
@@ -127,16 +126,16 @@
         });
     }
 
-    function renderInfoTable(){
+    function renderInfoTable() {
         // Xuất dữ liệu sang danh sách thông tin
         $("#product_item_table tbody").html("");
         lst.forEach((item) => {
             $("#product_item_table tbody").append(`
                 <tr>
-                    <td class="text-center border-2 w-[30%] px-2 py-4">${item.product_name}</td>
+                    <td class="text-center border-2 w-[30%] px-2 py-4">${item.product.tenSanPham}</td>
                     <td class="text-center border-2 w-[10%] px-2 py-4">${item.total_buy}</td>
                     <td class="border-2 w-[30%] px-2 py-4">${item.size_lst}</td>
-                    <td class="text-center border-2 w-[10%] px-2 py-4"><i id="${item.product_name}" class='cursor-pointer text-red-600 text-xl bx bxs-trash remove_product'></i></td>
+                    <td class="text-center border-2 w-[10%] px-2 py-4"><i id="${item.product.maSanPham}" class='cursor-pointer text-red-600 text-xl bx bxs-trash remove_product'></i></td>
                 </tr>
             `);
         });
@@ -146,8 +145,7 @@
 
     // Khi nhấn nút 'Thêm vào danh sách'
     $("#add_to_list").on("click", async function () {
-
-        $(`#same-entry-price`).prop("checked", false)
+        $(`#same-entry-price`).prop("checked", false);
 
         await saveTemporaryData();
         // console.log(lst)
@@ -166,7 +164,7 @@
                 let size = await getProductSizeById(item);
                 let quantity = parseInt($(`#${item.maKichCo}-quantity`).val());
                 let price = parseInt($(`#${item.maKichCo}-entry-price`).val());
-                
+
                 let sizeObj = {
                     size_id: item.maKichCo,
                     size_name: size.tenKichCo,
@@ -192,7 +190,7 @@
         });
 
         const info = {
-            product_name: productData.tenSanPham,
+            product: productData,
             total_buy: total_buy,
             sizeArray: sizeArray,
             size_lst: size_lst,
@@ -202,7 +200,7 @@
         }
         // Tóm tắt thông tin sản phẩm
         for (const item of lst) {
-            if (item.product_name == info.product_name) {
+            if (item.product.maSanPham == info.product.maSanPham) {
                 item.total_buy = info.total_buy;
                 item.sizeArray = info.sizeArray;
                 item.size_lst = info.size_lst;
@@ -212,20 +210,41 @@
         lst.push(info);
     }
 
-    // function removeProduct(e) {
-    //     console.log(1)
-    //     for (const item of lst) {
-    //         if (e.target.id == item.product_name)
-    //         {
-    //             let index = lst.findIndex(i => i.product_name == item.product_name);
-    //             lst.splice(index, 1);
-    //             break;
-    //         }
-    //     }
-    //     renderInfoTable();
-    // }
-    
-    
+    $("#import-data").on("click", function () {
+        const chiTiet = lst.map((item) => ({
+            maSanPham: item.product.maSanPham,
+            danhSachKichCo: item.sizeArray.map((size) => ({
+                maKichCo: size.size_id,
+                soLuongKichCo: size.quantity,
+                giaKichCo: size.price,
+            })),
+        }));
+
+        const data = {
+            nhaCungCap: supplierId,
+            chiTiet: chiTiet,
+        };
+        // console.log(data)
+        try {
+            $.ajax({
+                url: "/api/product/create-goods-receipt",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json", 
+                data: JSON.stringify(data),
+                success: function (response) {
+                    console.log("Nhập phiếu thành công:\n", response);
+                    window.location.href = response.redirectUrl;
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi khi nhập phiếu:", xhr.responseText || error);
+                },
+            });
+        } catch (error) {
+            console.error("Có lỗi xảy ra khi nhập phiếu. Vui lòng thử lại! ", error);
+        }
+    });
+
     // let supplierData = null;
     // $('#supplierSelect').on('change', async function() {
     //     try {

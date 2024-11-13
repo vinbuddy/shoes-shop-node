@@ -10,7 +10,6 @@ export async function renderCreateGoodsReceipt (req, res, next) {
             'suppliers' : suppliers,
             'products': products,
         }
-        console.log(data)
         return res.render("admin/product/goods-receipt", {
             layout: "./layouts/main",
             page: "goods-receipt",
