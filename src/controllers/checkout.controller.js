@@ -237,6 +237,7 @@ export async function checkoutHandler(req, res) {
             trangThaiDonHang: [
                 {
                     maTrangThai: firstTrangThai.maTrangThai,
+                    _id: firstTrangThai.maTrangThai,
                     thoiGian: new Date(),
                 },
             ],

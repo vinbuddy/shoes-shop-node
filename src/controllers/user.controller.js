@@ -1,5 +1,5 @@
 import DonHangModel from "../models/donHang.model.js";
-import StatusModel from "../models/trangThai.model.js";
+import TrangThaiModel from "../models/trangThai.model.js";
 // import NguoiDungModel from "../models/nguoidung.model.js";
 
 export async function renderUserProfilePage(req, res) {
@@ -31,39 +31,34 @@ export async function renderUserOrderPage(req, res) {
     const cancelOrders = [];
     const completedOrders = [];
     const refundOrders = [];
-    orders.forEach((order) => {
+    const status = await TrangThaiModel.find();
+    for (const order of orders) {
         const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
-        console.log(latestStatus);
-        const status = StatusModel.findById(latestStatus.maTrangThai)
-            .populate({
-                path: "maTrangThai",
-                select: "tenTrangThai",
-            })
-            .exec();
-        console.log(status.tenTrangThai);
-        switch (latestStatus.tenTrangThai) {
-            case "Chờ xác nhận":
+        const id = latestStatus.maTrangThai;
+        const statusOrder = status.findIndex((status) => status._id.equals(id));
+        switch (statusOrder) {
+            case 0: // Chờ xác nhận
                 pendingOrders.push(order);
                 break;
-            case "Đang giao":
+            case 1: // Đang giao
                 shippedOrders.push(order);
                 break;
-            case "Đã giao":
+            case 2: // Đã giao
                 deliveredOrders.push(order);
                 break;
-            case "Đã hủy":
+            case 3: // Đã hủy
                 cancelOrders.push(order);
                 break;
-            case "Hoàn thành":
+            case 4: // Hoàn thành
                 completedOrders.push(order);
                 break;
-            case "Đã trả hàng":
+            case 5: // Đã trả hàng
                 refundOrders.push(order);
                 break;
             default:
                 break;
         }
-    });
+    }
 
     return res.render("user/order", {
         layout: "./layouts/user",
@@ -72,5 +67,11 @@ export async function renderUserOrderPage(req, res) {
         customer: customer,
         orders: orders,
         pendingOrders: pendingOrders,
+        shippedOrders: shippedOrders,
+        deliveredOrders: deliveredOrders,
+        cancelOrders: cancelOrders,
+        completedOrders: completedOrders,
+        refundOrders: refundOrders,
+        status: status,
     });
 }
