@@ -139,7 +139,7 @@
                              var statusOrder = status.findIndex((status) => status._id.equals((order.trangThaiDonHang[order.trangThaiDonHang.length - 1]).maTrangThai));
                              %> 
                             <%  if (statusOrder === 3) { %>
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ</button>
+                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ </button>
                                 
                             <% } else { %>
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>

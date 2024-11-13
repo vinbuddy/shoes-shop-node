@@ -1,0 +1,166 @@
+<div class="tp-main-wrapper bg-gray-100" x-data="{ sideMenu: false }"></div>
+    <div class="tp-main-content" x-data="{ searchOverlay: false }">
+        <div class="body-content px-8 py-8 bg-gray-100">
+            <div class="flex justify-between mb-10">
+                <div class="page-title">
+                    <h3 class="mb-0 text-2xl font-bold">Danh sách đơn hàng</h3>
+                    <ul class="text-sm font-medium flex items-center space-x-3 text-gray-500">
+                        <li class="breadcrumb-item text-gray-400">
+                            <a href="./admin/Dashboard" class="hover:text-blue-500"> Home</a>
+                        </li>
+                        <li class="breadcrumb-item flex items-center">
+                            <span class="inline-block bg-gray-400 w-1 h-1 rounded-full"></span>
+                        </li>
+                        <li class="breadcrumb-item text-gray-400">Danh sách đơn hàng</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- table -->
+            <div class="bg-white rounded-md shadow-md py-4">
+                <div class="tp-search-box flex items-center justify-between px-8 py-8 flex-wrap">
+                    <div class="search-input relative">
+                        <input class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" type="text" placeholder="Search by order id" />
+                        <button class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M18.9999 19L14.6499 14.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex justify-end space-x-6">
+                        <div class="search-select mr-3 flex items-center space-x-3">
+                            <span class="text-sm inline-block leading-none -translate-y-[2px]">Trạng thái:</span>
+                            <select class="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <% statuses.forEach(status => { %>
+                                    <option value="<%= status.value %>"><%= status.tenTrangThai %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative overflow-x-auto mx-8">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="bg-gray-50">
+                            <tr class="border-b border-gray-200 text-xs">
+                                <th scope="col" class="py-3 text-xs text-gray-400 uppercase font-semibold w-1/12">
+                                    <div class="tp-checkbox -translate-y-[3px]">
+                                        <input id="selectAllProduct" type="checkbox" />
+                                        <label for="selectAllProduct"></label>
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold">Khách hàng</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Số lượng</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Tổng tiền</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Trạng thái</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Ngày</th>
+                                <th scope="col" class="px-9 py-3 text-xs text-gray-400 uppercase font-semibold w-1/6 text-right">Hoá đơn</th>
+                                <th scope="col" class="px-9 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach(order => { %>
+                            <tr class="bg-white border-b border-gray-200 last:border-0 text-start mx-9">
+                                <td class="pr-3 whitespace-nowrap">
+                                    <div class="tp-checkbox">
+                                        <input id="product-1" type="checkbox" />
+                                        <label for="product-1"></label>
+                                    </div>
+                                </td>
+                                <td class="pr-8 py-5 whitespace-nowrap">
+                                    <a href="#" class="flex items-center space-x-5 hover:text-blue-500 text-gray-700">
+                                        <img class="w-12 h-12 rounded-full" src="<%= order.maKhachHang.anhDaiDien  %>" alt="" />
+                                        <span class="font-medium"><%= order.maKhachHang.tenKhachHang %> </span>
+                                    </a>
+                                </td>
+                                <td class="px-3 py-3 font-normal text-gray-600 text-right"><%= order.chiTietDonHang.reduce((total, item) => total + item.soLuongDaChon, 0) %></td>
+                                <td class="px-3 py-3 font-normal text-gray-600 text-right"><%= order.tongTienThanhToan.toLocaleString('vi-VN') %>Đ</td>
+                                <td class="px-3 py-3 text-right">
+                                
+                                <% if (order.trangThai === 0) { %>
+                                    <span class="text-sm text-warning px-3 py-1 rounded-md leading-none bg-warning/10 font-medium whitespace-nowrap"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
+                                <% } else if (order.trangThai === 1) { %>
+                                    <span class="text-sm text-teal-600 px-3 py-1 rounded-md leading-none bg-teal-100 font-medium"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
+                                <% } else if (order.trangThai === 2 || order.trangThai === 3) { %>
+                                    <span class="text-sm text-green-600 px-3 py-1 rounded-md leading-none bg-blue-100 font-medium"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
+                                <% } else { %>
+                                    <span class="text-sm text-red-600 px-3 py-1 rounded-md leading-none bg-red-100 font-medium  whitespace-nowrap"> <%=  order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %></span>
+                                <% } %>
+                                </td>
+                                <td class="px-3 py-3 font-normal text-gray-600 text-right"><%= new Date(order.ngayDatHang).toLocaleDateString() %> </td>
+                                <td class="px-9 py-3 text-right">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <div class="relative" x-data="{ editTooltip: false }">
+                                            <a href="/admin/order/detail/<%= order._id %>" class="block w-auto px-3 h-10 leading-10 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 font-medium">Chi tiết</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-9 py-3 text-end">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <div class="relative" x-data="{ printTooltip: false }">
+                                            <button
+                                            
+                                                class="w-auto px-3 h-10 leading-10 text-xs bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center justify-center"
+                                                x-on:mouseenter="printTooltip = true"
+                                                x-on:mouseleave="printTooltip = false"
+                                            >
+                                                <svg
+                                                    class="-translate-y-px"
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 32 32"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        fill="currentColor"
+                                                        d="m10.9052 29.895h10.18c1.099 0 1.99-.8909 1.99-1.99v-5.92c0-1.099-.891-1.99-1.99-1.99h-10.18c-1.099 0-1.99.891-1.99 1.99v5.92c0 1.099.8909 1.99 1.99 1.99z"
+                                                    ></path>
+                                                    <path
+                                                        fill="currentColor"
+                                                        d="m7.915 26.0044v-6.0093c0-.5522.4478-1 1-1h14.1602c.5522 0 1 .4478 1 1v6.0098h1.5498c2.7461 0 4.98-1.9873 4.98-4.4302v-6.9795c0-2.4375-2.2339-4.4204-4.98-4.4204h-19.2598c-2.7407 0-4.9702 1.9829-4.9702 4.4204v6.9795c0 2.4429 2.2295 4.4302 4.9937 4.4297z"
+                                                    ></path>
+                                                    <path
+                                                        fill="currentColor"
+                                                        d="m11.8751 2.105c-1.1 0-2 .9-2 2v3.84c0 .8174.6627 1.48 1.48 1.48h9.27c.8174 0 1.48-.6626 1.48-1.48v-3.85c0-1.1-.89-1.99-2-1.99z"
+                                                    ></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% if (totalPages > 1) { %>
+        <nav class="mt-10 flex justify-center">
+            <ul class="list-style-none flex">
+                <li>
+                    <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                    
+                    <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                        class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                        Trang trước
+                     </a>
+                </li>
+                
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                       class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                        <%= i %>
+                    </a>
+                <% } %>
+               
+                <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                    class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                     Trang sau
+                 </a>
+            </ul>
+        </nav>
+    <% } %>
+</div>
