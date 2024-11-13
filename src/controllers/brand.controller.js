@@ -64,6 +64,7 @@ export async function createBrand(req, res) {
             });
         }
         const newBrand = new BrandModel({ tenHangSanXuat, moTa });
+
         await newBrand.save();
         return res.redirect("/admin/brand");
     } catch (error) {

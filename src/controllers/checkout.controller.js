@@ -7,6 +7,7 @@ import { sortObject } from "../utils/sort.js";
 import DonHangModel from "../models/donHang.model.js";
 import SanPhamModel from "../models/sanPham.model.js";
 import GioHangModel from "../models/gioHang.model.js";
+import TrangThaiModel from "../models/trangThai.model.js";
 env.config();
 
 const VIEW_OPTIONS = {
@@ -217,7 +218,7 @@ export async function checkoutHandler(req, res) {
             (total, item) => total + item.soLuongDaChon * item.giaDaChon,
             0
         );
-
+        const firstTrangThai = await TrangThaiModel.findOne();
         const orderData = {
             maKhachHang: req.session.customer.maKhachHang,
             maNguoiTao: null,
@@ -235,7 +236,8 @@ export async function checkoutHandler(req, res) {
             tongTienThanhToan: totalOrderPrice,
             trangThaiDonHang: [
                 {
-                    tenTrangThai: "Chờ xác nhận",
+                    maTrangThai: firstTrangThai.maTrangThai,
+                    _id: firstTrangThai.maTrangThai,
                     thoiGian: new Date(),
                 },
             ],
