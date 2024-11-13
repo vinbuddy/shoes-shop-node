@@ -70,8 +70,7 @@ const trangThaiDonHangSchema = new mongoose.Schema({
     maTrangThai: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "TrangThai",
-        default: () => new mongoose.Types.ObjectId(),
-        unique: true,
+        required: true,
     },
     thoiGian: {
         type: Date,
