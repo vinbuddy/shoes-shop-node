@@ -5,7 +5,7 @@
 
         if (productId !== "null") {
             $.ajax({
-                url: `/api/product/${productId}`,
+                url: `/product/api/${productId}`,
                 type: "GET",
                 dataType: "json",
                 success: async function (data) {
@@ -100,7 +100,7 @@
     async function getProductSizeById(size) {
         if (size !== "null") {
             const response = await $.ajax({
-                url: `/api/product-size/${size.maKichCo}`,
+                url: `/product/api/product-size/${size.maKichCo}`,
                 type: "GET",
                 dataType: "json",
             });
@@ -228,7 +228,7 @@
         // console.log(data)
         try {
             $.ajax({
-                url: "/api/product/create-goods-receipt",
+                url: "/product/api/create-goods-receipt",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json", 
@@ -260,7 +260,7 @@
     //     const supplierId = element.val();
     //     if (supplierId !== 'null') {
     //         const response = await $.ajax({
-    //             url: `/api/supplier/${supplierId}`,
+    //             url: `/supplier/api/${supplierId}`,
     //             type: 'GET',
     //             dataType: 'json'
     //         });

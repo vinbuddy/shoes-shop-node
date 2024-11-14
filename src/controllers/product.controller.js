@@ -1,6 +1,8 @@
 import BrandModel from "../models/hangSanXuat.model.js";
 import CategoryModel from "../models/danhMuc.model.js";
 import ProductModel from "../models/sanPham.model.js";
+import SupplierModel from "../models/nhaCungCap.model.js";
+import GoodsReceiptModel from "../models/phieuNhap.js"
 import SizeModel from "../models/kichCo.model.js";
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
@@ -223,5 +225,105 @@ export async function createProductHandler(req, res) {
             ...VIEW_OPTIONS.ADMIN_CREATE,
             error: error.message,
         });
+    }
+}
+
+export async function renderAdminCreateGoodsReceipt (req, res, next) {
+    try {
+        const suppliers = await SupplierModel.find({}).select();
+        const products = await ProductModel.find({}).select();
+        const data = {
+            'suppliers' : suppliers,
+            'products': products,
+        }
+        return res.render("admin/product/goods-receipt", {
+            layout: "./layouts/admin",
+            page: "goods-receipt",
+            title: "Phiếu nhập hàng",
+            data: data,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// API
+
+// Get Product Information
+// [GET] /api/product/
+export async function getAllProduct(req, res) {
+
+    const product = await ProductModel.find({}).select();
+
+    if (product) {
+        return res.json(product);
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+    }
+}
+export async function getProductById(req, res) {
+    const productId = req.params.id;
+    
+    const product = await ProductModel.findOne({ maSanPham: productId }).sort({maSanPham: 1});
+    if (product) {
+        return res.json(product);
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+    }
+}
+// Get Product Size By Id
+// [GET] /api/product-size/:id
+export async function getSizeById(req, res) {
+    const sizeId = req.params.id;
+
+    const size = await SizeModel.findOne({maKichCo : sizeId}).sort({maKichCo: 1});
+    
+    if (size) {
+        return res.json(size);
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy kích cỡ này' });
+    }
+}
+// Create Goods Receipt 
+// [POST] /api/product/create-goods-receipt
+export async function createGoodsReceipt(req, res) {
+    const { nhaCungCap, chiTiet } = req.body;
+
+    if (!nhaCungCap || !chiTiet || !Array.isArray(chiTiet)) {
+        return res.status(400).json({ message: 'Dữ liệu không hợp lệ.' });
+    }
+
+    try {
+        const phieuNhap = new GoodsReceiptModel({
+            nhaCungCap: nhaCungCap,
+            chiTiet: chiTiet,
+        });
+        
+        for (const item of chiTiet) {
+            let prod = await ProductModel.findOne({maSanPham: item.maSanPham});
+            
+            if (prod) {
+                const updatedSizes = prod.danhSachKichCo.map((prodSize) => {
+                    const receiptSize = item.danhSachKichCo.find((size) => size.maKichCo == prodSize.maKichCo);
+                    if (receiptSize) {
+                        prodSize.soLuongKichCo += receiptSize.soLuongKichCo;
+                    }
+                    return prodSize;
+                });
+
+                await ProductModel.updateOne({maSanPham: item.maSanPham}, {danhSachKichCo: updatedSizes})
+                console.log(`Cập nhật số lượng sản phẩm: ${prod.tenSanPham} thành công.`);
+            }
+            else {
+                console.log(`Không tìm thấy sản phẩm với mã: ${item.maSanPham}`);
+            }
+        }
+        
+        await phieuNhap.save();
+        return res.status(200).json({ redirectUrl: "/admin/create-goods-receipt" });
+    }
+    catch (error) {
+        console.error('Lỗi khi lưu phiếu nhập:', error);
+        res.status(500).json({ message: 'Lỗi máy chủ. Vui lòng thử lại sau.' });
     }
 }

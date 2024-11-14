@@ -1,18 +1,17 @@
 import express from "express";
 import {
+    renderAdminCreateGoodsReceipt,
     renderAdminCreateProductPage,
     renderAdminProductPage,
     createProductHandler,
 } from "../controllers/product.controller.js";
-
-import {renderCreateGoodsReceipt} from "../controllers/admin/product.controller.js";
 
 import multer from "multer";
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
-router.get("/create-goods-receipt", renderCreateGoodsReceipt);
+router.get("/create-goods-receipt", renderAdminCreateGoodsReceipt);
 
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
