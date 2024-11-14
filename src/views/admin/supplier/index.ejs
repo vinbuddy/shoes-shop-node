@@ -1,0 +1,99 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<div class="flex flex-col sm:flex-row justify-between left-4 right-4 z-10">
+    <form action="/admin/supplier/search" method="GET" class=" self-start left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
+        <input type="text" name="tenNhaCungCap" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof tenNhaCungCap !== 'undefined' ? tenNhaCungCap : '' %>">
+        <select name="trangThaiXoa" class="border border-gray-300 rounded px-4 py-2 flex-1">
+            <option value="">Tất cả trạng thái</option>
+            <option value="false">Đang hoạt động</option>
+            <option value="true">Dừng hoạt động</option>
+        </select>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <i class="fas fa-filter"></i> Lọc
+        </button>
+    </form>
+    <div class="flex flex-col sm:flex-row sm:mt-8 mt-0 gap-12">
+        <ul class="max-w-fit mx-auto">
+            <% suppliers.forEach(function(supplier) { %>
+            <li class="sm:rounded-md bg-white shadow mb-4">
+                <div class="px-4 py-5 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900"><%= supplier.tenNhaCungCap %></h3>
+                        <p class="mt-1 max-w-2xl text-sm font-semibold text-gray-800">Đại diện: <%= supplier.nguoiLienHe %></p>
+                    </div>
+                    <div class="mt-4 flex gap-8">
+                        <p><a href="tel:<%= supplier.soDienThoai %>" class="text-blue-500 hover:underline"><i class="fas fa-phone-alt"></i> <%= supplier.soDienThoai %></a></p>
+                        <p><a href="mailto:<%= supplier.email %>" class="text-blue-500 hover:underline"><i class="fas fa-envelope"></i> <%= supplier.email %></a></p>
+                        <p><a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(supplier.diaChi) %>" target="_blank" class="text-blue-500 hover:underline"><i class="fas fa-map-marker-alt"></i> <%= supplier.diaChi %></a></p>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between">
+                        <p class="text-sm font-medium text-gray-500"><span class="text-green-600"><% if (supplier.trangThaiXoa) { %>
+                            <span class="bg-gray-200 text-red-500 px-2 py-1 rounded text-sm font-semibold">Dừng hoạt động</span>
+                        <% } else { %>
+                            <span class="bg-gray-200 text-green-500 px-2 py-1 rounded text-sm font-semibold">Đang hoạt động</span>
+                        <% } %></span></p>
+                        <div>
+                            <% if (!supplier.trangThaiXoa) { %>
+                                <a href="/admin/supplier/edit/<%= supplier.maNhaCungCap %>" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <a href="/admin/supplier/delete/<%= supplier.maNhaCungCap %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                                    <i class="fas fa-trash-alt"></i> Xoá
+                                </a>
+                            <% } else { %>
+                                <a href="/admin/supplier/restore/<%= supplier.maNhaCungCap %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                                    <i class="fas fa-undo"></i> Khôi phục
+                                </a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <% }); %>
+        </ul>
+    </div>
+    <div class="sm:ml-4 sm:mt-0 mt-24">
+        <a href="/admin/supplier/create" class=" float-right inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
+            <i class="fas fa-plus"></i> Thêm nhà cung cấp
+        </a>
+    </div>
+</div>
+
+<div class="mt-8 flex justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Previous</span>
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        <% } else { %>
+            <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-300">
+                <span class="sr-only">Previous</span>
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-500 text-sm font-medium text-white">
+                    <%= i %>
+                </span>
+            <% } else { %>
+                <a href="?page=<%= i %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <%= i %>
+                </a>
+            <% } %>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Next</span>
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        <% } else { %>
+            <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-300">
+                <span class="sr-only">Next</span>
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        <% } %>
+    </nav>
+</div>

@@ -9,6 +9,7 @@ import cartRoutes from "./cart.route.js";
 import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import checkoutRoutes from "./checkout.route.js";
+import orderRoutes from "./order.route.js";
 const router = express.Router();
 
 router.use("/", homeRoutes);
@@ -20,4 +21,5 @@ router.use("/cart", cartRoutes);
 router.use("/brand", brandRoutes);
 router.use("/supplier", supplierRoutes);
 router.use("/checkout", checkoutRoutes);
+router.use("/order", orderRoutes);
 export default router;

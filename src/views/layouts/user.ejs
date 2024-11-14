@@ -22,11 +22,11 @@
                                     <div class="flex items-center border p-3 rounded-2xl">
                                         <img
                                             class="size-10 object-cover rounded-full"
-                                            src="https://img.freepik.com/free-photo/horizontal-portrait-smiling-happy-young-pleasant-looking-female-wears-denim-shirt-stylish-glasses-with-straight-blonde-hair-expresses-positiveness-poses_176420-13176.jpg"
-                                            alt=""
+                                            src="<%= customer.anhDaiDien %>"
+                                            alt="avatar"
                                         />
                                         <div class="ms-3">
-                                            <h3 class="text-lg font-semibold">Annah</h3>
+                                            <h3 class="text-lg font-semibold"><%= customer.tenKhachHang%></h3>
                                             <p class="text-sm text-gray-500"></p>
                                         </div>
                                     </div>
@@ -34,11 +34,11 @@
                                 <ul class="py-3 px-2">
                                     <li class="flex items-center py-2 rounded-lg">
                                         <span class="me-3"><i class="bx bx-user"></i></span>
-                                        <a href="">Profile</a>
+                                        <a href="/user/profile">Profile</a>
                                     </li>
                                     <li class="flex items-center py-2 rounded-lg">
                                         <span class="me-3"><i class="bx bx-package"></i></span>
-                                        <a href="">Order</a>
+                                        <a href="/user/order">Order</a>
                                     </li>
                                 </ul>
                             </aside>
