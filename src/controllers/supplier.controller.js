@@ -104,7 +104,6 @@ export async function searchSupplier(req, res) {
             query.trangThaiXoa = trangThaiXoa === "true";
         }
         if (trangThaiXoa === "") {
-            console.log("trangThaiXoa", trangThaiXoa);
             query.trangThaiXoa = { $in: [true, false] };
         }
         const { page, limit, skip } = getPagination(req);

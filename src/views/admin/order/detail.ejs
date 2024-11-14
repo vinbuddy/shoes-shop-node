@@ -1,0 +1,231 @@
+<div class="tp-main-wrapper bg-slate-100" x-data="{ sideMenu: false }">
+    <div class="tp-main-content " x-data="{ searchOverlay: false }">
+        <div class="body-content px-8 py-8 bg-gray-100">
+            <div class="flex justify-between mb-10">
+                <div class="page-title">
+                    <h3 class="mb-0 text-2xl font-bold">Chi tiết đơn hàng</h3>
+                    <ul class="text-sm font-medium flex items-center space-x-3 text-gray-500">
+                        <li class="breadcrumb-item text-gray-400">
+                            <a href="/admin/Dashboard" class="hover:text-blue-500"> Home</a>
+                        </li>
+                        <li class="breadcrumb-item flex items-center">
+                            <span class="inline-block bg-gray-400 w-1 h-1 rounded-full"></span>
+                        </li>
+                        <li class="breadcrumb-item  text-gray-400">
+                            <a href="/admin/order/" class="hover:text-blue-500">Đơn hàng</a>
+                        </li>
+                        <li class="breadcrumb-item flex items-center">
+                            <span class="inline-block bg-gray-400 w-1 h-1 rounded-full"></span>
+                        </li>
+                        <li class="breadcrumb-item text-gray-400 ">Chi tiết đơn hàng</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- table -->
+            <div class="">
+                <div class="flex items-center flex-wrap justify-between px-8 mb-6 bg-white rounded-t-md rounded-b-md shadow-xs py-6">
+                    <div class="relative">
+                        
+ <h5 class="mb-0 font-semibold">Mã đơn hàng: <%= order.maDonHang %></h5>
+                    </div>
+                    <form  method="post" action="/admin/order/updateStatus/<%= order.maDonHang %>" class="flex sm:justify-end flex-wrap sm:space-x-6 mt-5 md:mt-0">
+                        <div class="search-select mr-3 flex items-center space-x-3 ">
+                            <input type="hidden" class="form-control" name="id" value="<%= order.maDonHang %>">
+                            <label class="text-lg inline-block leading-none -translate-y-[2px] mr-3">Thay đổi trạng thái : </label>
+                            <select name="status" class="font-medium bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-3 hover:bg-blue-100">
+                                <% statuses.forEach(status => { %>
+                                    <option value="<%= status.maTrangThai %>" <%= (status.maTrangThai).toString() === (order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.maTrangThai).toString() ? 'selected' : '' %>><%= status.tenTrangThai %></option>
+                                <% }) %>
+                            </select>    
+                        </div>
+                        <div class="product-add-btn flex ">
+                            <button type="submit" class="btn bg-green-600 hover:bg-green-500 hover text-white">Cập nhật</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-t-md rounded-b-md shadow-xs px-8 py-8">
+                        <h5 class="font-semibold">Chi tiết khách hàng</h5>
+                        <div class="relative overflow-x-auto ">
+                            <table class="w-[400px] sm:w-full text-base text-left text-gray-500">
+                                <tbody>
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                           Tài khoản
+                                        <td class="py-3 whitespace-nowrap ">
+                                            <a href="#" class="flex items-center justify-end space-x-5 text-end text-heading text-hover-primary">
+                                                <span class="font-medium "> <%= order.maKhachHang.tenKhachHang %></span>
+                                            </a>
+                                        </td>                                            
+                                    </tr>                                                           
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                            email
+                                        </td>
+                                        <td class="py-3 text-end">
+                                            <a href="tel:9458785014"><%= order.maKhachHang.email %></a>
+                                        </td>                                            
+                                    </tr>                                                           
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-t-md rounded-b-md shadow-xs px-8 py-8">
+                        <h5 class="font-semibold">Tóm tắt đơn hàng</h5>
+                        <div class="relative overflow-x-auto ">
+                            <table class="w-[400px] sm:w-full text-base text-left text-gray-500">
+                                <tbody>
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                            Ngày tạo đơn hàng
+                                        </td>
+                                        <td class="py-3 whitespace-nowrap text-end">
+                                            <p class="mb-0 text-sm"> <%= new Date(order.ngayDatHang).toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) %></p> 
+                                        </td>                                            
+                                    </tr>                                                           
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                            Phương thức thanh toán 
+                                        </td>
+                                        <td class="py-3 text-end">
+                                            <%= order.thongTinThanhToan.phuongThucThanhToan %>
+                                        </td>                                            
+                                    </tr>                                                           
+                                                                                             
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-t-md rounded-b-md shadow-xs px-8 py-8">
+                        <h5 class="font-semibold">Thông tin giao hàng</h5>
+                        <div class="relative overflow-x-auto ">
+                            <table class="w-[400px] sm:w-full text-base text-left text-gray-500">
+                                <tbody>
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                           Tên khách hàng
+                                        </td>
+                                        <td class="py-3 whitespace-nowrap ">
+                                            <a href="#" class="flex items-center justify-end space-x-5 text-end text-heading text-hover-primary">
+                                            
+                                                <span class="font-medium "> <%= order.thongTinGiaoHang.tenNguoiNhan %></span>
+                                            </a>
+                                        </td>                                            
+                                    </tr>                                                           
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                            Điện thoại
+                                        </td>
+                                        <td class="py-3 text-end">
+                                            <a href="tel:9458785014"><%= order.thongTinGiaoHang.soDienThoaiNguoiNhan %></a>
+                                        </td>                                            
+                                    </tr>    
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[40%]">
+                                            Địa chỉ
+                                        </td>
+                                        <td class="py-3 text-end">
+                                            <%= order.thongTinGiaoHang.diaChiGiaoHang %>
+                                        </td>                                            
+                                    </tr>
+                                                                                               
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-6">
+                    <div class="col-span-12 2xl:col-span-8">
+                        <div class="bg-white rounded-t-md rounded-b-md shadow-xs py-8">
+                            <div class="relative overflow-x-auto  mx-8">
+                                <table class="w-[975px] md:w-full text-base text-left text-gray-500">
+                                    
+                                    <thead class="bg-white">
+                                        <tr class="border-b border-gray6 text-tiny">
+                                            <th scope="col" class="pr-8 py-3 text-sm text-text2 uppercase font-semibold ">
+                                                Sản phẩm
+                                            </th>
+                                            <th scope="col" class="px-3 py-3 text-sm text-text2 uppercase font-semibold whitespace-nowrap  text-end">
+                                                Giá
+                                            </th>
+                                            <th scope="col" class="px-3 py-3 text-sm text-text2 uppercase font-semibold whitespace-nowrap text-end">
+                                                Số lượng
+                                            </th>
+                                            <th scope="col" class="px-3 py-3 text-sm text-text2 uppercase font-semibold whitespace-nowrap text-end">
+                                                Tổng tiền
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% order.chiTietDonHang.forEach(product => { %>
+                                            <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                                <td class="pr-8 py-5 ">
+                                                    <a href="#" class="flex items-center space-x-5">
+                                                        <img class="w-[60px] h-auto object-cover rounded-md" src="<%= product.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>" alt="<%= product.maSanPham.tenSanPham %>">
+                                                        <span class="font-medium text-heading text-hover-primary"><%= product.maSanPham.tenSanPham %></span>
+                                                    </a>
+                                                </td>
+                                                <td class="px-3 py-3 font-normal text-[#55585B] text-end">
+                                                    <%= product.giaDaChon.toLocaleString('vi-VN')%>đ
+                                                </td>
+                                                <td class="px-3 py-3 font-normal text-[#55585B] text-end">
+                                                    <%= product.soLuongDaChon%>
+                                                </td>
+                                                <td class="px-3 py-3 font-normal text-[#55585B] text-end">
+                                                    <%= (product.giaDaChon *product.soLuongDaChon).toLocaleString('vi-VN') %>đ
+                                                </td>
+                                            </tr>         
+                                            
+                                        <% }) %>
+                                                                                                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 2xl:col-span-4">
+                        <div class="bg-white rounded-t-md rounded-b-md shadow-xs py-8 px-8">
+                            <h5 class="font-semibold">Giá đơn hàng</h5>
+                            <div class="relative overflow-x-auto">
+                                <table class="w-full text-base text-left text-gray-500">
+                                    <tbody>
+                                                                                 
+                                        <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                            <td class="pr-3 py-3 pt-6 font-normal text-[#55585B] text-start">
+                                                Giá sản phẩm:
+                                            </td>
+                                            <td class="px-3 py-3 pt-6 font-normal text-[#55585B] text-end">
+                                               <%= order.tongTienThanhToan.toLocaleString('vi-VN') %>đ
+                                            </td>
+                                        </tr>                                          
+                                        <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                            <td class="pr-3 py-3 font-normal text-[#55585B] text-start">
+                                                Phí giao hàng:
+                                            </td>
+                                            <td class="px-3 py-3 font-normal text-[#55585B] text-end">
+                                                <%= order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN') %>đ
+                                            </td>
+                                        </tr>                                          
+                                        <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                            <td class="pr-3 py-3 font-normal text-[#55585B] text-start">
+                                                Tổng cộng:
+                                            </td>
+                                            <td class="px-3 py-3 text-[#55585B] text-end text-lg font-semibold">
+                                                <%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %>đ
+                                            </td>
+                                        </tr>                                          
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
