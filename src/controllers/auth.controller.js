@@ -5,6 +5,7 @@ import env from "dotenv";
 import KhachHangModel from "../models/khachHang.model.js";
 import { getRedis } from "../utils/redis.js";
 import { sendEmail } from "../utils/mail.js";
+import { syncCartItemsAfterLogin } from "./cart.controller.js";
 
 env.config();
 
@@ -215,6 +216,14 @@ export async function loginHandler(req, res) {
             }
         });
 
+        // Sync cart
+        const result = syncCartItemsAfterLogin(req);
+
+        if (result) {
+            // Clear cookie cartItems
+            res.clearCookie("cartItems");
+        }
+
         return res.redirect("/");
     } catch (error) {
         return res.render("auth/login", {
@@ -342,6 +351,14 @@ export async function googleAuthCallbackHandler(req, res) {
                 throw new Error("Không thể lưu session.");
             }
         });
+
+        // Sync cart
+        const result = syncCartItemsAfterLogin(req);
+
+        if (result) {
+            // Clear cookie cartItems
+            res.clearCookie("cartItems");
+        }
 
         return res.redirect("/");
     } catch (error) {

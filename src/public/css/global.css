@@ -12,6 +12,26 @@ body {
     --primary: "#0578f8";
 }
 
+*,
+*:hover {
+    scrollbar-color: auto !important;
+}
+
+.scrollbar::-webkit-scrollbar {
+    border-radius: 0;
+    width: 7px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
 .btn {
     display: flex;
     justify-content: center;
