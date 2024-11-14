@@ -1,0 +1,17 @@
+<div id="invoice" class="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
+    <h2 class="text-2xl font-semibold text-center mb-4">Hóa Đơn</h2>
+    <p><strong>Mã đơn hàng:</strong> <%= order.maDonHang %></p>
+    <p><strong>Ngày đặt:</strong> <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+    
+    <div class="mt-4">
+        <h3 class="text-lg font-semibold mb-2">Chi tiết đơn hàng</h3>
+        <% order.chiTietDonHang.forEach(item => { %>
+            <p>Sản phẩm: <%= item.maSanPham.tenSanPham %> - Số lượng: <%= item.soLuongDaChon %> - Giá: <%= item.giaDaChon * item.soLuongDaChon %>₫</p>
+        <% }) %>
+    </div>
+    
+    <div class="mt-4">
+        <p><strong>Tổng thanh toán:</strong> <%= order.tongTienThanhToan %>₫</p>
+        <p><strong>Phương thức thanh toán:</strong> <%= order.thongTinThanhToan.phuongThucThanhToan %></p>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    renderBrandPage,
+    renderBrandPageWithPagination,
     deleteBrand,
     updateBrand,
     renderCreatePage,
@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", renderBrandPage);
+router.get("/", renderBrandPageWithPagination);
 router.get("/create", renderCreatePage);
 router.get("/delete/:id", deleteBrand);
 router.get("/restore/:id", restoreBrand);

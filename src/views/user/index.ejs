@@ -1,63 +1,15 @@
-<!-- <div class="bg-white p-6">
-    <div class="flex items-center space-x-6">
-        <div>
-            <img
-                class="h-24 w-24 rounded-full object-cover cursor-pointer hover:opacity-80"
-                src="https://img.freepik.com/free-photo/horizontal-portrait-smiling-happy-young-pleasant-looking-female-wears-denim-shirt-stylish-glasses-with-straight-blonde-hair-expresses-positiveness-poses_176420-13176.jpg"
-                alt="User Avatar"
-            />
-        </div>
-        <div>
-            <h2 class="text-2xl font-semibold text-gray-800">Annah</h2>
-            <p class="text-gray-600">Annah@example.com</p>
-        </div>
-    </div>
-
-    <div class="mt-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Thông tin cá nhân</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <p class="text-gray-600"><strong>Địa chỉ:</strong> 123 Main St, Hà Nội, Việt Nam</p>
-            </div>
-            <div>
-                <p class="text-gray-600"><strong>Số điện thoại:</strong> +84 123 456 789</p>
-            </div>
-            <div>
-                <p class="text-gray-600"><strong>Ngày sinh:</strong> 01/01/1990</p>
-            </div>
-        </div>
-    </div>
-
- <div class="mt-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Lịch sử mua hàng</h3>
-        <ul class="divide-y divide-gray-200">
-            <li class="py-4 flex justify-between">
-                <span>Giày Nike Air Max</span>
-                <span class="text-gray-600">20/09/2024</span>
-            </li>
-            <li class="py-4 flex justify-between">
-                <span>Giày Adidas Ultraboost</span>
-                <span class="text-gray-600">15/08/2024</span>
-            </li>
-            <li class="py-4 flex justify-between">
-                <span>Converse Classic</span>
-                <span class="text-gray-600">10/07/2024</span>
-            </li>
-        </ul>
-    </div> 
-</div> -->
-
 <form class="rounded-xl">
     <h3 class="text-xl font-bold mb-5">Hồ sơ của tôi</h3>
 
     <div class="flex-col-reverse grid grid-cols-12 gap-5">
         <div class="order-2 lg:order-1 col-span-12 sm:col-span-12 md:col-span-12 lg:col-span-7 xl:col-span-7">
             <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                 <input
                     disabled
                     type="email"
                     name="email"
-                    value="annah@gmail.com"
+                    value="<%= customer.email %>"
                     placeholder="Enter Email Address"
                     class="w-full px-4 py-3 rounded-lg mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                     autofocus
@@ -65,12 +17,13 @@
                     required
                 />
 
+                <label for="username" class="block text-sm font-medium text-gray-700 mt-5">Username</label>
                 <input
                     type="username"
                     name="username"
-                    value="Annah"
+                    value="<%= customer.tenKhachHang %>"
                     placeholder="Enter username"
-                    class="mt-5 w-full px-4 py-3 rounded-lg bg-gray-200 border focus:border-blue-500 focus:bg-white focus:outline-none"
+                    class="w-full px-4 py-3 rounded-lg bg-gray-200 border focus:border-blue-500 focus:bg-white focus:outline-none"
                     autofocus
                     autocomplete
                     required
@@ -80,7 +33,7 @@
                     type="submit"
                     class="w-full block bg-primary hover:bg-blue-400 focus:bg-blue-400 text-white font-semibold rounded-lg px-4 py-3 mt-6"
                 >
-                    Save changes
+                    Lưu
                 </button>
             </div>
         </div>
@@ -89,7 +42,7 @@
                 <label for="avatar" class="overflow-hidden">
                     <img
                         class="w-[300px] h-[300px] object-cover rounded-full mx-auto cursor-pointer"
-                        src="https://img.freepik.com/free-photo/horizontal-portrait-smiling-happy-young-pleasant-looking-female-wears-denim-shirt-stylish-glasses-with-straight-blonde-hair-expresses-positiveness-poses_176420-13176.jpg"
+                        src="<%= customer.anhDaiDien %>"
                     />
                 </label>
                 <div class="mt-5 flex justify-center">

@@ -1,0 +1,486 @@
+<div class="container mt-5">
+    <h2 class="text-2xl font-bold mb-4">Danh sách đơn hàng của tôi</h2>
+    <ul class="flex border-b mb-4" id="orderStatusTabs" role="tablist">
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-blue-500 font-bold border-b-2 border-blue-500"
+                id="all-orders-tab"
+                data-toggle="tab"
+                href="#all-orders"
+                role="tab"
+                aria-controls="all-orders"
+                aria-selected="true"
+                onclick="switchTab(event, 'all-orders')"
+                >Tất cả đơn</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-yellow-500 font-bold border-b-2 border-transparent hover:border-yellow-500"
+                id="pending-orders-tab"
+                data-toggle="tab"
+                href="#pending-orders"
+                role="tab"
+                aria-controls="pending-orders"
+                aria-selected="false"
+                onclick="switchTab(event, 'pending-orders')"
+                >Chờ xác nhận</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-teal-500 font-bold border-b-2 border-transparent hover:border-teal-500"
+                id="shipped-orders-tab"
+                data-toggle="tab"
+                href="#shipped-orders"
+                role="tab"
+                aria-controls="shipped-orders"
+                aria-selected="false"
+                onclick="switchTab(event, 'shipped-orders')"
+                >Đang giao</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-green-500 font-bold border-b-2 border-transparent hover:border-green-500"
+                id="delivered-orders-tab"
+                data-toggle="tab"
+                href="#delivered-orders"
+                role="tab"
+                aria-controls="delivered-orders"
+                aria-selected="false"
+                onclick="switchTab(event, 'delivered-orders')"
+                >Đã giao</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-green-500 font-bold border-b-2 border-transparent hover:border-green-500"
+                id="completed-orders-tab"
+                data-toggle="tab"
+                href="#completed-orders"
+                role="tab"
+                aria-controls="completed-orders"
+                aria-selected="false"
+                onclick="switchTab(event, 'completed-orders')"
+                >Hoàn thành</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-red-500 font-bold border-b-2 border-transparent hover:border-red-500"
+                id="cancelled-orders-tab"
+                data-toggle="tab"
+                href="#cancelled-orders"
+                role="tab"
+                aria-controls="cancelled-orders"
+                aria-selected="false"
+                onclick="switchTab(event, 'cancelled-orders')"
+                >Đã huỷ</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-red-500 font-bold border-b-2 border-transparent hover:border-red-500"
+                id="refunded-orders-tab"
+                data-toggle="tab"
+                href="#refunded-orders"
+                role="tab"
+                aria-controls="refunded-orders"
+                aria-selected="false"
+                onclick="switchTab(event, 'refunded-orders')"
+                >Trả hàng</a
+            >
+        </li>
+    </ul>
+    <div class="tab-content" id="orderStatusTabsContent">
+        <div class="tab-pane fade show" id="all-orders" role="tabpanel" aria-labelledby="all-orders-tab">
+            <!-- All orders content -->
+             
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% orders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                             <% 
+                             var statusOrder = status.findIndex((status) => status._id.equals((order.trangThaiDonHang[order.trangThaiDonHang.length - 1]).maTrangThai));
+                             %> 
+                            <%  if (statusOrder === 3) { %>
+                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ </button>
+                                
+                            <% } else { %>
+                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
+                            <% } %>
+                            <!-- Cancel Order Button -->
+                            <% if (statusOrder === 0 || statusOrder === 1 || statusOrder === 2) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
+                            <% } else if (statusOrder === 4) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Trả hàng</button>
+                            <% } %>
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="tab-pane fade hidden" id="pending-orders" role="tabpanel" aria-labelledby="pending-orders-tab">
+            <!-- Pending orders content -->
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% pendingOrders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <!-- Cancel Order Button -->
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="tab-pane fade hidden" id="shipped-orders" role="tabpanel" aria-labelledby="shipped-orders-tab">
+            <!-- Shipped orders content -->
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% shippedOrders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <!-- Cancel Order Button -->
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="tab-pane fade hidden" id="delivered-orders" role="tabpanel" aria-labelledby="delivered-orders-tab">
+            <!-- Delivered orders content -->
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% deliveredOrders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <!-- Cancel Order Button -->
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Trả hàng</button>
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="tab-pane fade hidden" id="completed-orders" role="tabpanel" aria-labelledby="completed-orders-tab">
+            <!-- Completed orders content -->
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% completedOrders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <!-- Cancel Order Button -->
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="tab-pane fade hidden" id="cancelled-orders" role="tabpanel" aria-labelledby="cancelled-orders-tab">
+            <!-- Cancelled orders content -->
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% cancelOrders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ</button>
+                            <!-- Cancel Order Button -->
+                            
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="tab-pane fade hidden" id="refunded-orders" role="tabpanel" aria-labelledby="refunded-orders-tab">
+            <!-- Refunded orders content -->
+            <div class="space-y-8 p-4 bg-gray-100">
+                <% refundOrders.forEach(order => { %>
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+                        <!-- Danh sách chi tiết sản phẩm -->
+                        <div class="space-y-4">
+                            <% order.chiTietDonHang.forEach(detail => { %>
+                                <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                    <!-- Hình ảnh sản phẩm -->
+                                    <div class="flex items-center space-x-2">
+                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        
+                                        <!-- Thông tin sản phẩm -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
+                                        </div>
+                                    </div>
+                
+                                    <!-- Đơn giá -->
+                                    <p class="text-indigo-600 font-semibold text-sm">
+                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    </p>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <!-- Thông tin đơn hàng -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="border-gray-200 pb-2 mb-2">
+                                <p class="text-gray-500 text-sm mt-1">Ngày đặt hàng: <%= new Date(order.ngayDatHang).toLocaleDateString() %></p>
+                            </div>
+                            <!-- Tổng tiền của đơn hàng -->
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                            </div>
+                        </div>
+                        <!-- Buttons for order actions -->
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <!-- View Order Details Button -->
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <!-- Cancel Order Button -->
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
+                        </div>          
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script>
+    const formatVNCurrency = (value) => {
+        return value.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+    };
+    
+    function viewOrderDetails(orderId) {
+        alert('Viewing details for order: ' + orderId);
+    }
+
+    function cancelOrder(orderId) {
+        if (confirm('Bạn có chắc chắn muốn huỷ đơn hàng này không?')) {
+            alert('Order ' + orderId + ' has been cancelled.');
+            window.location.href = '/order/cancel/' + orderId;
+        }
+    }
+
+    function switchTab(event, tabId) {
+        event.preventDefault();
+        document.querySelectorAll('.tab-pane').forEach(tab => {
+            tab.classList.remove('show');
+            tab.classList.add('hidden');
+        });
+        document.querySelectorAll('[data-toggle="tab"]').forEach(tab => {
+            tab.classList.remove('border-blue-500', 'text-blue-500');
+            tab.classList.add('border-transparent');
+        });
+
+        document.getElementById(tabId).classList.add('show');
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById(tabId).classList.add('show');
+        event.currentTarget.classList.add('border-blue-500', 'text-blue-500');
+        event.currentTarget.classList.remove('border-transparent');
+    }
+</script>

@@ -1,8 +1,8 @@
 import express from "express";
-import { renderUserProfilePage } from "../controllers/user.controller.js";
+import { renderUserProfilePage, renderUserOrderPage } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
-router.get("/:id", renderUserProfilePage);
-
+router.get("/profile", renderUserProfilePage);
+router.get("/order", renderUserOrderPage);
 export default router;
