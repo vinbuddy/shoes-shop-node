@@ -29,14 +29,20 @@
                     </div>
                     <div class="flex justify-end space-x-6">
                         <div class="search-select mr-3 flex items-center space-x-3">
+                            <span class="text-sm inline-block leading-none -translate-y-[2px]">Chuyển trạng thái tiếp theo:</span>
+                        <button id="nextStatus" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Chuyển</button>
+                        </div>
+                        <div class="search-select mr-3 flex items-center space-x-3">
                             <span class="text-sm inline-block leading-none -translate-y-[2px]">Trạng thái:</span>
-                            <select class="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="selectStatus" class="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Tất cả</option>
                                 <% statuses.forEach(status => { %>
-                                    <option value="<%= status.value %>"><%= status.tenTrangThai %></option>
+                                    <option value="<%= status.maTrangThai %>" <%= searchStatus == status.maTrangThai.toString() ? 'selected' : '' %> ><%= status.tenTrangThai %></option>
                                 <% }) %>
                             </select>
                         </div>
                     </div>
+                
                 </div>
                 <div class="relative overflow-x-auto mx-8">
                     <table class="w-full text-sm text-left text-gray-500">
@@ -44,9 +50,10 @@
                             <tr class="border-b border-gray-200 text-xs">
                                 <th scope="col" class="py-3 text-xs text-gray-400 uppercase font-semibold w-1/12">
                                     <div class="tp-checkbox -translate-y-[3px]">
-                                        <input id="selectAllProduct" type="checkbox" />
-                                        <label for="selectAllProduct"></label>
+                                        <input id="selectAllOrder" type="checkbox" />
+                                        <label for="selectAllOrder"></label>
                                     </div>
+                                
                                 </th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold">Khách hàng</th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Số lượng</th>
@@ -62,9 +69,13 @@
                             <tr class="bg-white border-b border-gray-200 last:border-0 text-start mx-9">
                                 <td class="pr-3 whitespace-nowrap">
                                     <div class="tp-checkbox">
-                                        <input id="product-1" type="checkbox" />
-                                        <label for="product-1"></label>
+                                        <input id="order-1" type="checkbox" />
+                                        <label for="order-1"></label>
                                     </div>
+                                </td>
+                                
+                                <td class=" hidden pr-8 py-5 whitespace-nowrap">
+                                    <p id="orderId" > <%= order.maDonHang%> </p>
                                 </td>
                                 <td class="pr-8 py-5 whitespace-nowrap">
                                     <a href="#" class="flex items-center space-x-5 hover:text-blue-500 text-gray-700">
@@ -164,3 +175,53 @@
         </nav>
     <% } %>
 </div>
+<script>
+    document.getElementById('selectAllOrder').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+</script>
+<script>
+    console.log(window.location.search)
+    document.getElementById('selectStatus').addEventListener('change', function() {
+        const select = this.value;
+        window.location.href = `?status=${select}`;
+    });
+</script>
+<script>
+    document.getElementById('nextStatus').addEventListener('click', function() {
+        const checkedOrders = [];
+        const checkboxes = document.querySelectorAll('.tp-checkbox input[type="checkbox"]:checked');
+        checkboxes.forEach(checkbox => {
+            const orderIdInput = checkbox.closest('tr').querySelector('#orderId');
+            if (orderIdInput) {
+                checkedOrders.push(orderIdInput.textContent.trim());
+            }
+        });
+        if (checkedOrders.length > 0) {
+            fetch('/admin/order/nextStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderIds: checkedOrders })
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to update order status.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred.');
+            });
+        
+        } else {
+            alert('No orders selected.');
+        }
+    });
+</script>

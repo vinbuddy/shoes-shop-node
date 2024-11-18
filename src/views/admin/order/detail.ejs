@@ -91,7 +91,14 @@
                                             <%= order.thongTinThanhToan.phuongThucThanhToan %>
                                         </td>                                            
                                     </tr>                                                           
-                                                                                             
+                                    <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
+                                        <td class="py-3 font-normal text-[#55585B] w-[50%]">
+                                             Trạng thái thanh toán
+                                        </td>
+                                        <td class="py-3 text-end">
+                                            <%= order.thongTinThanhToan.trangThaiThanhToan %>
+                                        </td>                                            
+                                    </tr>                                                       
                                 </tbody>
                             </table>
                         </div>
@@ -203,7 +210,7 @@
                                                 Phí giao hàng:
                                             </td>
                                             <td class="px-3 py-3 font-normal text-[#55585B] text-end">
-                                                <%= order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN') %>đ
+                                                <%= (order.thongTinGiaoHang.phiVanChuyen == 0) ? order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN'): '0'  %>đ
                                             </td>
                                         </tr>                                          
                                         <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">

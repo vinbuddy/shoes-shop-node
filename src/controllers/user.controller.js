@@ -36,6 +36,7 @@ export async function renderUserOrderPage(req, res) {
         const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
         const id = latestStatus.maTrangThai;
         const statusOrder = status.findIndex((status) => status._id.equals(id));
+        order.statusOrder = statusOrder;
         switch (statusOrder) {
             case 0: // Chờ xác nhận
                 pendingOrders.push(order);
@@ -46,13 +47,15 @@ export async function renderUserOrderPage(req, res) {
             case 2: // Đã giao
                 deliveredOrders.push(order);
                 break;
-            case 3: // Đã hủy
-                cancelOrders.push(order);
-                break;
-            case 4: // Hoàn thành
+            case 3: // Hoàn thành
                 completedOrders.push(order);
                 break;
-            case 5: // Đã trả hàng
+            case 4: // Đã hủy
+                cancelOrders.push(order);
+                break;
+            case 5: //  trả hàng
+            case 6: // trả hàng
+            case 7: // trả hàng
                 refundOrders.push(order);
                 break;
             default:

@@ -40,7 +40,6 @@ export function renderCreatePage(req, res) {
 export async function renderUpdatePage(req, res) {
     const { id } = req.params;
     const supplier = await NhaSanXuatModel.findById(id);
-    console.log(supplier);
     return res.render("admin/supplier/edit", {
         layout: "./layouts/admin",
         page: "supplier",

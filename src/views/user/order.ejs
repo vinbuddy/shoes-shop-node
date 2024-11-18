@@ -138,18 +138,22 @@
                              <% 
                              var statusOrder = status.findIndex((status) => status._id.equals((order.trangThaiDonHang[order.trangThaiDonHang.length - 1]).maTrangThai));
                              %> 
-                            <%  if (statusOrder === 3) { %>
+                            <%  if (statusOrder === 4) { %>
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ </button>
                                 
                             <% } else { %>
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
                             <% } %>
                             <!-- Cancel Order Button -->
-                            <% if (statusOrder === 0 || statusOrder === 1 || statusOrder === 2) { %>
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
-                            <% } else if (statusOrder === 4) { %>
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Trả hàng</button>
-                            <% } %>
+                            <% if (statusOrder === 0 || statusOrder === 1 ) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng </button>
+                            <%} else { %> 
+                            <% if (statusOrder === 2 ) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Hoàn thành</button>
+                            <% }  else if (statusOrder === 4) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
+                            <% }} %>
                         </div>          
                     </div>
                 <% }) %>
@@ -293,7 +297,8 @@
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
                             <!-- Cancel Order Button -->
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Trả hàng</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
+                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Hoàn thành</button>
                         </div>          
                     </div>
                 <% }) %>
@@ -434,9 +439,11 @@
                         <!-- Buttons for order actions -->
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
-                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
+                            <% if(order.statusOrder == 5) { %>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="refundOrder('<%= order._id %>')">Huỷ yêu cầu trả hàng</button>
+                            <% } %>
                             <!-- Cancel Order Button -->
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
                         </div>          
                     </div>
                 <% }) %>
@@ -463,6 +470,12 @@
         if (confirm('Bạn có chắc chắn muốn huỷ đơn hàng này không?')) {
             alert('Order ' + orderId + ' has been cancelled.');
             window.location.href = '/order/cancel/' + orderId;
+        }
+    }
+    function refundOrder(orderId) {
+        if (confirm('Bạn có chắc chắn muốn trả hàng cho đơn hàng này không?')) {
+            alert('Order ' + orderId + ' has been marked for refund.');
+            window.location.href = '/order/refund/' + orderId;
         }
     }
 
