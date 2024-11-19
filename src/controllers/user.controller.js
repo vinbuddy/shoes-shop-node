@@ -63,7 +63,7 @@ export async function renderUserOrderPage(req, res) {
         }
     }
 
-    return res.render("user/order", {
+    return res.render("order/index", {
         layout: "./layouts/user",
         page: "order",
         title: "Order",
@@ -76,5 +76,29 @@ export async function renderUserOrderPage(req, res) {
         completedOrders: completedOrders,
         refundOrders: refundOrders,
         status: status,
+    });
+}
+
+export async function renderUserOrderDetailPage(req, res) {
+    const { id } = req.params;
+    const customer = req.session.customer;
+    const order = await DonHangModel.findById(id)
+        .populate({
+            path: "chiTietDonHang.maSanPham",
+            select: "tenSanPham giaSanPham hinhAnhDaiDien",
+        })
+        .populate({
+            path: "chiTietDonHang.maKichCoSanPham",
+            select: "tenKichCo",
+        })
+        .populate({ path: "maKhachHang" })
+        .populate({ path: "trangThaiDonHang.maTrangThai" })
+        .exec();
+    return res.render("order/detail", {
+        layout: "./layouts/user",
+        page: "order",
+        title: "Order Detail",
+        order: order,
+        customer: customer,
     });
 }

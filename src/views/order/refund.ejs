@@ -1,0 +1,164 @@
+<div class="container mx-auto p-6">
+    <% if (locals.error) { %>
+    <div role="alert" class="alert alert-error text-white mb-5">
+        <i class='bx bxs-error-circle'></i>
+        <span>
+            <%= error %>
+        </span>
+    </div>
+    <% } %>
+
+    <div class="flex justify-between items-center mb-5">
+        <h3 class="text-2xl font-bold mb-5 text-orange-500">Yêu cầu trả sản phẩm</h3>
+    </div>
+
+    <div>
+        <form id="create-reason-form" action="/order/refund/<%= order.maDonHang %>" method="post" enctype="multipart/form-data">
+            <div class="grid grid-cols-12 gap-5">
+                <div class="col-span-8 bg-gray-50 rounded-xl p-4 shadow-lg">
+                    <section>
+                        <label class="form-control w-full max-w-full mb-4">
+                            <div class="label">
+                                <span class="label-text font-semibold text-lg">Chọn lý do trả hàng</span>
+                            </div>
+                            <div class="mt-2 space-y-2 text-sm">
+                                <label class="flex items-center">
+                                    <input type="radio" name="reason" value="Người bán gửi sai hàng." class="mr-2">
+                                    <span>Người bán gửi sai hàng</span>
+                                </label>
+                                <label class="flex items-center"></label>
+                                    <input type="radio" name="reason" value="Hàng bể vỡ (vỡ vụn, trầy xước, không nguyên vẹn, rò rỉ chất lỏng...)" class="mr-2">
+                                    <span>Hàng bể vỡ. (vỡ vụn, trầy xước, không nguyên vẹn, rò rỉ chất lỏng...)</span>
+                                </label>
+                                <label class="flex items-center"></label>
+                                    <input type="radio" name="reason" value="Hàng lỗi, không hoạt động." class="mr-2">
+                                    <span>Hàng lỗi, không hoạt động.</span>
+                                </label>
+                                <label class="flex items-center"></label>
+                                    <input type="radio" name="reason" value="Khác với mô tả." class="mr-2">
+                                    <span>Khác với mô tả.</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="reason" value="Lý do khác." class="mr-2">
+                                    <span>Lý do khác.</span>
+                                </label>
+                            </div>
+                        </label>
+                    </section>
+                    <div class="form-control mb-5 mt-5">
+                        <div class="label">
+                            <span class="label-text font-semibold text-lg">Mô tả:</span>
+                        </div>
+                        <textarea name="description " id="description" class="textarea h-24 w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4" placeholder="Nhập mô tả"></textarea>
+                    </div>
+                </div>
+
+                <div class="col-span-4 p-4 bg-gray-50 rounded-xl shadow-lg">
+                    <section>
+                        <div class="flex items-center gap-2 mb-5">
+                            <p class="font-semibold text-lg">Hình ảnh</p>
+                            <label class="text-white btn bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" for="reason-image-files">
+                                <i class='bx bx-upload'></i>
+                                Thêm
+                            </label>
+                        </div>
+                        <ul id="uploadImages" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto scrollbar"></ul>
+                            <input id="reason-image-files" name="reasonImageFiles" hidden type="file" accept="image/png, image/jpeg" multiple />
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            <section class="mt-14">
+                <button type="submit" class="w-full md:w-auto btn text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                    Gửi yêu cầu trả hàng
+                </button>
+            </section>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+<script>
+    const validation = new JustValidate("#create-reason-form");
+    validation
+        
+        validation.addField("input[name='reason']", [
+            {
+                rule: "required",
+                errorMessage: "Bắt buộc phải chọn một lý do",
+            },
+        ]);
+
+    validation.onSuccess((event) => {
+        if (reasonImageInputFiles.files.length === 0) {
+            alert("Vui lòng chọn ít nhất một hình ảnh sản phẩm");
+            return;
+        }
+        event.target.submit(); 
+    });
+</script>
+
+<script>
+    const reasonImageInputFiles = document.getElementById("reason-image-files");
+    const reasonImageUploads = document.getElementById("uploadImages");
+
+    const fileListTransfer = new DataTransfer();
+
+    const renderImageFiles = (files) => {
+        const lis = reasonImageUploads.querySelectorAll("li");
+        lis.forEach(li => {
+            li.remove();
+        });
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="preview-image relative group border rounded-2xl h-full">
+                        <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                            <img src="${e.target.result}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
+                        </div>
+                        <button data-index="${i}" type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    </div>
+                `;
+
+                reasonImageUploads.appendChild(li);
+
+                const removeBtns = li.querySelectorAll(".btn-remove-preview-image");
+                removeBtns.forEach((btn) => {
+                    btn.addEventListener("click", function(event) {
+                        const removeIndex = parseInt(this.getAttribute("data-index"));
+
+                        fileListTransfer.items.remove(removeIndex);
+                        li.remove();
+
+                        reasonImageInputFiles.files = fileListTransfer.files;
+                    });
+                });
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    reasonImageInputFiles.addEventListener("change", (event) => {
+        const files = event.target.files;
+
+        for (let i = 0; i < files.length; i++) {
+            fileListTransfer.items.add(files[i]);
+        }
+
+        reasonImageInputFiles.files = fileListTransfer.files;
+
+        renderImageFiles(reasonImageInputFiles.files);
+    });
+</script>

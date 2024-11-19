@@ -173,13 +173,13 @@
                                                     </a>
                                                 </td>
                                                 <td class="px-3 py-3 font-normal text-[#55585B] text-end">
-                                                    <%= product.giaDaChon.toLocaleString('vi-VN')%>đ
+                                                    <%= product.giaDaChon.toLocaleString('vi-VN')%>₫
                                                 </td>
                                                 <td class="px-3 py-3 font-normal text-[#55585B] text-end">
                                                     <%= product.soLuongDaChon%>
                                                 </td>
                                                 <td class="px-3 py-3 font-normal text-[#55585B] text-end">
-                                                    <%= (product.giaDaChon *product.soLuongDaChon).toLocaleString('vi-VN') %>đ
+                                                    <%= (product.giaDaChon *product.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                                 </td>
                                             </tr>         
                                             
@@ -202,7 +202,7 @@
                                                 Giá sản phẩm:
                                             </td>
                                             <td class="px-3 py-3 pt-6 font-normal text-[#55585B] text-end">
-                                               <%= order.tongTienThanhToan.toLocaleString('vi-VN') %>đ
+                                               <%= order.tongTienThanhToan.toLocaleString('vi-VN') %>₫
                                             </td>
                                         </tr>                                          
                                         <tr class="bg-white border-b border-gray6 last:border-0 text-start mx-9">
@@ -218,7 +218,7 @@
                                                 Tổng cộng:
                                             </td>
                                             <td class="px-3 py-3 text-[#55585B] text-end text-lg font-semibold">
-                                                <%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %>đ
+                                                <%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %>₫
                                             </td>
                                         </tr>                                          
                                     </tbody>

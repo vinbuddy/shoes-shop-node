@@ -28,7 +28,7 @@ export async function updateBrand(req, res) {
         if (existingBrand) {
             return res.redirect("/admin/brand");
         }
-
+        const totalBrands = await BrandModel.countDocuments();
         const updatedData = { tenHangSanXuat, moTa };
         await BrandModel.findByIdAndUpdate(id, updatedData);
         const brands = await BrandModel.find();
@@ -37,6 +37,8 @@ export async function updateBrand(req, res) {
             page: "brand",
             title: "brand page",
             brands: brands,
+            currentPage: 1,
+            totalPages: Math.ceil(totalBrands / 10),
             error: "Nhãn hàng này đã tồn tại",
         });
     } catch (error) {

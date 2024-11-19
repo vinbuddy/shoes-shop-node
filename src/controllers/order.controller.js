@@ -2,7 +2,7 @@ import DonHangModel from "../models/donHang.model.js";
 import TrangThaiModel from "../models/trangThai.model.js";
 import mongoose from "mongoose";
 import env from "dotenv";
-
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 env.config();
 
 const VIEW_OPTIONS = {
@@ -123,7 +123,7 @@ export const updateOrderStatus = async (req, res) => {
 
     return res.redirect("/admin/order/detail/" + orderId);
 };
-export const cancelOrder = async (req, res) => {
+export const cancelOrderHandle = async (req, res) => {
     const { id: orderId } = req.params;
     const order = await DonHangModel.findById(orderId);
 
@@ -154,7 +154,56 @@ export const cancelOrder = async (req, res) => {
     );
     return res.redirect("/user/order");
 };
-export const refundOrder = async (req, res) => {
+export const refundOrderHandle = async (req, res) => {
+    const { id: orderId } = req.params;
+
+    const order = await DonHangModel.findById(orderId);
+
+    if (!order) {
+        return res.redirect("/user/order");
+    }
+    const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
+    const status = await TrangThaiModel.find();
+    const statusCodes = latestStatus.maTrangThai;
+
+    if (status.findIndex((s) => s.maTrangThai.toString() == statusCodes) !== 2) {
+        return res.redirect("/user/order");
+    }
+    const { reason, description } = req.body;
+    const files = req.files;
+    // const reasonImageFiles = files["reasonImageFiles"];
+    console.log(files);
+    // let uploadedFiles = [];
+    // if (reasonImageFiles && reasonImageFiles.length > 0) {
+    //     const uploadPromises = reasonImageFiles.map((file) => {
+    //         let uploadPromise = uploadToCloudinary(file, "products");
+    //         return uploadPromise;
+    //     });
+    //     uploadedFiles = await Promise.all(uploadPromises);
+    // }
+    // const sixthStatus = status[5];
+
+    // await DonHangModel.findOneAndUpdate(
+    //     { maDonHang: orderId },
+    //     {
+    //         thongTinTraHang: {
+    //             lyDoTraHang: reason,
+    //             motaTraHang: description,
+    //             ngayTraHang: new Date(),
+    //             danhSachHinhAnh: uploadedFiles.map((file) => file.url),
+    //         },
+    //         $push: {
+    //             trangThaiDonHang: {
+    //                 maTrangThai: sixthStatus.maTrangThai,
+    //                 _id: sixthStatus.maTrangThai,
+    //                 thoiGian: new Date(),
+    //             },
+    //         },
+    //     }
+    // );
+    // return res.redirect("/user/order");
+};
+export const completedOrderHandle = async (req, res) => {
     const { id: orderId } = req.params;
     const order = await DonHangModel.findById(orderId);
 
@@ -169,15 +218,15 @@ export const refundOrder = async (req, res) => {
         return res.redirect("/user/order");
     }
 
-    const sixthStatus = status[5];
+    const fourthStatus = status[3];
 
     await DonHangModel.findOneAndUpdate(
         { maDonHang: orderId },
         {
             $push: {
                 trangThaiDonHang: {
-                    maTrangThai: sixthStatus.maTrangThai,
-                    _id: sixthStatus.maTrangThai,
+                    maTrangThai: fourthStatus.maTrangThai,
+                    _id: fourthStatus.maTrangThai,
                     thoiGian: new Date(),
                 },
             },
@@ -229,3 +278,18 @@ export const nextStatus = async (req, res) => {
             res.status(500).json({ message: "Failed to update order status", error });
         });
 };
+export async function renderRefundPage(req, res) {
+    const { id } = req.params;
+    const customer = req.session.customer;
+    const order = await DonHangModel.findById(id)
+        .populate({ path: "maKhachHang" })
+        .populate({ path: "trangThaiDonHang.maTrangThai" })
+        .exec();
+    return res.render("order/refund", {
+        layout: "./layouts/user",
+        page: "order",
+        title: "Refund",
+        order: order,
+        customer: customer,
+    });
+}
