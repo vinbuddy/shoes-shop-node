@@ -13,11 +13,12 @@
     </div>
 
     <div>
-        <form id="create-reason-form" action="/order/refund/<%= order.maDonHang %>" method="post" enctype="multipart/form-data">
+        <form id="create-reason-form" action="/order/refund" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<%= order.maDonHang %>">
             <div class="grid grid-cols-12 gap-5">
                 <div class="col-span-8 bg-gray-50 rounded-xl p-4 shadow-lg">
                     <section>
-                        <label class="form-control w-full max-w-full mb-4">
+                        <div class="form-control w-full max-w-full mb-4">
                             <div class="label">
                                 <span class="label-text font-semibold text-lg">Chọn lý do trả hàng</span>
                             </div>
@@ -43,7 +44,7 @@
                                     <span>Lý do khác.</span>
                                 </label>
                             </div>
-                        </label>
+                        </div>
                     </section>
                     <div class="form-control mb-5 mt-5">
                         <div class="label">
@@ -62,7 +63,7 @@
                                 Thêm
                             </label>
                         </div>
-                        <ul id="uploadImages" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto scrollbar"></ul>
+                        <ul id="uploadImages" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto scrollbar">
                             <input id="reason-image-files" name="reasonImageFiles" hidden type="file" accept="image/png, image/jpeg" multiple />
                         </ul>
                     </section>

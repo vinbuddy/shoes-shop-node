@@ -155,9 +155,9 @@ export const cancelOrderHandle = async (req, res) => {
     return res.redirect("/user/order");
 };
 export const refundOrderHandle = async (req, res) => {
-    const { id: orderId } = req.params;
+    const { id, reason, description } = req.body;
 
-    const order = await DonHangModel.findById(orderId);
+    const order = await DonHangModel.findById(id);
 
     if (!order) {
         return res.redirect("/user/order");
@@ -169,39 +169,37 @@ export const refundOrderHandle = async (req, res) => {
     if (status.findIndex((s) => s.maTrangThai.toString() == statusCodes) !== 2) {
         return res.redirect("/user/order");
     }
-    const { reason, description } = req.body;
     const files = req.files;
-    // const reasonImageFiles = files["reasonImageFiles"];
-    console.log(files);
-    // let uploadedFiles = [];
-    // if (reasonImageFiles && reasonImageFiles.length > 0) {
-    //     const uploadPromises = reasonImageFiles.map((file) => {
-    //         let uploadPromise = uploadToCloudinary(file, "products");
-    //         return uploadPromise;
-    //     });
-    //     uploadedFiles = await Promise.all(uploadPromises);
-    // }
-    // const sixthStatus = status[5];
+    const reasonImageFiles = files["reasonImageFiles"];
+    let uploadedFiles = [];
+    if (reasonImageFiles && reasonImageFiles.length > 0) {
+        const uploadPromises = reasonImageFiles.map((file) => {
+            let uploadPromise = uploadToCloudinary(file, "products");
+            return uploadPromise;
+        });
+        uploadedFiles = await Promise.all(uploadPromises);
+    }
+    const sixthStatus = status[5];
 
-    // await DonHangModel.findOneAndUpdate(
-    //     { maDonHang: orderId },
-    //     {
-    //         thongTinTraHang: {
-    //             lyDoTraHang: reason,
-    //             motaTraHang: description,
-    //             ngayTraHang: new Date(),
-    //             danhSachHinhAnh: uploadedFiles.map((file) => file.url),
-    //         },
-    //         $push: {
-    //             trangThaiDonHang: {
-    //                 maTrangThai: sixthStatus.maTrangThai,
-    //                 _id: sixthStatus.maTrangThai,
-    //                 thoiGian: new Date(),
-    //             },
-    //         },
-    //     }
-    // );
-    // return res.redirect("/user/order");
+    await DonHangModel.findOneAndUpdate(
+        { maDonHang: id },
+        {
+            thongTinTraHang: {
+                lyDoTraHang: reason,
+                motaTraHang: description,
+                ngayTraHang: new Date(),
+                danhSachHinhAnh: uploadedFiles.map((file) => file.url),
+            },
+            $push: {
+                trangThaiDonHang: {
+                    maTrangThai: sixthStatus.maTrangThai,
+                    _id: sixthStatus.maTrangThai,
+                    thoiGian: new Date(),
+                },
+            },
+        }
+    );
+    return res.redirect("/user/order");
 };
 export const completedOrderHandle = async (req, res) => {
     const { id: orderId } = req.params;
@@ -234,7 +232,16 @@ export const completedOrderHandle = async (req, res) => {
     );
     return res.redirect("/user/order");
 };
-
+export const cancelRefundHandle = async (req, res) => {
+    const { id: orderId } = req.params;
+    const order = await DonHangModel.findById(orderId);
+    if (!order) {
+        return res.redirect("/user/order");
+    }
+    order.trangThaiDonHang.pop();
+    await order.save();
+    return res.redirect("/user/order");
+};
 export const nextStatus = async (req, res) => {
     const { orderIds } = req.body;
 

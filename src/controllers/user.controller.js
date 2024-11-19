@@ -53,9 +53,10 @@ export async function renderUserOrderPage(req, res) {
             case 4: // Đã hủy
                 cancelOrders.push(order);
                 break;
-            case 5: //  trả hàng
-            case 6: // trả hàng
-            case 7: // trả hàng
+            case 5: // yêu cầu trả hàng
+            case 6: // chấp nhận yêu cầu
+            case 7: // trả hàng thành công
+            case 8: // từ chối trả hàng
                 refundOrders.push(order);
                 break;
             default:

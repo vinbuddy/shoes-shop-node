@@ -182,7 +182,6 @@ export async function createProductHandler(req, res) {
         const thumbnailImageFile = files["productImageThumbnail"];
         let uploadedFiles = [];
         let thumbnailUrl = null;
-
         if (productImageFiles && productImageFiles.length > 0) {
             const uploadPromises = productImageFiles.map((file) => {
                 let uploadPromise = uploadToCloudinary(file, "products");

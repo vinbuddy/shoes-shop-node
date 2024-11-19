@@ -115,11 +115,9 @@
                                 <span class="text-sm font-semibold text-green-500"><%= status[statusOrder].tenTrangThai %></span>
                             <% } else if(statusOrder === 4) { %>
                                 <span class="text-sm font-semibold text-red-500"><%= status[statusOrder].tenTrangThai %></span>
-                            <% } else if(statusOrder === 5) { %>
+                            <% } else if(statusOrder === 5 || statusOrder === 6 || statusOrder === 7 || statusOrder === 8) { %>
                                 <span class="text-sm font-semibold text-red-500"><%= status[statusOrder].tenTrangThai %></span>
-                            <% } else if(statusOrder === 6) { %>
-                                <span class="text-sm font-semibold text-red-500"><%= status[statusOrder].tenTrangThai %></span>
-                            <% } %>
+                            <% }%>
                         </div>
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
@@ -321,7 +319,7 @@
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
                             <!-- Cancel Order Button -->
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="refundOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
                             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="completedOrder('<%= order._id %>')">Hoàn thành</button>
                         </div>          
                     </div>
@@ -429,13 +427,9 @@
                 <% refundOrders.forEach(order => { %>
                         
                     <div class="bg-white shadow-lg rounded-xl p-6">
-                        <% if(order.statusOrder == 5){ %>
-                            <span class="text-sm font-semibold text-red-500">Yêu cầu trả hàng</span>
-                            <% } else if(order.statusOrder == 6) { %>
-                            <span class="text-sm font-semibold text-red-500">Trả hàng thành công</span>
-                            <% } else{ %>
-                            <span class="text-sm font-semibold text-red-500">Từ chối trả hàng</span>
-                            <% } %>
+                        
+                            <span class="text-sm font-semibold text-red-500"><%= status[order.statusOrder].tenTrangThai %></span>
+                           
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
