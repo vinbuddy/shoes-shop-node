@@ -3,6 +3,9 @@ import {
     renderAdminCreateProductPage,
     renderAdminProductPage,
     createProductHandler,
+    renderAdminEditProductPage,
+    updateProductHandler,
+    deleteProductHandler,
 } from "../controllers/product.controller.js";
 
 import brandRoutes from "./brand.route.js";
@@ -39,6 +42,23 @@ router.use("/status", statusRoutes);
 
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
+router.get("/product/edit/:id", renderAdminEditProductPage);
+router.post(
+    "/product/edit",
+    uploadFile.fields([
+        {
+            name: "productImageFiles",
+            maxCount: 30,
+        },
+        {
+            name: "productImageThumbnail",
+            maxCount: 1,
+        },
+    ]),
+    updateProductHandler
+);
+router.get("/product/delete/:id", deleteProductHandler);
+
 router.get("/order", renderAdminOrderPage);
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);

@@ -56,17 +56,12 @@
                             <% }) %>
                         </td>
                         <th class="flex items-center gap-3">
-                            <a href="/admin/product/details/<%= product.maSanPham %>" class="btn btn-ghost btn-sm">
-                                <i class="bx bx-detail"></i>
-                            </a>
                             <a href="/admin/product/edit/<%= product.maSanPham %>" class="btn btn-ghost btn-sm">
                                 <i class="bx bx-edit"></i>
                             </a>
-                            <form action="/admin/product/delete/<%= product.maSanPham %>" method="POST" class="inline">
-                                <button type="submit" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
-                                    <i class="bx bx-trash"></i>
-                                </button>
-                            </form>
+                            <a href="/admin/product/delete/<%= product.maSanPham %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                <i class="bx bx-trash"></i>
+                            </a>
                         </th>
                     </tr>
                 <% }) %>
