@@ -8,6 +8,12 @@ import {
     deleteProductHandler,
 } from "../controllers/product.controller.js";
 
+import {
+    createEmployeeHandler,
+    renderAdminCreateEmployeePage,
+    renderAdminEmployeePage,
+} from "../controllers/employee.controller.js";
+
 import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import categoryRoutes from "./category.route.js";
@@ -62,4 +68,17 @@ router.get("/product/delete/:id", deleteProductHandler);
 router.get("/order", renderAdminOrderPage);
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
+
+router.get("/employee", renderAdminEmployeePage);
+router.get("/employee/create", renderAdminCreateEmployeePage);
+router.post(
+    "/employee/create",
+    uploadFile.fields([
+        {
+            name: "anhDaiDien",
+            maxCount: 1,
+        },
+    ]),
+    createEmployeeHandler
+);
 export default router;

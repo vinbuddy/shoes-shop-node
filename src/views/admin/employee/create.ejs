@@ -1,0 +1,139 @@
+<div class="flex justify-between items-center mb-5">
+    <h3 class="text-xl font-bold mb-5">Thêm mới nhân viên</h3>
+</div>
+<form id="create-employee-form" action="/admin/employee/create" method="POST" enctype="multipart/form-data" class="space-y-5">
+  <div>
+    <label for="tenNguoiDung" class="block">Tên nhân viên</label>
+    <input type="text" name="tenNguoiDung" id="tenNguoiDung" class="input input-bordered w-full">
+  </div>
+  <div>
+    <label for="email" class="block">Email</label>
+    <input type="email" name="email" id="email" class="input input-bordered w-full">
+  </div>
+  <div>
+    <label for="matKhau" class="block">Mật khẩu</label>
+    <input type="password" name="matKhau" id="matKhau" class="input input-bordered w-full">
+  </div>
+<div>
+	<label for="maVaiTro" class="block">Vai trò</label>
+	<select name="maVaiTro" id="maVaiTro" class="select select-bordered w-full">
+		<% roles.forEach(role => { %>
+			<% if (role.tenVaiTro !== 'Quản trị viên') { %>
+				<option value="<%= role.maVaiTro %>"><%= role.tenVaiTro %></option>
+			<% } %>
+		<% }) %>
+	</select>
+</div>
+  <div>
+    <section class="w-1/3">
+      	<div class="flex items-center gap-2 mb-5">
+          <p>Chọn hình ảnh đại diện</p>
+
+          	<label class="btn btn-sm" for="anhDaiDien">
+              <i class='bx bx-upload'></i>
+              Thêm
+          	</label>
+      	</div>
+     
+      <ul id="uploadImageThumnail">
+          <input id="anhDaiDien" name="anhDaiDien" hidden type="file" accept="image/png, image/jpeg" />
+     
+      </ul>
+  </section>
+  </div>
+  <button type="submit" class="btn btn-lg bg-primary text-white hover:bg-primary w-full mt-10">Thêm</button>
+</form>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+<script>
+    const validation = new JustValidate("#create-employee-form");
+    validation
+        .addField("#tenNguoiDung", [
+            {
+                rule: "required",
+                errorMessage: "Tên nguời dùng là bắt buộc",
+            },
+            {
+                rule: "maxLength",
+                value: 255,
+                errorMessage: "Tên người dùng không được vượt quá 255 ký tự",
+            },
+        ])
+        .addField("#email", [
+			{
+				rule: "required",
+				errorMessage: "Email là bắt buộc",
+			},
+			{
+				rule: "email",
+				errorMessage: "Email không hợp lệ",
+			},
+		])
+		.addField("#matKhau", [
+			{
+				rule: "required",
+				errorMessage: "Mật khẩu là bắt buộc",
+			},
+			{
+				rule: "minLength",
+				value: 6,
+				errorMessage: "Mật khẩu phải có ít nhất 6 ký tự",
+			},
+		])
+
+    validation.onSuccess((event) => {
+        event.preventDefault(); // Prevent default form submission
+        event.target.submit(); // Submit the form when validation is successful
+    });
+</script>
+
+
+<script>
+    const productImageThumbnailInputFile = document.getElementById("anhDaiDien");
+    const productImageThumbnailUpload = document.getElementById("uploadImageThumnail");
+
+    productImageThumbnailInputFile.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const url = URL.createObjectURL(file);
+
+        const lis = productImageThumbnailUpload.querySelectorAll("li");
+        
+        lis.forEach(li => {
+            li.remove();
+        });
+
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <div class="preview-image relative group border rounded-2xl h-full">
+                <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                    <img src="${url}" class="w-full object-cover object-center group-hover:opacity-75" />
+                </div>
+                <button data-url="${url}" type="button" class="btn-remove-thumbnail-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        `;
+
+        productImageThumbnailUpload.appendChild(li);
+
+        const removeBtn = li.querySelector(".btn-remove-thumbnail-image");
+
+        removeBtn.addEventListener("click", function(event) {
+            const url = this.getAttribute("data-url");
+            console.log("url: ", url);
+
+            URL.revokeObjectURL(url);
+
+            this.closest("li").remove();
+
+            productImageThumbnailInputFile.value = null;
+        })
+        
+    })
+</script> 
