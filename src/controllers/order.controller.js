@@ -14,9 +14,17 @@ const VIEW_OPTIONS = {
         layout: "./layouts/admin",
         title: "Danh sách đơn hàng",
     },
+    ADMIN_LIST_REFUND: {
+        layout: "./layouts/admin",
+        title: "Danh sách đơn trả hàng",
+    },
     ORDER_DETAIL: {
         layout: "./layouts/admin",
         title: "chi tiết đơn hàng",
+    },
+    USER_REFUND: {
+        layout: "./layouts/user",
+        title: "Yêu cầu trả hàng",
     },
 };
 
@@ -90,7 +98,6 @@ export const renderAdminOrderDetailPage = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
     const { id: orderId } = req.params;
-    console.log(orderId);
     const { status: statusId } = req.body;
     const order = await DonHangModel.findById(orderId);
 
@@ -187,7 +194,6 @@ export const refundOrderHandle = async (req, res) => {
             thongTinTraHang: {
                 lyDoTraHang: reason,
                 motaTraHang: description,
-                ngayTraHang: new Date(),
                 danhSachHinhAnh: uploadedFiles.map((file) => file.url),
             },
             $push: {
@@ -285,7 +291,7 @@ export const nextStatus = async (req, res) => {
             res.status(500).json({ message: "Failed to update order status", error });
         });
 };
-export async function renderRefundPage(req, res) {
+export async function renderRefundClientPage(req, res) {
     const { id } = req.params;
     const customer = req.session.customer;
     const order = await DonHangModel.findById(id)
@@ -293,10 +299,158 @@ export async function renderRefundPage(req, res) {
         .populate({ path: "trangThaiDonHang.maTrangThai" })
         .exec();
     return res.render("order/refund", {
-        layout: "./layouts/user",
-        page: "order",
-        title: "Refund",
+        ...VIEW_OPTIONS.USER_REFUND,
         order: order,
         customer: customer,
     });
 }
+
+export async function renderRefundAdminPage(req, res) {
+    const customer = req.session.customer;
+    const orders = await DonHangModel.find({
+        "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+    })
+        .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
+        .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
+        .sort({ "trangThaiDonHang.thoiGian": -1 })
+        .exec();
+
+    const status = await TrangThaiModel.find();
+    const orderList = [];
+    for (const order of orders) {
+        const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
+        const id = latestStatus.maTrangThai._id;
+        const statusOrder = status.findIndex((status) => status._id.equals(id));
+
+        if (statusOrder === 5 || statusOrder === 6 || statusOrder === 7 || statusOrder === 8) {
+            orderList.push({
+                ...order._doc,
+                trangThai: statusOrder,
+            });
+        }
+    }
+
+    return res.render("admin/order/refund", {
+        ...VIEW_OPTIONS.ADMIN_LIST_REFUND,
+        orders: orderList,
+        customer: customer,
+    });
+}
+export const fetchRefundOrders = async (req, res) => {
+    const tabId = req.params.tabId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const orders = await DonHangModel.find({
+        "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+    })
+        .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
+        .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
+        .sort({ "trangThaiDonHang.thoiGian": -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
+    const totalOrders = await DonHangModel.countDocuments({
+        "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+    });
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    const status = await TrangThaiModel.find();
+    const orderList = [];
+    for (const order of orders) {
+        const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
+        const id = latestStatus.maTrangThai._id;
+        const statusOrder = status.findIndex((status) => status._id.equals(id));
+        if (
+            tabId == "all-orders" &&
+            (statusOrder === 5 || statusOrder === 6 || statusOrder === 7 || statusOrder === 8)
+        ) {
+            orderList.push({
+                ...order._doc,
+                trangThai: statusOrder,
+            });
+        } else if (tabId == "request-refund" && statusOrder === 5) {
+            orderList.push({
+                ...order._doc,
+                trangThai: statusOrder,
+            });
+        } else if (tabId == "accept-refund" && statusOrder === 6) {
+            orderList.push({
+                ...order._doc,
+                trangThai: statusOrder,
+            });
+        } else if (tabId == "deny-refund" && statusOrder === 7) {
+            orderList.push({
+                ...order._doc,
+                trangThai: statusOrder,
+            });
+        } else if (tabId == "completed-refund" && statusOrder === 8) {
+            orderList.push({
+                ...order._doc,
+                trangThai: statusOrder,
+            });
+        }
+    }
+
+    return res.json({
+        orders: orderList,
+        currentPage: page,
+        totalPages: totalPages,
+    });
+};
+
+export const refundStatusHandle = async (req, res) => {
+    const { orderIds, type } = req.body;
+    console.log(type);
+    if (!Array.isArray(orderIds) || orderIds.length === 0) {
+        return res.redirect("/admin/order/");
+    }
+
+    if (!orderIds) {
+        return res.redirect("/admin/order/");
+    }
+
+    Promise.all(
+        orderIds.map(async (orderId) => {
+            const order = await DonHangModel.findById(orderId);
+
+            const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
+            const status = await TrangThaiModel.find();
+            const statusCodes = latestStatus.maTrangThai.toString();
+
+            const currentIndex = status.findIndex((s) => s._id.equals(statusCodes));
+            let nextStatus = null;
+            if (currentIndex == 5 && type === "accept") {
+                nextStatus = status[6];
+            } else if (currentIndex == 5 && type === "deny") {
+                nextStatus = status[7];
+            } else if (currentIndex == 7 && type === "completed") {
+                nextStatus = status[8];
+            }
+            if (nextStatus) {
+                await DonHangModel.findOneAndUpdate(
+                    { maDonHang: orderId },
+                    {
+                        $push: {
+                            trangThaiDonHang: {
+                                maTrangThai: nextStatus._id,
+                                _id: nextStatus._id,
+                                thoiGian: new Date(),
+                            },
+                        },
+                    }
+                );
+            } else {
+                return res.status(400).json({ message: "Invalid request" });
+            }
+        })
+    )
+        .then(() => {
+            res.status(200).json({ message: "Order status updated successfully" });
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Failed to update order status", error });
+        });
+};

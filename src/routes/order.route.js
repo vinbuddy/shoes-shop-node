@@ -3,7 +3,7 @@ import {
     cancelOrderHandle,
     refundOrderHandle,
     completedOrderHandle,
-    renderRefundPage,
+    renderRefundClientPage,
     cancelRefundHandle,
 } from "../controllers/order.controller.js";
 
@@ -22,6 +22,8 @@ router.post(
     refundOrderHandle
 );
 router.get("/completed/:id", completedOrderHandle);
-router.get("/refundRequest/:id", renderRefundPage);
+router.get("/refundRequest/:id", renderRefundClientPage);
 router.get("/cancelRefund/:id", cancelRefundHandle);
+router.get("/refundStatus/:id", cancelRefundHandle);
+
 export default router;

@@ -30,7 +30,7 @@
                     <div class="flex justify-end space-x-6">
                         <div class="search-select mr-3 flex items-center space-x-3">
                             <span class="text-sm inline-block leading-none -translate-y-[2px]">Chuyển trạng thái tiếp theo:</span>
-                        <button id="nextStatus" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Chuyển</button>
+                        <button id="nextStatus" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</button>
                         </div>
                         <div class="search-select mr-3 flex items-center space-x-3">
                             <span class="text-sm inline-block leading-none -translate-y-[2px]">Trạng thái:</span>
@@ -91,9 +91,9 @@
                                 <% if (order.trangThai === 0) { %>
                                     <span class="text-sm text-yellow-600 px-3 py-1 rounded-md leading-none bg-yellow-50 font-medium whitespace-nowrap"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
                                 <% } else if (order.trangThai === 1) { %>
-                                    <span class="text-sm text-teal-600 px-3 py-1 rounded-md leading-none bg-teal-100 font-medium"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
+                                    <span class="text-sm text-teal-600 px-3 py-1 rounded-md leading-none bg-teal-100 font-medium whitespace-nowrap"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
                                 <% } else if (order.trangThai === 2 || order.trangThai === 3) { %>
-                                    <span class="text-sm text-green-600 px-3 py-1 rounded-md leading-none bg-blue-100 font-medium"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
+                                    <span class="text-sm text-green-600 px-3 py-1 rounded-md leading-none bg-blue-100 font-medium whitespace-nowrap"><%= order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %>  </span>
                                 <% } else { %>
                                     <span class="text-sm text-red-600 px-3 py-1 rounded-md leading-none bg-red-100 font-medium  whitespace-nowrap"> <%=  order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %></span>
                                 <% } %>
@@ -113,7 +113,7 @@
                                 <td class="px-9 py-3 text-right">
                                     <div class="flex items-center justify-end space-x-2">
                                         <div class="relative" x-data="{ editTooltip: false }">
-                                            <a href="/admin/order/detail/<%= order._id %>" class="block w-auto px-3 h-10 leading-10 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 font-medium">Chi tiết</a>
+                                            <a href="/admin/order/detail/<%= order._id %>" class="block w-auto px-3 h-10 leading-10 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 font-medium dark:shadow-md dark:shadow-blue-800/80">Chi tiết</a>
                                         </div>
                                     </div>
                                 </td>
