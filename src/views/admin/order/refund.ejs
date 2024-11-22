@@ -172,15 +172,7 @@
         });
     }
     function completedRefund() {
-        showModal("Xác nhận trả hàng thành công không?", function () {
-            // nextStatus("completed");
-        });
-    }
-
-    function completedOrder(orderId) {
-        showModal("Bạn có chắc chắn muốn hoàn thành đơn hàng này không?", function () {
-            window.location.href = "/order/completed/" + orderId;
-        });
+        showModal("Xác nhận trả hàng thành công không?", function () {});
     }
 
     function getStatusColor(status) {
