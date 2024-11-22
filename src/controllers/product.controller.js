@@ -351,3 +351,38 @@ export async function createGoodsReceipt(req, res) {
         res.status(500).json({ message: 'Lỗi máy chủ. Vui lòng thử lại sau.' });
     }
 }
+
+export async function updateSizeList(req, res) {
+    const { productId, danhSachKichCo } = req.body;
+
+    console.log(productId)
+    
+    if (!Array.isArray(danhSachKichCo)) {
+        return res.status(400).json({ message: 'Dữ liệu danh sách kích cỡ không hợp lệ.' });
+    }
+
+    try {
+        const product = await ProductModel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Sản phẩm không tồn tại.' });
+        }
+
+        // Kiểm tra các mã size có hợp lệ
+        for (const kichCo of danhSachKichCo) {
+            const isValidSize = await SizeModel.findById(kichCo.maKichCo);
+            if (!isValidSize) {
+                return res.status(400).json({
+                    message: `Mã kích cỡ không hợp lệ: ${kichCo.maKichCo}`,
+                });
+            }
+        }
+
+        // Cập nhật danh sách size
+        product.danhSachKichCo = danhSachKichCo;
+        await product.save();
+
+        return res.status(200).json({ message: 'Cập nhật danh sách kích cỡ thành công.', product });
+    } catch (error) {
+        return res.status(500).json({ message: 'Lỗi server. Vui lòng thử lại sau.', error });
+    }
+}
