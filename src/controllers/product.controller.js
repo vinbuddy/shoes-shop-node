@@ -305,7 +305,8 @@ export async function updateProductHandler(req, res) {
         }
 
         // Danh sách hình ảnh giữ lại
-        const retainedImageUrls = Array.isArray(retainedImages) ? retainedImages : [];
+        const retainedImageUrls =
+            Array.isArray(retainedImages) && retainedImages.length > 0 ? retainedImages : product.danhSachHinhAnh;
 
         // Upload hình ảnh mới
         if (productImageFiles && productImageFiles.length > 0) {
@@ -317,9 +318,10 @@ export async function updateProductHandler(req, res) {
         const updatedImages = retainedImageUrls.concat(uploadedFiles.map((file) => file.url));
 
         // (Tùy chọn) Xóa hình ảnh không còn được sử dụng khỏi Cloudinary
-        const imagesToDelete = product.danhSachHinhAnh.filter((url) => !retainedImageUrls.includes(url));
-        await Promise.all(imagesToDelete.map((url) => deleteFromCloudinary(url)));
-
+        if (retainedImageUrls.length < product.danhSachHinhAnh.length) {
+            const imagesToDelete = product.danhSachHinhAnh.filter((url) => !retainedImageUrls.includes(url));
+            await Promise.all(imagesToDelete.map((url) => deleteFromCloudinary(url)));
+        }
         // Xử lý danh sách kích cỡ
         const productSizes = Object.entries(sizes).map(([maKichCo, kichCo]) => {
             if (!maKichCo || !kichCo.maKichCo || !kichCo.giaKichCo) {
