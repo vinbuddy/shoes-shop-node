@@ -10,7 +10,10 @@ import {
 
 import {
     createEmployeeHandler,
+    deleteEmployeeHandler,
+    editEmployeeHandler,
     renderAdminCreateEmployeePage,
+    renderAdminEditEmployeePage,
     renderAdminEmployeePage,
 } from "../controllers/employee.controller.js";
 
@@ -69,6 +72,7 @@ router.get("/order", renderAdminOrderPage);
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
 
+// Employee
 router.get("/employee", renderAdminEmployeePage);
 router.get("/employee/create", renderAdminCreateEmployeePage);
 router.post(
@@ -81,4 +85,16 @@ router.post(
     ]),
     createEmployeeHandler
 );
+router.get("/employee/edit/:id", renderAdminEditEmployeePage);
+router.post(
+    "/employee/edit",
+    uploadFile.fields([
+        {
+            name: "anhDaiDien",
+            maxCount: 1,
+        },
+    ]),
+    editEmployeeHandler
+);
+router.get("/employee/delete/:id", deleteEmployeeHandler);
 export default router;

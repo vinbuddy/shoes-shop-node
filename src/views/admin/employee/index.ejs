@@ -6,7 +6,17 @@
                 <%= message %>
             </span>
         </div>
-        <% } %>
+    <% } %>
+
+    <% if (locals.error)  { %>
+        <div role="alert" class="alert alert-error text-white mb-5">
+            <i class='bx bx-x'></i>
+            <span>
+                <%= error %>
+            </span>
+        </div>
+    <% } %>
+
     <div class="flex justify-between items-center mb-5">
         <h3 class="text-xl font-bold mb-5">Danh sách nhân viên</h3>
 
@@ -35,9 +45,9 @@
                         <td>
                             <div class="flex items-center gap-3">
                                 <div class="avatar">
-                                    <div class="h-12 w-12 rounded-full">
+                                    <div class="h-12 w-12 rounded-full border">
                                         <img
-                                            class="!object-contain"
+                                            class="!object-cover"
                                             src="<%= employee.anhDaiDien || '/images/no-result.png' %>"
                                             alt="<%= employee.tenSanPham %>"
                                         />
@@ -56,7 +66,7 @@
                             <a href="/admin/employee/edit/<%= employee.maNguoiDung %>" class="btn btn-ghost btn-sm">
                                 <i class="bx bx-edit"></i>
                             </a>
-                            <a href="/admin/employee/delete/<%= employee.maNguoiDung %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                            <a href="/admin/employee/delete/<%= employee.maNguoiDung %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?');">
                                 <i class="bx bx-trash"></i>
                             </a>
                         </th>

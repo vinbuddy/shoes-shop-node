@@ -12,6 +12,10 @@ const VIEW_OPTIONS = {
         title: "Thêm nhân viên",
         layout: "layouts/admin",
     },
+    EDIT_EMPLOYEE: {
+        title: "Chỉnh sửa nhân viên",
+        layout: "layouts/admin",
+    },
 };
 
 export async function renderAdminEmployeePage(req, res) {
@@ -57,6 +61,25 @@ export async function renderAdminCreateEmployeePage(req, res) {
     }
 }
 
+export async function renderAdminEditEmployeePage(req, res) {
+    try {
+        const { id } = req.params;
+        const employee = await UserModel.findById(id).populate("maVaiTro");
+        const roles = await RoleModel.find();
+
+        return res.render("admin/employee/edit", {
+            ...VIEW_OPTIONS.EDIT_EMPLOYEE,
+            employee,
+            roles,
+        });
+    } catch (error) {
+        return res.render("admin/employee/edit", {
+            ...VIEW_OPTIONS.EDIT_EMPLOYEE,
+            error: error.message,
+        });
+    }
+}
+
 export async function createEmployeeHandler(req, res) {
     try {
         const { tenNguoiDung, email, matKhau, maVaiTro } = req.body;
@@ -97,5 +120,60 @@ export async function createEmployeeHandler(req, res) {
             ...VIEW_OPTIONS.CREATE_EMPLOYEE,
             error: error.message,
         });
+    }
+}
+
+export async function editEmployeeHandler(req, res) {
+    try {
+        const { tenNguoiDung, maVaiTro, maNguoiDung } = req.body;
+
+        const employee = await UserModel.findOne({ maNguoiDung: new mongoose.Types.ObjectId(maNguoiDung) });
+        if (!employee) {
+            throw new Error("Nhân viên không tồn tại");
+        }
+
+        // Xử lý hình ảnh mới nếu có
+        const files = req.files;
+        const avatarFiles = files["anhDaiDien"];
+        let avatarUrl = employee.anhDaiDien;
+
+        if (avatarFiles && avatarFiles.length > 0) {
+            const thumbnailUpload = await uploadToCloudinary(avatarFiles[0], "avatars");
+            avatarUrl = thumbnailUpload.url;
+        }
+
+        // Cập nhật dữ liệu
+        employee.tenNguoiDung = tenNguoiDung;
+        employee.maVaiTro = new mongoose.Types.ObjectId(maVaiTro);
+        employee.anhDaiDien = avatarUrl;
+
+        await employee.save();
+
+        return res.redirect("/admin/employee");
+    } catch (error) {
+        console.log("error: ", error);
+        return res.render("admin/employee/index", {
+            ...VIEW_OPTIONS.EDIT_EMPLOYEE,
+            error: error.message,
+        });
+    }
+}
+
+export async function deleteEmployeeHandler(req, res) {
+    try {
+        const { id } = req.params;
+        const employee = await UserModel.findOne({ maNguoiDung: new mongoose.Types.ObjectId(id) });
+
+        if (!employee) {
+            throw new Error("Nhân viên không tồn tại");
+        }
+
+        employee.trangThaiXoa = true;
+        await employee.save();
+
+        return res.redirect("/admin/employee");
+    } catch (error) {
+        console.log("error: ", error);
+        return res.redirect("/admin/employee");
     }
 }
