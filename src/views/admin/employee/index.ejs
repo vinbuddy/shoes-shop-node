@@ -1,0 +1,108 @@
+<div>
+    <% if (locals.message)  { %>
+        <div role="alert" class="alert alert-success text-white mb-5">
+            <i class='bx bx-check-circle'></i>
+            <span>
+                <%= message %>
+            </span>
+        </div>
+    <% } %>
+
+    <% if (locals.error)  { %>
+        <div role="alert" class="alert alert-error text-white mb-5">
+            <i class='bx bx-x'></i>
+            <span>
+                <%= error %>
+            </span>
+        </div>
+    <% } %>
+
+    <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl font-bold mb-5">Danh sách nhân viên</h3>
+
+        <a href="/admin/employee/create" class="btn bg-primary text-white hover:bg-primary rounded-xl">
+            <i class="bx bx-plus"></i>
+            Thêm nhân viên
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="table">
+            <!-- head -->
+            <thead>
+                <tr>
+                    <th>Mã nhân viên</th>
+                    <th>Tên nhân viên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% employees && employees.forEach(employee => { %>
+                    <tr>
+                        <td><%= employee.maNguoiDung %></td>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="avatar">
+                                    <div class="h-12 w-12 rounded-full border">
+                                        <img
+                                            class="!object-cover"
+                                            src="<%= employee.anhDaiDien || '/images/no-result.png' %>"
+                                            alt="<%= employee.tenSanPham %>"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-semibold"><%= employee.tenNguoiDung %></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><%= employee.email %></td>
+                        <td>
+                            <%= employee.maVaiTro.tenVaiTro %>
+                        </td>
+                        <th class="flex items-center gap-3">
+                            <a href="/admin/employee/edit/<%= employee.maNguoiDung %>" class="btn btn-ghost btn-sm">
+                                <i class="bx bx-edit"></i>
+                            </a>
+                            <a href="/admin/employee/delete/<%= employee.maNguoiDung %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?');">
+                                <i class="bx bx-trash"></i>
+                            </a>
+                        </th>
+                    </tr>
+                <% }) %>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+        <nav class="mt-10 flex justify-center">
+            <ul class="list-style-none flex">
+                <li>
+                    <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                    
+                    <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                        class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                        Trang trước
+                     </a>
+                </li>
+                
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                       class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                        <%= i %>
+                    </a>
+                <% } %>
+               
+                <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                    class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                     Trang sau
+                 </a>
+            </ul>
+        </nav>
+    <% } %>
+</div>

@@ -11,8 +11,11 @@ cloudinary.config({
 export const uploadToCloudinary = async (file, folder) => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader
-            .upload_stream({ resource_type: "auto", folder: folder }, (error, result) => {
-                if (error) return reject(error);
+            .upload_stream({ resource_type: "auto", folder: folder, timeout: 120000 }, (error, result) => {
+                if (error) {
+                    console.error("Upload to Cloudinary failed:", error.message);
+                    return reject(error);
+                }
 
                 if (result) {
                     resolve({

@@ -55,7 +55,7 @@
              </label>
  
              <div class="grid grid-cols-12 gap-5 mt-10">
-                 <section class="col-span-5">
+                 <section class="col-span-4">
                      <p class="mb-5">Chọn danh mục cho sản phẩm</p>
                      <ul>
                          <% if (categories && categories.length > 0) { %>
@@ -78,7 +78,7 @@
                          <% } %>
                      </ul>
                  </section>
-                 <section class="col-span-7">
+                 <section class="col-span-8">
                      <p class="mb-5">Chọn kích cỡ cho sản phẩm</p>
                      <ul id="size-list">
                          <% if (sizes && sizes.length > 0) { %>
@@ -96,9 +96,19 @@
                                              Kích cỡ <%= size.tenKichCo %>
                                          </label>
                                      </div>
+
+                                    <div class="flex-1 flex items-center gap-5">
+                                        <label for="" class="flex-1 text-right">Số lượng</label>
+                                        <input 
+                                            type="number" 
+                                            min="0"
+                                            value="<%= product.danhSachKichCo.find(d => d.maKichCo.maKichCo.toString() === size.maKichCo.toString())?.soLuongKichCo || 0 %>" 
+                                            name="sizes[<%= size.maKichCo %>][soLuongKichCo]" 
+                                            class="input input-sm input-bordered">
+                                    </div>
  
                                      <div class="flex-1 flex items-center gap-5">
-                                         <label for="" class="flex-1 text-right">Nhập giá kích cỡ <%= size.tenKichCo %></label>
+                                         <label for="" class="flex-1 text-right">Giá kích cỡ</label>
                                          <input 
                                             data-sizePrice="<%= product.danhSachKichCo.find(d => d.maKichCo.maKichCo.toString() === size.maKichCo.toString())?.giaKichCo || '' %>" 
                                             disabled type="text" 
@@ -242,139 +252,118 @@
  </script>
  
  <script>
-     const productImageInputFiles = document.getElementById("product-image-files");
-     const productImageUploads = document.getElementById("uploadImages");
- 
-     const productImageThumbnailInputFile = document.getElementById("product-image-thumbnail");
-     const productImageThumbnailUpload = document.getElementById("uploadImageThumnail");
- 
-     const fileListTransfer = new DataTransfer();
- 
-     const renderImageFiles = (files) => {
-         
-         const lis = productImageUploads.querySelectorAll("li");
-         
-         lis.forEach(li => {
-             li.remove();
-         });
- 
-         for (let i = 0; i < files.length; i++) {
-             const file = files[i];
-             const reader = new FileReader();
- 
-             reader.onload = (e) => {
-                 const img = document.createElement("img");
-                 img.src = e.target.result;
- 
-                 const li = document.createElement("li");
-                 li.innerHTML = `
-                     <div class="preview-image relative group border rounded-2xl h-full">
-                         <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
-                             <img src="${e.target.result}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
-                         </div>
-                         <button data-index="${i}" type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
-                             <i class="bx bx-x"></i>
-                         </button>
-                     </div>
-                 `;
- 
-                 productImageUploads.appendChild(li);
- 
-                 const removeBtns = li.querySelectorAll(".btn-remove-preview-image");
-                 removeBtns.forEach((btn) => {
-                     btn.addEventListener("click", function(event) {
-                         const removeIndex = parseInt(this.getAttribute("data-index"));
- 
-                         fileListTransfer.items.remove(removeIndex);
-                         li.remove();
- 
-                         productImageInputFiles.files = fileListTransfer.files;
-                     });
-                 });
-             };
- 
-             reader.readAsDataURL(file);
-         }
-     };
- 
-     productImageInputFiles.addEventListener("change", (event) => {
-         const files = event.target.files;
- 
-         for (let i = 0; i < files.length; i++) {
-             fileListTransfer.items.add(files[i]);
-         }
- 
-         productImageInputFiles.files = fileListTransfer.files;
- 
-         renderImageFiles(productImageInputFiles.files);
-     });
- 
-     productImageThumbnailInputFile.addEventListener("change", (event) => {
-         const file = event.target.files[0];
- 
-         if (!file) {
-             return;
-         }
- 
-         const url = URL.createObjectURL(file);
- 
-         const lis = productImageThumbnailUpload.querySelectorAll("li");
-         
-         lis.forEach(li => {
-             li.remove();
-         });
- 
- 
-         const li = document.createElement("li");
-         li.innerHTML = `
-             <div class="preview-image relative group border rounded-2xl h-full">
-                 <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
-                     <img src="${url}" class="h-[400px] w-full object-cover object-center group-hover:opacity-75" />
-                 </div>
-                 <button data-url="${url}" type="button" class="btn-remove-thumbnail-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
-                     <i class="bx bx-x"></i>
-                 </button>
-             </div>
-         `;
- 
-         productImageThumbnailUpload.appendChild(li);
- 
-         const removeBtn = li.querySelector(".btn-remove-thumbnail-image");
- 
-         removeBtn.addEventListener("click", function(event) {
-             const url = this.getAttribute("data-url");
- 
-             URL.revokeObjectURL(url);
- 
-             this.closest("li").remove();
- 
-             productImageThumbnailInputFile.value = null;
-         })
-         
-     }) 
-     
-     // Add remove thumbnail image
-    const removeThumbnailBtn = document.querySelector(".btn-remove-thumbnail-image");
-    if (removeThumbnailBtn) {
-        removeThumbnailBtn.addEventListener("click", function(event) {
-            // Remove thumbnail image from parent
-            const parent = this.closest("li");
+    const productImageInputFiles = document.getElementById("product-image-files");
+    const productImageUploads = document.getElementById("uploadImages");
 
-            parent.remove();
+    const productImageThumbnailInputFile = document.getElementById("product-image-thumbnail");
+    const productImageThumbnailUpload = document.getElementById("uploadImageThumnail");
+
+    const fileListTransfer = new DataTransfer();
+
+    // Render image files (add to existing list)
+    const renderImageFiles = (files) => {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="preview-image relative group border rounded-2xl h-full">
+                        <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                            <img src="${e.target.result}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
+                        </div>
+                        <button data-index="${fileListTransfer.items.length - 1}" type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    </div>
+                `;
+
+                productImageUploads.appendChild(li);
+
+                // Add event to remove button
+                const removeBtn = li.querySelector(".btn-remove-preview-image");
+                removeBtn.addEventListener("click", function () {
+                    const removeIndex = parseInt(this.getAttribute("data-index"));
+
+                    fileListTransfer.items.remove(removeIndex);
+                    li.remove();
+
+                    // Update input files
+                    productImageInputFiles.files = fileListTransfer.files;
+                });
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Add event listener for file input
+    productImageInputFiles.addEventListener("change", (event) => {
+        const files = event.target.files;
+
+        for (let i = 0; i < files.length; i++) {
+            fileListTransfer.items.add(files[i]);
+        }
+
+        productImageInputFiles.files = fileListTransfer.files;
+
+        renderImageFiles(files);
+    });
+
+    // Thumbnail image logic
+    productImageThumbnailInputFile.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const url = URL.createObjectURL(file);
+
+        const lis = productImageThumbnailUpload.querySelectorAll("li");
+
+        lis.forEach((li) => {
+            li.remove();
         });
-    }
- 
-    // Add remove preview image
-    const removePreviewBtns = document.querySelectorAll(".btn-remove-preview-image");
-    removePreviewBtns.forEach(btn => {
-        btn.addEventListener("click", function(event) {
-            // Remove preview image from parent
-            const parent = this.closest("li");
 
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <div class="preview-image relative group border rounded-2xl h-full">
+                <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                    <img src="${url}" class="h-[400px] w-full object-cover object-center group-hover:opacity-75" />
+                </div>
+                <button data-url="${url}" type="button" class="btn-remove-thumbnail-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+        `;
+
+        productImageThumbnailUpload.appendChild(li);
+
+        const removeBtn = li.querySelector(".btn-remove-thumbnail-image");
+
+        removeBtn.addEventListener("click", function () {
+            const url = this.getAttribute("data-url");
+
+            URL.revokeObjectURL(url);
+
+            this.closest("li").remove();
+
+            productImageThumbnailInputFile.value = null;
+        });
+    });
+
+    // Add remove preview image functionality for existing images
+    const removePreviewBtns = document.querySelectorAll(".btn-remove-preview-image");
+    removePreviewBtns.forEach((btn) => {
+        btn.addEventListener("click", function () {
+            const parent = this.closest("li");
             parent.remove();
         });
     });
- </script> 
+</script>
+
  
  <!-- Sizes -->
  <script>
