@@ -38,7 +38,7 @@ export async function renderAdminEmployeePage(req, res) {
             filters: req.query,
         });
     } catch (error) {
-        return res.render("employee/index", {
+        return res.render("admin/employee/index", {
             ...VIEW_OPTIONS.EMPLOYEE_LIST,
             error: error.message,
         });
