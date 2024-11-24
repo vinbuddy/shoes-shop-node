@@ -420,9 +420,23 @@ export async function adminLoginHandler(req, res) {
             return res.redirect("/admin/create-goods-receipt");
         }
     } catch (error) {
-        return res.render("auth/login", {
+        return res.render("/admin/auth/admin-login", {
             ...VIEW_OPTIONS.LOGIN,
             error: error.message,
         });
     }
+}
+
+export async function adminLogoutHandler(req, res) {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error destroying session:", err);
+            return res.redirect("/");
+        }
+
+        // Clear cookie
+        res.clearCookie("connect.sid"); // Clear the session cookie
+
+        return res.redirect("/admin/auth/admin-login");
+    });
 }

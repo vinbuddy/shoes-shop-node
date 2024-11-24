@@ -254,6 +254,7 @@ export async function createProductHandler(req, res) {
 
 export async function renderAdminCreateGoodsReceipt (req, res, next) {
     try {
+        const user = req.session.user;
         const suppliers = await SupplierModel.find({}).select();
         const products = await ProductModel.find({}).select();
         const data = {
@@ -265,6 +266,7 @@ export async function renderAdminCreateGoodsReceipt (req, res, next) {
             page: "goods-receipt",
             title: "Phiếu nhập hàng",
             data: data,
+            user: user,
         });
     } catch (error) {
         next(error);

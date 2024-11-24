@@ -17,6 +17,7 @@ import {
     //Admin
     renderAdminLoginPage,
     adminLoginHandler,
+    adminLogoutHandler,
 } from "../controllers/auth.controller.js";
 
 env.config();
@@ -46,6 +47,7 @@ router.post("/reset-password", resetPasswordHandler);
 //Admin
 router.get("/admin-login", renderAdminLoginPage);
 router.post("/admin-login", adminLoginHandler);
+router.get("/admin-logout", adminLogoutHandler);
 
 
 export default router;
