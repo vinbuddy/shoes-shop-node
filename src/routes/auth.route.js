@@ -18,6 +18,8 @@ import {
     renderAdminLoginPage,
     adminLoginHandler,
     adminLogoutHandler,
+    renderAdminProfilePage,
+    adminChangePasswordHandler
 } from "../controllers/auth.controller.js";
 
 env.config();
@@ -46,8 +48,11 @@ router.post("/reset-password", resetPasswordHandler);
 
 //Admin
 router.get("/admin-login", renderAdminLoginPage);
-router.post("/admin-login", adminLoginHandler);
 router.get("/admin-logout", adminLogoutHandler);
+router.get("/profile", renderAdminProfilePage);
+
+router.post("/admin-login", adminLoginHandler);
+router.post("/change-password", adminChangePasswordHandler);
 
 
 export default router;

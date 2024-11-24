@@ -17,7 +17,13 @@ import {
     renderAdminOrderDetailPage,
     updateOrderStatus,
 } from "../controllers/order.controller.js";
+
+import {
+    renderAdminProfilePage,
+} from "../controllers/user.controller.js"
+
 import multer from "multer";
+
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
@@ -52,5 +58,7 @@ router.get("/product/create", renderAdminCreateProductPage);
 router.get("/order", renderAdminOrderPage);
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
+
+router.get("/profile", renderAdminProfilePage)
 
 export default router;

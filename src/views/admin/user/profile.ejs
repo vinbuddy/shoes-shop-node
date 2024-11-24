@@ -1,0 +1,54 @@
+<div>
+    <h2 class="text-xl font-bold">Hồ sơ người dùng</h2>
+</div>
+<div class="flex mt-5">
+    <div class="flex-1 mx-5">
+        <form action="">
+            <h2 class="text-xl font-medium text-blue-600">Thông tin tài khoản</h2>
+            <div class="">
+                <label for="" class="block my-2">Mã người dùng</label>
+                <input type="text" name="" id="" placeholder="Mã người dùng" value="<%- user.maNguoiDung %>" readonly class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <div class="">
+                <label for="" class="block my-2">Tên người dùng</label>
+                <input type="text" name="" id="" placeholder="Tên người dùng" value="<%- user.tenNguoiDung %>" class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <div>
+                <label for="" class="block my-2">Email</label>
+                <input type="email" name="" id="" placeholder="Email" value="<%- user.email %>" class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <div class="flex my-5 justify-end">
+                <input type="submit" value="Lưu thông tin" class="bg-blue-600 text-white rounded-xl px-4 py-2">
+            </div>
+        </form>
+    </div>
+    <div class="flex-1 mx-5">
+        <form action="/admin/auth/change-password" method="post">
+            <h2 class="text-xl font-medium text-blue-600">Thông tin đăng nhập</h2>
+            <div>
+                <label for="" class="block my-2">Email</label>
+                <input type="text" name="email" id="" placeholder="Email" value="<%- user.email %>" class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <div>
+                <label for="" class="block my-2">Mật khẩu cũ</label>
+                <input type="password" name="oldPassword" id="" placeholder="Mật khẩu cũ" class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <div>
+                <label for="" class="block my-2">Mật khẩu mới</label>
+                <input type="password" name="newPassword" id="" placeholder="Mật khẩu mới" class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <div>
+                <label for="" class="block my-2">Nhập lại mật khẩu mới</label>
+                <input type="password" name="confirmNewPassword" id="" placeholder="Nhập lại mật khẩu mới" class="w-full block outline-none py-2 px-4 border border-blue-600 rounded">
+            </div>
+            <% if (locals?.error) { %>
+                <p class="text-red-500 text-center my-5">
+                    <%= error %>
+                </p>
+            <% } %>
+            <div class="flex my-5 justify-end">
+                <input type="submit" value="Lưu thông tin" class="bg-blue-600 text-white rounded-xl px-4 py-2">
+            </div>
+        </form>
+    </div>
+</div>

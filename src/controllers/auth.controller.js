@@ -404,23 +404,9 @@ export async function adminLoginHandler(req, res) {
             }
         });
         
-        let role = VaiTroModel.findById(user.maVaiTro);
-        let roleName = role.tenVaiTro;
-        if (roleName === "Quản trị viên") {
-
-        }
-        else if (roleName === "Nhân viên quản lý") {
-
-        }
-        else if (roleName === "Nhân viên bán hàng") {
-
-        }
-        else { 
-            // Nhân viên kho
-            return res.redirect("/admin/create-goods-receipt");
-        }
+        return res.redirect("/admin/create-goods-receipt");
     } catch (error) {
-        return res.render("/admin/auth/admin-login", {
+        return res.render("admin/auth/login", {
             ...VIEW_OPTIONS.LOGIN,
             error: error.message,
         });
@@ -439,4 +425,64 @@ export async function adminLogoutHandler(req, res) {
 
         return res.redirect("/admin/auth/admin-login");
     });
+}
+export async function renderAdminProfilePage(req, res) {
+    const { email, token } = req.query;
+
+    try {
+        const redisClient = getRedis();
+        const storedToken = await redisClient.get(email);
+
+        if (!storedToken) {
+            throw new Error("Token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        if (storedToken !== token) {
+            throw new Error("Token không hợp lệ.");
+        }
+
+        return res.render("admin/profile", { ...VIEW_OPTIONS.RESET_PASSWORD, token, email });
+    } catch (error) {
+        return res.render("admin/profile", { ...VIEW_OPTIONS.RESET_PASSWORD, token, email, error: error.message });
+    }
+}
+export async function adminChangePasswordHandler(req, res) {
+    const { email, oldPassword, newPassword, confirmNewPassword } = req.body;
+    const user = req.session.user;
+
+    try {
+        if (!email || !oldPassword || !newPassword || !confirmNewPassword) {
+            throw new Error("Dữ liệu đầu vào không hợp lệ");
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.matKhau);
+        if (isMatch) {
+            if (newPassword === confirmNewPassword) {
+
+            }
+            else {
+                return res.render("admin/user/profile", {
+                    ...VIEW_OPTIONS.RESET_PASSWORD,
+                    error: "Mật khẩu mới và nhập lại mật khẩu không khớp.",
+                    user: user,
+                });
+            }
+        }
+        else {
+            return res.render("admin/user/profile", {
+                ...VIEW_OPTIONS.RESET_PASSWORD,
+                error: "Mật khẩu cũ không đúng.",
+                user: user,
+            });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await NguoiDungModel.updateOne({ email }, { matKhau: hashedPassword });
+
+        return res.redirect("/admin/profile");
+    } catch (error) {
+        return res.render("admin/user/profile", { ...VIEW_OPTIONS.RESET_PASSWORD, error: error.message, email });
+    }
 }
