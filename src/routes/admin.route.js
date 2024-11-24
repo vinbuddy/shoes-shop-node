@@ -10,6 +10,8 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import categoryRoutes from "./category.route.js";
 import statusRoutes from "./status.route.js";
+import authRoutes from "./auth.route.js"
+
 import {
     renderAdminOrderPage,
     renderAdminOrderDetailPage,
@@ -43,10 +45,12 @@ router.use("/brand", brandRoutes);
 router.use("/supplier", supplierRoutes);
 router.use("/category", categoryRoutes);
 router.use("/status", statusRoutes);
+router.use("/auth", authRoutes)
 
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
 router.get("/order", renderAdminOrderPage);
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
+
 export default router;

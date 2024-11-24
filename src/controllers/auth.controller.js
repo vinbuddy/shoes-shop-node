@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import env from "dotenv";
 
 import KhachHangModel from "../models/khachHang.model.js";
+import NguoiDungModel from "../models/nguoidung.model.js";
+import VaiTroModel from "../models/vaiTro.model.js";
 import { getRedis } from "../utils/redis.js";
 import { sendEmail } from "../utils/mail.js";
 import { syncCartItemsAfterLogin } from "./cart.controller.js";
@@ -363,5 +365,64 @@ export async function googleAuthCallbackHandler(req, res) {
         return res.redirect("/");
     } catch (error) {
         res.render("auth/login", { ...VIEW_OPTIONS.LOGIN, error: error.message });
+    }
+}
+
+// Admin
+export function renderAdminLoginPage(req, res) {
+    return res.render("admin/auth/login", {
+        layout: "./layouts/auth",
+        page: "login",
+        title: "Đăng nhập quản trị",
+    });
+}
+export async function adminLoginHandler(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        const user = await NguoiDungModel.findOne({
+            email: email,
+        });
+
+        if (!user) {
+            throw new Error("Người dùng không tồn tại.");
+        }
+        
+
+        // Compare password with hashed password
+        const isMatch = await bcrypt.compare(password, user.matKhau);
+
+        if (!isMatch) {
+            throw new Error("Mật khẩu không chính xác.");
+        }
+
+        // Create session
+        req.session.user = user;
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+        
+        let role = VaiTroModel.findById(user.maVaiTro);
+        let roleName = role.tenVaiTro;
+        if (roleName === "Quản trị viên") {
+
+        }
+        else if (roleName === "Nhân viên quản lý") {
+
+        }
+        else if (roleName === "Nhân viên bán hàng") {
+
+        }
+        else { 
+            // Nhân viên kho
+            return res.redirect("/admin/create-goods-receipt");
+        }
+    } catch (error) {
+        return res.render("auth/login", {
+            ...VIEW_OPTIONS.LOGIN,
+            error: error.message,
+        });
     }
 }
