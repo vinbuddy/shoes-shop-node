@@ -163,6 +163,14 @@ export async function verifyOTPHandler(req, res) {
             }
         });
 
+        // Sync cart
+        const result = syncCartItemsAfterLogin(req);
+
+        if (result) {
+            // Clear cookie cartItems
+            res.clearCookie("cartItems");
+        }
+
         return res.redirect("/");
     } catch (error) {
         return res.render("auth/otp", {

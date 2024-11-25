@@ -144,18 +144,60 @@
             <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
                 <% if (products && products.length > 0) { %>
                     <% products.forEach(product => { %>
+
+                        <% 
+                            // Lấy khuyến mãi áp dụng cho sản phẩm
+                            const applicablePromotions = promotions.filter(promo =>
+                                promo.danhSachSanPhamApDung.some(
+                                    productId => productId.toString() === product.maSanPham.toString()
+                                )
+                            );
+
+                            // Lấy giá trị giảm cao nhất
+                            const maxDiscount = applicablePromotions.length > 0 
+                                ? Math.max(...applicablePromotions.map(promo => promo.giaTriKhuyenMai)) 
+                                : 0;
+
+                            // Tính giá sau khuyến mãi (nếu có)
+                            const finalPrice = product.danhSachKichCo[0]?.giaKichCo 
+                                ? product.danhSachKichCo[0].giaKichCo * (1 - maxDiscount / 100) 
+                                : null;
+                        %>
+
                         <a href="/product/<%= product.maSanPham %>" class="group">
                             <div
-                                class="aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7"
+                                class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                             >
                                 <img
                                     src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
-                                    alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                                    alt="<%= product.tenSanPham %>"
                                     class="h-full w-full object-cover object-center group-hover:opacity-75"
                                 />
+
+                                <% if (maxDiscount > 0) { %>
+                                    <label class="absolute top-3 right-3 badge badge-error text-white">
+                                        Giảm <%= maxDiscount %>%
+                                    </label>
+                                <% } %>
                             </div>
-                            <h3 class="mt-4 text-lg truncate max-w-full"><%= product.tenSanPham %></h3>
+                            <h3 class="mt-4 text-sm text-gray-700"><%= product.tenSanPham %></h3>
                             
+                            <% if (maxDiscount > 0) { %>
+                                
+                               <div class="flex items-center gap-2">
+                                    <p class="mt-1 text-lg font-medium text-primary">
+                                        <%= formatVNCurrency(finalPrice || 0) %>
+                                    </p>
+                                    <p class="mt-1 text-gray-700 line-through">
+                                        <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                    </p>
+
+                                </div>
+                            <% } else { %>
+                                <p class="mt-1 text-lg font-medium text-gray-900">
+                                    <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                </p>
+                            <% } %>
                         </a>
                     <% }) %>
                 <% } %>

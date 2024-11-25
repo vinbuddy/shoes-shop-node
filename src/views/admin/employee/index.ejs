@@ -6,13 +6,23 @@
                 <%= message %>
             </span>
         </div>
-        <% } %>
-    <div class="flex justify-between items-center mb-5">
-        <h3 class="text-xl font-bold mb-5">Danh sách sản phẩm</h3>
+    <% } %>
 
-        <a href="/admin/product/create" class="btn bg-primary text-white hover:bg-primary rounded-xl">
+    <% if (locals.error)  { %>
+        <div role="alert" class="alert alert-error text-white mb-5">
+            <i class='bx bx-x'></i>
+            <span>
+                <%= error %>
+            </span>
+        </div>
+    <% } %>
+
+    <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl font-bold mb-5">Danh sách nhân viên</h3>
+
+        <a href="/admin/employee/create" class="btn bg-primary text-white hover:bg-primary rounded-xl">
             <i class="bx bx-plus"></i>
-            Thêm sản phẩm
+            Thêm nhân viên
         </a>
     </div>
 
@@ -21,45 +31,42 @@
             <!-- head -->
             <thead>
                 <tr>
-                    <th>Mã sản phẩm</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Hãng sản xuất</th>
-                    <th>Danh mục</th>
+                    <th>Mã nhân viên</th>
+                    <th>Tên nhân viên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
-                <% products && products.forEach(product => { %>
+                <% employees && employees.forEach(employee => { %>
                     <tr>
-                        <td><%= product.maSanPham %></td>
+                        <td><%= employee.maNguoiDung %></td>
                         <td>
                             <div class="flex items-center gap-3">
                                 <div class="avatar">
-                                    <div class="h-12 w-12">
+                                    <div class="h-12 w-12 rounded-full border">
                                         <img
-                                            class="!object-contain"
-                                            src="<%= product.hinhAnhDaiDien || '/images/no-result.png' %>"
-                                            alt="<%= product.tenSanPham %>"
+                                            class="!object-cover"
+                                            src="<%= employee.anhDaiDien || '/images/no-result.png' %>"
+                                            alt="<%= employee.tenSanPham %>"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-semibold"><%= product.tenSanPham %></div>
-                                    <div class="text-sm opacity-50"><%= product.moTaSanPham.substring(0, 50) %>...</div> <!-- Show a short description -->
+                                    <div class="font-semibold"><%= employee.tenNguoiDung %></div>
                                 </div>
                             </div>
                         </td>
-                        <td><%= product.maHangSanXuat.tenHangSanXuat %></td>
+                        <td><%= employee.email %></td>
                         <td>
-                            <% product.danhSachDanhMuc.forEach(category => { %>
-                                <span class="badge badge-ghost badge-sm"><%= category.tenDanhMuc %></span>
-                            <% }) %>
+                            <%= employee.maVaiTro.tenVaiTro %>
                         </td>
                         <th class="flex items-center gap-3">
-                            <a href="/admin/product/edit/<%= product.maSanPham %>" class="btn btn-ghost btn-sm">
+                            <a href="/admin/employee/edit/<%= employee.maNguoiDung %>" class="btn btn-ghost btn-sm">
                                 <i class="bx bx-edit"></i>
                             </a>
-                            <a href="/admin/product/delete/<%= product.maSanPham %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                            <a href="/admin/employee/delete/<%= employee.maNguoiDung %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?');">
                                 <i class="bx bx-trash"></i>
                             </a>
                         </th>
