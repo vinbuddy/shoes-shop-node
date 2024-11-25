@@ -101,14 +101,18 @@
                             <div class="flex items-center gap-2 mb-5 cursor-pointer">
                                 <img
                                     class="size-8 object-cover rounded-full"
-                                    src="https://img.freepik.com/free-photo/horizontal-portrait-smiling-happy-young-pleasant-looking-female-wears-denim-shirt-stylish-glasses-with-straight-blonde-hair-expresses-positiveness-poses_176420-13176.jpg"
+                                    src="<%- locals?.session?.user?.anhDaiDien || '/images/no-result.png' %>"
                                     alt=""
                                 />
 
-                                <p class="text-[#a1a1aa] text-sm truncate ms-2"><%- user.tenNguoiDung %></p>
+                                <p class="text-[#a1a1aa] text-sm truncate ms-2">
+                                    <%- locals?.session?.user?.tenNguoiDung %>
+                                </p>
                             </div>
 
-                            <button onclick="window.location.href = '/admin/auth/admin-logout'" class="w-full btn btn-sm btn-error text-white">Đăng xuất</button>
+                            <a href="/admin/auth/admin-logout" class="w-full btn btn-sm btn-error text-white">
+                                Đăng xuất
+                            </a>
                         </div>
                     </aside>
                 </section>
@@ -117,7 +121,6 @@
                 </section>
             </div>
         </div>
-        <%- include('../partials/import-script.ejs') %>
-        <%- script %>
+        <%- include('../partials/import-script.ejs') %> <%- script %>
     </body>
 </html>
