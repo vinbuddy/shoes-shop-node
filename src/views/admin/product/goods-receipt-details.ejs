@@ -36,7 +36,7 @@
                     Danh sách các size
                 </th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Hành động
+                    Thao tác
                 </th>
             </tr>
         </thead>
@@ -84,24 +84,17 @@
                     <div class="w-[150px]">
                         <h2 class="font-medium text-lg text-blue-600">Giá nhập</h2>
                     </div>
-                    <div class="w-[150px]">
-                        <h2 class="font-medium text-lg text-blue-600">Thao tác</h2>
-                    </div>
                 </div>
                 <div id="sizeDetails">
                     <div class="flex justify-around mb-1">
                         <div class="w-[150px]">
-                            <input type="text" class="w-[150px] border-2 rounded outline-none py-1 px-2">
+                            <input readonly type="text" class="w-[150px] border-2 rounded outline-none py-1 px-2">
                         </div>
                         <div class="w-[150px]">
-                            <input type="text" class="w-[150px] border-2 rounded outline-none py-1 px-2">
+                            <input readonly type="text" class="w-[150px] border-2 rounded outline-none py-1 px-2">
                         </div>
                         <div class="w-[150px]">
-                            <input type="text" class="w-[150px] border-2 rounded outline-none py-1 px-2">
-                        </div>
-                        <div class="w-[150px] flex justify-center items-center">
-                            <a href="#"><i class='block mx-2 text-red-600 text-xl bx bxs-save'></i></a>
-                            <a href="#"><i class='block mx-2 text-red-600 text-xl bx bxs-trash'></i></a>
+                            <input readonly type="text" class="w-[150px] border-2 rounded outline-none py-1 px-2">
                         </div>
                     </div>
                 </div>
@@ -135,17 +128,13 @@ $(document).ready(function() {
                                     const sizeRow = `
                                         <div class="flex justify-around mb-1">
                                             <div class="w-[150px]">
-                                                <input type="text" value="${size.maKichCo.tenKichCo}" class="w-[150px] text-center border-2 rounded outline-none py-1 px-2">
+                                                <input readonly type="text" value="${size.maKichCo.tenKichCo}" class="w-[150px] text-center border-2 rounded outline-none py-1 px-2">
                                             </div>
                                             <div class="w-[150px]">
-                                                <input type="text" value="${size.soLuongKichCo}" class="w-[150px] text-center border-2 rounded outline-none py-1 px-2">
+                                                <input readonly type="text" value="${size.soLuongKichCo}" class="w-[150px] text-center border-2 rounded outline-none py-1 px-2">
                                             </div>
                                             <div class="w-[150px]">
-                                                <input type="text" value="${size.giaKichCo}" class="w-[150px] text-center border-2 rounded outline-none py-1 px-2">
-                                            </div>
-                                            <div class="w-[150px] flex justify-center items-center">
-                                                <a href="#"><i class='block mx-2 text-red-600 text-xl bx bxs-save'></i></a>
-                                                <a href="#"><i class='block mx-2 text-red-600 text-xl bx bxs-trash'></i></a>
+                                                <input readonly type="text" value="${size.giaKichCo}" class="w-[150px] text-center border-2 rounded outline-none py-1 px-2">
                                             </div>
                                         </div>
                                     `;
