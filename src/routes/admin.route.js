@@ -1,5 +1,7 @@
 import express from "express";
 import {
+    renderAdminGoodsReceiptDetails,
+    renderAdminGoodsReceiptList,
     renderAdminCreateGoodsReceipt,
     renderAdminCreateProductPage,
     renderAdminProductPage,
@@ -28,6 +30,8 @@ const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
+router.get('/goods-receipt-list', renderAdminGoodsReceiptList);
+router.get('/goods-receipt-details/:id', renderAdminGoodsReceiptDetails);
 router.get("/create-goods-receipt", renderAdminCreateGoodsReceipt);
 
 router.get("/product", renderAdminProductPage);

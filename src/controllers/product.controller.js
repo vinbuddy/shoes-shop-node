@@ -8,6 +8,8 @@ import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import env from "dotenv";
+import PhieuNhapModel from "../models/phieuNhap.js";
+import SanPhamModel from "../models/sanPham.model.js";
 
 env.config();
 
@@ -273,6 +275,108 @@ export async function renderAdminCreateGoodsReceipt (req, res, next) {
     }
 }
 
+export async function renderAdminGoodsReceiptList(req, res, next) {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const itemsPerPage = 10;
+        const skip = (page - 1) * itemsPerPage;
+        
+        // Lọc theo ngày nhập
+        const filterDateString = req.query.filterDate || '';
+        // Lọc theo tên sản phẩm
+        const productName = req.query.productName || '';
+        let filterDate;
+
+        let filter = {};
+
+        if (filterDateString) {
+            filterDate = new Date(filterDateString + "T00:00:00");
+            if (!isNaN(filterDate.getTime())) {
+                if (filterDate) {
+                    const startOfDay  = new Date(filterDate);
+                    startOfDay.setHours(0, 0, 0, 0);
+        
+                    const endOfDay = new Date(filterDate);
+                    endOfDay.setHours(23, 59, 59, 999);
+        
+                    filter.ngayNhap = { 
+                        $gte: startOfDay,
+                        $lt: endOfDay // Nhỏ hơn nửa đêm của ngày kế tiếp (23:59:59)
+                    };
+                }
+            }
+            else {
+                console.error("Định dạng ngày không hợp lệ");
+            }
+        }
+
+        const user = req.session.user;
+        const product = await SanPhamModel.findOne({tenSanPham : productName});
+        if (product) {
+            filter = {
+                productId: {'chiTiet.maSanPham': product.id}
+            }
+        }
+
+        const phieuNhap = await PhieuNhapModel.find(filter)
+                        .skip(skip)
+                        .limit(itemsPerPage)
+                        .populate("nhaCungCap")
+                        .populate("chiTiet.maSanPham")
+                        .exec();
+        
+        const formattedPhieuNhap = phieuNhap.map(item => {
+            const date = new Date(item.ngayNhap);
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            return { ...item._doc, ngayNhap: formattedDate };
+        });
+        // console.log(formattedPhieuNhap);
+
+        return res.render("admin/product/goods-receipt-list", {
+            layout: "./layouts/admin",
+            page: "goods-receipt-list",
+            title: "Danh sách phiếu nhập hàng",
+            goodsReceipt: formattedPhieuNhap,
+            user: user,
+            filterDate: filterDateString,
+            productName,
+        });
+    } catch (error) {
+        next(error);
+    }
+    
+}
+export async function renderAdminGoodsReceiptDetails(req, res, next) {
+    try {
+        const user = req.session.user;
+        const { id } = req.params;
+
+        const details = await PhieuNhapModel.findOne({maPhieuNhap: id})
+                        .populate("nhaCungCap")
+                        .populate("chiTiet.maSanPham")
+                        .populate("chiTiet.danhSachKichCo.maKichCo")
+                        .exec();
+
+        const date = new Date(details.ngayNhap);
+        const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        
+
+        console.log(details);
+
+        return res.render("admin/product/goods-receipt-details", {
+            layout: "./layouts/admin",
+            page: "goods-receipt-details",
+            title: "Chi tiết phiếu nhập hàng",
+            details,
+            user: user,
+            dateReceipt: formattedDate,
+        });
+    } catch (error) {
+        next(error);
+    }
+    
+}
+
 // API
 
 // Get Product Information
@@ -386,5 +490,20 @@ export async function updateSizeList(req, res) {
         return res.status(200).json({ message: 'Cập nhật danh sách kích cỡ thành công.', product });
     } catch (error) {
         return res.status(500).json({ message: 'Lỗi server. Vui lòng thử lại sau.', error });
+    }
+}
+// Get Product Information
+// [GET] /api/product/
+export async function getProductReceiptByProductId(req, res) {
+    const productId = req.params.id;
+    const product = await PhieuNhapModel.find({'chiTiet.maSanPham': productId})
+                        .populate("chiTiet.maSanPham")
+                        .populate("chiTiet.danhSachKichCo.maKichCo")
+                        .exec();
+
+    if (product) {
+        return res.json(product);
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
     }
 }
