@@ -1,5 +1,6 @@
 import SanPhamModel from "../models/sanPham.model.js";
 import HangSanXuatModel from "../models/hangSanXuat.model.js";
+import PromotionModel from "../models/chuongTrinhKhuyenMai.model.js";
 
 import { formatVNCurrency } from "../utils/format.js";
 
@@ -26,6 +27,12 @@ export async function renderHomePage(req, res) {
         8
     );
 
+    // Tìm khuyến mãi đang diễn ra
+    const promotions = await PromotionModel.find({
+        ngayKetThuc: { $gte: new Date() },
+        trangThaiXoa: false,
+    });
+
     return res.render("index", {
         layout: "./layouts/main",
         page: "home",
@@ -33,6 +40,7 @@ export async function renderHomePage(req, res) {
         nikeProducts,
         adidasProducts,
         pumaProducts,
+        promotions,
         formatVNCurrency,
     });
 }

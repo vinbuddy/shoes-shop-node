@@ -11,8 +11,11 @@ cloudinary.config({
 export const uploadToCloudinary = async (file, folder) => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader
-            .upload_stream({ resource_type: "auto", folder: folder }, (error, result) => {
-                if (error) return reject(error);
+            .upload_stream({ resource_type: "auto", folder: folder, timeout: 120000 }, (error, result) => {
+                if (error) {
+                    console.error("Upload to Cloudinary failed:", error.message);
+                    return reject(error);
+                }
 
                 if (result) {
                     resolve({
@@ -25,5 +28,41 @@ export const uploadToCloudinary = async (file, folder) => {
                 }
             })
             .end(file.buffer);
+    });
+};
+
+export const getPublicIdFromUrl = (url) => {
+    try {
+        const parts = url.split("/upload/");
+        if (parts.length < 2) {
+            throw new Error("Invalid Cloudinary URL format");
+        }
+        const publicIdWithExtension = parts[1];
+
+        const publicId = publicIdWithExtension.split(".").slice(0, -1).join(".");
+        return publicId;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const deleteFromCloudinary = async (publicId) => {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.destroy(publicId, { resource_type: "image" }, (error, result) => {
+            if (error) {
+                return reject(error);
+            }
+            if (result.result === "ok") {
+                resolve({
+                    success: true,
+                    message: "File deleted successfully",
+                });
+            } else {
+                resolve({
+                    success: false,
+                    message: "File not found or could not be deleted",
+                });
+            }
+        });
     });
 };
