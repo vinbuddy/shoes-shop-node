@@ -34,7 +34,7 @@ export function renderCreatePage(req, res) {
     return res.render("admin/supplier/create", {
         layout: "./layouts/admin",
         page: "supplier",
-        title: "create supplier",
+        title: "Tạo nhà cung cấp",
     });
 }
 export async function renderUpdatePage(req, res) {
@@ -44,7 +44,7 @@ export async function renderUpdatePage(req, res) {
     return res.render("admin/supplier/edit", {
         layout: "./layouts/admin",
         page: "supplier",
-        title: "Update supplier",
+        title: "Cập nhật nhà cung cấp",
         supplier: supplier,
     });
 }
@@ -125,5 +125,21 @@ export async function renderSupplierPageWithPagination(req, res) {
         return renderSupplierPage(res, suppliers, page, totalSuppliers);
     } catch (error) {
         console.error("Error fetching supplier:", error);
+    }
+}
+
+// API
+
+// Get Supplier Information By Id
+// [GET] /api/supplier/:id
+export async function getSupplierById(req, res) {
+    // Get supplier id from request params
+    const supplierId = req.params.id;
+    const supplier = await SupplierModel.findById(supplierId);
+    
+    if (supplier) {
+        return res.json(supplier);
+    } else {
+        return res.status(404).json({ error: 'Supplier not found' });
     }
 }

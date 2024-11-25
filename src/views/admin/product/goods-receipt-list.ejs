@@ -1,0 +1,152 @@
+<div>
+    <h1 class="text-2xl font-bold mb-5">Danh sách phiếu nhập</h1>
+    
+    <div class="flex flex-wrap justify-between items-center">
+        <!-- Bộ lọc -->
+        <form action="/admin/goods-receipt-list" method="get">
+            <div class="flex flex-wrap gap-5 mb-6">
+                <!-- Lọc theo ngày -->
+                <div class="flex flex-col">
+                    <label for="filter-date" class="text-sm text-blue-600 font-medium mb-2">Lọc theo ngày</label>
+                    <input
+                        type="date"
+                        id="filter-date"
+                        name="filterDate"
+                        value="<%= filterDate ? filterDate.toString().split('T')[0] : '' %>"
+                        class="mt-1 block w-full rounded-md border border-blue-600 shadow-sm  focus:ring focus:ring-blue-200 focus:ring-opacity-50 outline-none py-2 px-4"
+                    />
+                </div>
+
+                <!-- Lọc theo tên sản phẩm -->
+                <div class="flex flex-col">
+                    <label for="filter-product" class="text-sm text-blue-600 font-medium mb-2">Lọc theo tên sản phẩm</label>
+                    <input
+                        type="text"
+                        id="filter-product"
+                        name="productName"
+                        value="<%= productName %>" 
+                        placeholder="Tìm sản phẩm"
+                        class="mt-1 block w-full rounded-md shadow-sm border focus:ring focus:ring-blue-200 focus:ring-opacity-50 outline-none border-blue-600 py-2 px-4"
+                    />
+                </div>
+
+                <!-- Nút áp dụng bộ lọc -->
+                <div class="flex items-end">
+                    <button
+                        class="mb-1 px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
+                    >
+                        Lọc
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="mt-1 me-10">
+            <a href="/admin/create-goods-receipt" class="block px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
+            >Tạo phiếu nhập hàng</a>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Ngày nhập
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Nhà cung cấp
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Số lượng sản phẩm
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Thao tác
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <% goodsReceipt.forEach(item => { %>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-center"><%- item.ngayNhap %></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center"><%- item.nhaCungCap.tenNhaCungCap %></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center"><%- item.chiTiet.length %> sản phẩm</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <a href="/admin/goods-receipt-details/<%- item.maPhieuNhap %>" class="text-blue-600 hover:text-blue-900">Xem chi tiết</a>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+    <div class="flex flex-wrap justify-between items-center mt-6 me-10">
+        <p class="text-sm text-gray-700">
+            Hiển thị <span id="display-range" class="font-medium">1-10</span> của <span id="total-items" class="font-medium"><%- goodsReceipt.length %></span> phiếu nhập
+        </p>
+        <nav class="inline-flex -space-x-px" id="pagination-nav">
+            <a href="#" class="px-3 py-1 border border-gray-300 text-gray-500 rounded-l-md hover:bg-gray-100" id="prev-btn">Trước</a>
+            <a href="#" class="px-3 py-1 border border-gray-300 text-gray-500 rounded-r-md hover:bg-gray-100" id="next-btn">Tiếp</a>
+        </nav>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        const totalItems = $('#total-items').text();
+        const itemsPerPage = 10;
+        let currentPage = 1;
+
+        function updatePagination() {
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, totalItems);
+
+            // Cập nhật hiển thị số phiếu nhập
+            $('#display-range').text(`${start}-${end}`);
+
+            // Cập nhật trạng thái các nút
+            $('#prev-btn').prop('disabled', currentPage === 1);
+            $('#next-btn').prop('disabled', currentPage === Math.ceil(totalItems / itemsPerPage));
+
+            // Cập nhật các số trang
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            $('#pagination-nav .page-number').remove(); // Xóa các số trang cũ
+            for (let i = 1; i <= totalPages; i++) {
+                const pageNumber = $('<a>', {
+                    href: `/admin/goods-receipt-list?page=${i}`,
+                    text: i,
+                    class: 'px-3 py-1 border border-gray-300 text-gray-700 hover:opacity-80 page-number',
+                    'data-page': i,
+                });
+
+                if (i === currentPage) {
+                    pageNumber.addClass('bg-blue-500 text-white');
+                }
+
+                $('#pagination-nav #next-btn').before(pageNumber);
+            }
+        }
+
+        $(document).on('click', '.page-number', function(e) {
+            e.preventDefault();
+            currentPage = $(this).data('page');
+            updatePagination();
+        });
+
+        $('#prev-btn').click(function(e) {
+            e.preventDefault();
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+            }
+        });
+
+        $('#next-btn').click(function(e) {
+            e.preventDefault();
+            if (currentPage < Math.ceil(totalItems / itemsPerPage)) {
+                currentPage++;
+                updatePagination();
+            }
+        });
+
+        // Khởi tạo trang ban đầu
+        updatePagination();
+    });
+</script>

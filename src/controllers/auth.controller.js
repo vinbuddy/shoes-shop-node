@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import env from "dotenv";
 
 import KhachHangModel from "../models/khachHang.model.js";
+import NguoiDungModel from "../models/nguoidung.model.js";
+import VaiTroModel from "../models/vaiTro.model.js";
 import { getRedis } from "../utils/redis.js";
 import { sendEmail } from "../utils/mail.js";
 import { syncCartItemsAfterLogin } from "./cart.controller.js";
@@ -371,5 +373,124 @@ export async function googleAuthCallbackHandler(req, res) {
         return res.redirect("/");
     } catch (error) {
         res.render("auth/login", { ...VIEW_OPTIONS.LOGIN, error: error.message });
+    }
+}
+
+// Admin
+export function renderAdminLoginPage(req, res) {
+    return res.render("admin/auth/login", {
+        layout: "./layouts/auth",
+        page: "login",
+        title: "Đăng nhập quản trị",
+    });
+}
+export async function adminLoginHandler(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        const user = await NguoiDungModel.findOne({
+            email: email,
+        });
+
+        if (!user) {
+            throw new Error("Người dùng không tồn tại.");
+        }
+        
+
+        // Compare password with hashed password
+        const isMatch = await bcrypt.compare(password, user.matKhau);
+
+        if (!isMatch) {
+            throw new Error("Mật khẩu không chính xác.");
+        }
+
+        // Create session
+        req.session.user = user;
+        req.session.save((err) => {
+            if (err) {
+                throw new Error("Không thể lưu session.");
+            }
+        });
+        
+        return res.redirect("/admin/create-goods-receipt");
+    } catch (error) {
+        return res.render("admin/auth/login", {
+            ...VIEW_OPTIONS.LOGIN,
+            error: error.message,
+        });
+    }
+}
+
+export async function adminLogoutHandler(req, res) {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error destroying session:", err);
+            return res.redirect("/");
+        }
+
+        // Clear cookie
+        res.clearCookie("connect.sid"); // Clear the session cookie
+
+        return res.redirect("/admin/auth/admin-login");
+    });
+}
+export async function renderAdminProfilePage(req, res) {
+    const { email, token } = req.query;
+
+    try {
+        const redisClient = getRedis();
+        const storedToken = await redisClient.get(email);
+
+        if (!storedToken) {
+            throw new Error("Token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        if (storedToken !== token) {
+            throw new Error("Token không hợp lệ.");
+        }
+
+        return res.render("admin/profile", { ...VIEW_OPTIONS.RESET_PASSWORD, token, email });
+    } catch (error) {
+        return res.render("admin/profile", { ...VIEW_OPTIONS.RESET_PASSWORD, token, email, error: error.message });
+    }
+}
+export async function adminChangePasswordHandler(req, res) {
+    const { email, oldPassword, newPassword, confirmNewPassword } = req.body;
+    const user = req.session.user;
+
+    try {
+        if (!email || !oldPassword || !newPassword || !confirmNewPassword) {
+            throw new Error("Dữ liệu đầu vào không hợp lệ");
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.matKhau);
+        if (isMatch) {
+            if (newPassword === confirmNewPassword) {
+
+            }
+            else {
+                return res.render("admin/user/profile", {
+                    ...VIEW_OPTIONS.RESET_PASSWORD,
+                    error: "Mật khẩu mới và nhập lại mật khẩu không khớp.",
+                    user: user,
+                });
+            }
+        }
+        else {
+            return res.render("admin/user/profile", {
+                ...VIEW_OPTIONS.RESET_PASSWORD,
+                error: "Mật khẩu cũ không đúng.",
+                user: user,
+            });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await NguoiDungModel.updateOne({ email }, { matKhau: hashedPassword });
+
+        return res.redirect("/admin/profile");
+    } catch (error) {
+        return res.render("admin/user/profile", { ...VIEW_OPTIONS.RESET_PASSWORD, error: error.message, email });
     }
 }

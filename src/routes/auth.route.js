@@ -14,6 +14,12 @@ import {
     renderResetPasswordPage,
     resetPasswordHandler,
     googleAuthCallbackHandler,
+    //Admin
+    renderAdminLoginPage,
+    adminLoginHandler,
+    adminLogoutHandler,
+    renderAdminProfilePage,
+    adminChangePasswordHandler
 } from "../controllers/auth.controller.js";
 
 env.config();
@@ -39,5 +45,14 @@ router.post("/verify-otp", verifyOTPHandler);
 router.post("/login", loginHandler);
 router.post("/forgot", forgotPasswordHandler);
 router.post("/reset-password", resetPasswordHandler);
+
+//Admin
+router.get("/admin-login", renderAdminLoginPage);
+router.get("/admin-logout", adminLogoutHandler);
+router.get("/profile", renderAdminProfilePage);
+
+router.post("/admin-login", adminLoginHandler);
+router.post("/change-password", adminChangePasswordHandler);
+
 
 export default router;

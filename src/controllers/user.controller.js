@@ -75,3 +75,15 @@ export async function renderUserOrderPage(req, res) {
         status: status,
     });
 }
+
+//Admin
+export async function renderAdminProfilePage(req, res) {
+    const user = req.session.user;
+
+    return res.render("admin/user/profile", {
+        layout: "./layouts/admin",
+        page: "profile",
+        title: "Admin Profile",
+        user: user,
+    });
+}
