@@ -2,6 +2,7 @@ import BrandModel from "../models/hangSanXuat.model.js";
 import CategoryModel from "../models/danhMuc.model.js";
 import ProductModel from "../models/sanPham.model.js";
 import SizeModel from "../models/kichCo.model.js";
+import PromotionModel from "../models/chuongTrinhKhuyenMai.model.js";
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
@@ -36,6 +37,12 @@ export async function renderProductPage(req, res) {
     const brands = await BrandModel.find({ trangThaiXoa: false });
     const categories = await CategoryModel.find({ trangThaiXoa: false });
     const sizes = await SizeModel.find();
+
+    // Tìm khuyến mãi đang diễn ra
+    const promotions = await PromotionModel.find({
+        ngayKetThuc: { $gte: new Date() },
+        trangThaiXoa: false,
+    });
 
     const { page = 1, name, brand, category, size, minPrice, maxPrice } = req.query;
     const pageSize = 10;
@@ -110,10 +117,11 @@ export async function renderProductPage(req, res) {
         categories: categories,
         sizes: sizes,
         products: products,
+        promotions: promotions,
         currentPage: page,
         totalPages: Math.ceil(totalProducts / pageSize),
         filters: req.query,
-        formatCurrency: formatVNCurrency,
+        formatVNCurrency: formatVNCurrency,
     });
 }
 
@@ -126,10 +134,17 @@ export async function renderProductDetailPage(req, res) {
         })
         .populate("danhSachDanhMuc");
 
+    // Tìm khuyến mãi đang diễn ra
+    const promotions = await PromotionModel.find({
+        ngayKetThuc: { $gte: new Date() },
+        trangThaiXoa: false,
+    });
+
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
         loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
+        promotions: promotions,
         formatVNCurrency: formatVNCurrency,
     });
 }

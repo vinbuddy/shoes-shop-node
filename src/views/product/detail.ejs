@@ -31,9 +31,28 @@
         </section>
         <section class="col-span-5">
             <div>
+                <% 
+                    // Tìm khuyến mãi áp dụng cho sản phẩm
+                    const applicablePromotion = promotions.find(promo => 
+                        promo.danhSachSanPhamApDung.some(
+                            promoProductId => promoProductId.toString() === product.maSanPham.toString()
+                        )
+                    );
+
+                    const discountValue = applicablePromotion 
+                        ? applicablePromotion.giaTriKhuyenMai 
+                        : 0;
+                    
+                %>
                 <h1 class="text-3xl font-bold"><%= product ? product.tenSanPham : "Unknown Name" %></h1>
-                
-                <p class="mt-2 text-gray-500"><%= product ? product.moTaSanPham : "Unknown Description" %></p>
+
+                <% if (discountValue > 0) { %>
+                    <label class="mt-3 badge badge-error text-white">
+                        Giảm <%= discountValue %>%
+                    </label>
+                <% } %>
+
+                <p class="mt-3 text-gray-500"><%= product ? product.moTaSanPham : "Unknown Description" %></p>
 
                 <div class="mt-7">
                     <h2 class="text-base font-semibold mb-2">Danh mục</h2>
@@ -47,19 +66,37 @@
                 <div class="mt-7">
                     <h2 class="text-base font-semibold mb-2">Kích cỡ</h2>
                     <div id="size-list" class="grid grid-cols-4 gap-3">
+                        
                         <% if (product && product.danhSachKichCo.length > 0) { %>
                             <% product.danhSachKichCo.forEach((size, index) => { %>
+
+                                <% 
+                                    const finalPrice = size.giaKichCo - discountValue > 0
+                                        ? size.giaKichCo - discountValue
+                                        : 0;
+                                %>
+
                                 <button 
                                     data-sizeQuantity="<%= size.soLuongKichCo %>" 
-                                    data-sizePrice="<%= size.giaKichCo %>" 
+                                    data-sizePrice="<%= finalPrice > 0 ? finalPrice : size.giaKichCo %>" 
                                     data-sizeId="<%= size.maKichCo.maKichCo%>" 
                                     <%= size.soLuongKichCo === 0 ? 'disabled' : '' %>
                                     class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-center border p-2 rounded-xl">
                                         <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
 
-                                        <span>
-                                            <%= formatVNCurrency(size.giaKichCo) %>
-                                        </span>
+                                        <% if (discountValue > 0) { %>
+                                            <span class="line-through text-sm text-gray-400">
+                                                <%= formatVNCurrency(size.giaKichCo) %>
+                                            </span>
+                                            <span class="text-primary font-bold">
+                                                <%= formatVNCurrency(finalPrice) %>
+                                            </span>
+                                            
+                                        <% } else { %>
+                                            <span>
+                                                <%= formatVNCurrency(size.giaKichCo) %>
+                                            </span>
+                                        <% } %>
                                 </button>
                             <% }) 
                         } %>
@@ -219,8 +256,6 @@
                     body: JSON.stringify(body)
                 });
                 const data = await response.json();
-                console.log("data: ", data);
-                console.log("response: ", response);
 
                 if (response.ok) {
                     // Reset quantity to 1
