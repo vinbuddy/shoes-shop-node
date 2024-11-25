@@ -4,7 +4,6 @@ import env from "dotenv";
 
 import KhachHangModel from "../models/khachHang.model.js";
 import NguoiDungModel from "../models/nguoidung.model.js";
-import VaiTroModel from "../models/vaiTro.model.js";
 import { getRedis } from "../utils/redis.js";
 import { sendEmail } from "../utils/mail.js";
 import { syncCartItemsAfterLogin } from "./cart.controller.js";
@@ -412,7 +411,7 @@ export async function adminLoginHandler(req, res) {
             }
         });
         
-        return res.redirect("/admin/create-goods-receipt");
+        return res.redirect("/admin/goods-receipt-list");
     } catch (error) {
         return res.render("admin/auth/login", {
             ...VIEW_OPTIONS.LOGIN,
