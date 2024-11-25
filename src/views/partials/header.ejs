@@ -151,11 +151,41 @@
                  
                 <button
                     id="search-btn"
-                    class="hidden rounded-full px-3 py-1 text-sm bg-primary text-white focus:outline-none focus:ring"
+                    class="hidden btn-circle btn btn-sm focus:outline-none focus:ring"
                 >
-                    <i class="bx bx-search relative top-[1px]"></i>
-                    <span>Tìm</span>
+                    <i id="close-icon" class='bx bx-x relative top-[1px]'></i>
                 </button>
+
+                <!-- Search result -->
+                <ul id="search-result" class="absolute hidden top-full right-0 w-full border bg-white max-h-[340px] overflow-y-auto scrollbar rounded-xl shadow-lg py-3">
+                    <li class="mb-3 last:mb-0">
+                        <a href="" class="group flex items-center gap-2 px-3 mb-3 last:mb-0">
+                            <img class="w-10 h-10 rounded-xl object-contain border" src="https://images.stockx.com/360/Air-Jordan-1-Retro-High-Travis-Scott/Images/Air-Jordan-1-Retro-High-Travis-Scott/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1635191289&h=384&fm=avif&q=57" alt="">
+                            <h3 class="flex-1 text-sm truncate max-w-full group-hover:text-primary">
+                                Air Jordan 1 Retro High Travis Scott
+                            </h3>
+                        </a>
+                       
+                    </li>
+                    <li class="mb-3 last:mb-0">
+                        <a href="" class="group flex items-center gap-2 px-3 mb-3 last:mb-0">
+                            <img class="w-10 h-10 rounded-xl object-contain border" src="https://images.stockx.com/360/Air-Jordan-1-Retro-High-Travis-Scott/Images/Air-Jordan-1-Retro-High-Travis-Scott/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1635191289&h=384&fm=avif&q=57" alt="">
+                            <h3 class="flex-1 text-sm truncate max-w-full group-hover:text-primary">
+                                Air Jordan 1 Retro High Travis Scott
+                            </h3>
+                        </a>
+                       
+                    </li>
+                    <li class="mb-3 last:mb-0">
+                        <a href="" class="group flex items-center gap-2 px-3">
+                            <img class="w-10 h-10 rounded-xl object-contain border" src="https://images.stockx.com/360/Air-Jordan-1-Retro-High-Travis-Scott/Images/Air-Jordan-1-Retro-High-Travis-Scott/Lv2/img01.jpg?auto=compress&w=576&dpr=1&updated_at=1635191289&h=384&fm=avif&q=57" alt="">
+                            <h3 class="flex-1 text-sm truncate max-w-full group-hover:text-primary">
+                                Air Jordan 1 Retro High Travis Scott
+                            </h3>
+                        </a>
+                       
+                    </li>
+                </ul>
                 
             </div>
         </div>
@@ -187,5 +217,97 @@
             cartBadge.innerText = totalItems;
         }
         
+    })
+</script>
+
+<!-- Search -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("search-input");
+        const searchResults = document.getElementById("search-result");
+        const searchIcon = document.getElementById("search-icon");
+        const closeIcon = document.getElementById("close-icon");
+
+
+        searchIcon.addEventListener("click", () => {
+            // Nếu search result đang hiển thị thì ẩn đi
+            if (!searchResults.classList.contains("hidden")) {
+                searchResults.classList.add("hidden");
+            }
+        });
+
+        // Hàm debounce
+        function debounce(func, delay) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        // Hàm fetch dữ liệu tìm kiếm
+        async function fetchSearchResults(query) {
+            if (!query.trim()) {
+                searchResults.innerHTML = ""; // Xóa kết quả khi input rỗng
+                searchResults.classList.add("hidden");
+                return;
+            }
+
+            // Hiển thị loader
+            closeIcon.classList.remove("bx-x");
+            closeIcon.classList.add("bx-loader-alt", "animate-spin");
+
+            try {
+                const response = await fetch(`/product/api/search?search=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error("Lỗi khi lấy kết quả tìm kiếm!");
+
+                const results = await response.json();
+                displayResults(results);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                // Ẩn loader
+                closeIcon.classList.remove("bx-loader-alt", "animate-spin");
+                closeIcon.classList.add("bx-x");
+            }
+        }
+
+        // Hàm hiển thị kết quả tìm kiếm
+        function displayResults(data) {
+            searchResults.innerHTML = ""; // Xóa kết quả cũ
+            searchResults.classList.remove("hidden");
+            const results = data?.products;
+
+            if (results.length === 0) {
+                searchResults.innerHTML = `<li class="px-3 py-2 text-gray-500 text-center">Không tìm thấy sản phẩm nào</li>`;
+                return;
+            }
+
+            results.forEach((item) => {
+                const resultItem = document.createElement("li");
+                resultItem.classList.add("mb-3", "last:mb-0");
+
+                resultItem.innerHTML = `
+                    <a href="/product/${item.maSanPham}" class="group flex items-center gap-2 px-3">
+                        <img class="w-10 h-10 rounded-xl object-contain border" src="${item.hinhAnhDaiDien || '/images/no-result.png'}" alt="${item.tenSanPham}">
+                        <h3 class="flex-1 text-sm truncate max-w-full group-hover:text-primary">
+                            ${item.tenSanPham}
+                        </h3>
+                    </a>
+                `;
+
+                searchResults.appendChild(resultItem);
+            });
+        }
+
+        // Lắng nghe sự kiện nhập liệu, sử dụng debounce
+        searchInput.addEventListener(
+            "input",
+            debounce((event) => {
+                const query = event.target.value;
+                fetchSearchResults(query);
+            }, 500)
+        );
+
     })
 </script>
