@@ -1,7 +1,7 @@
 <h1 class="text-2xl font-bold mb-4">Chi tiết phiếu nhập</h1>
 
 <!-- Thông tin phiếu nhập -->
-<div class="mb-6 grid grid-cols-2 gap-4">
+<div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
         <p class="text-sm text-gray-600">Mã phiếu:</p>
         <p id="goods-receipt-id" class="font-medium text-lg text-blue-600"><%- details.maPhieuNhap %></p>
@@ -59,7 +59,7 @@
                         <% }) %>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <button data-product-id="<%- item.maSanPham.maSanPham %>" class="showDetailsProduct bg-primary text-white py-2 px-4 rounded-full font-semibold">Chi Tiết Size</button>
+                        <button data-product-id="<%- item.maSanPham.maSanPham %>" class="w-full showDetailsProduct bg-primary text-white py-2 px-4 rounded-full md:font-semibold">Chi Tiết Size</button>
                     </td>
                 </tr>
             <% }) %>
