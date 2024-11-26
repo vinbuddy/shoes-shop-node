@@ -11,6 +11,7 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import checkoutRoutes from "./checkout.route.js";
 import orderRoutes from "./order.route.js";
+import reportRoutes from "./report.route.js";
 const router = express.Router();
 
 router.use("/", homeRoutes);
@@ -24,4 +25,5 @@ router.use("/brand", brandRoutes);
 router.use("/supplier", supplierRoutes);
 router.use("/checkout", checkoutRoutes);
 router.use("/order", orderRoutes);
+router.use("/report", reportRoutes);
 export default router;

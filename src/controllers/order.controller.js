@@ -140,3 +140,112 @@ export const updateOrderStatus = async (req, res) => {
 
     return res.redirect("/admin/order/detail/" + orderId);
 };
+
+// API
+const getOrdersAndRevenue = async (filterCondition) => {
+    try {
+        const orders = await DonHangModel.find(filterCondition)
+        .populate("maKhachHang")
+        .populate("trangThaiDonHang.maTrangThai")
+        .populate("chiTietDonHang.maSanPham")
+        .populate("chiTietDonHang.maKichCoSanPham")
+        .exec();
+
+        const revenue = await DonHangModel.aggregate([
+            {
+                //Lọc các đơn hàng theo điều kiện truyền vào
+                $match: filterCondition
+            },
+            {
+                // Nhóm theo ngày đặt hàng và tính tổng tiền
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$ngayDatHang" } },
+                    totalAmount: { $sum: "$tongTienThanhToan" }
+                }
+                },
+            {
+                // Định dạng lại kết quả
+                $project: {
+                    _id: 0,
+                    date: "$_id",
+                    totalAmount: 1
+                }
+            },
+        ]);
+
+        return { orders, revenue };
+    } catch (error) {
+        console.error('Lỗi tìm nạp dữ liệu:', error);
+        throw new Error('Không thể tìm nạp đơn đặt hàng và doanh thu.');
+    }
+}
+export async function apiGetOrder(req, res) {
+    const {
+        timeType,
+    } = req.params;
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+    const status = await TrangThaiModel.findOne({tenTrangThai: 'Chờ xác nhận'}).exec(); //Hoàn thành
+    let filterCondition = {}
+
+    if (timeType === 'day') {
+        filterCondition = {
+            ngayDatHang: {
+                $gte: new Date(year, month - 1, 1),
+                $lt: new Date(year, month, 1)
+            },
+            "trangThaiDonHang": {
+                $elemMatch: {
+                    "maTrangThai": status.maTrangThai
+                }
+            }
+        };
+    }
+    else if (timeType === 'week') {
+        
+    }
+    else if (timeType === 'month') {
+        const startDate = new Date(year, 0, 1);
+        const endDate = new Date(year + 1, 0, 1); 
+
+        filterCondition = {
+            ngayDatHang: {
+                $gte: startDate, 
+                $lt: endDate
+            },
+            "trangThaiDonHang": {
+                $elemMatch: {
+                    "maTrangThai": status.maTrangThai
+                }
+            }
+        };
+    }
+    else {
+        // Year
+        const startDate = new Date(new Date().getFullYear() - 10, 0, 1); // Ngày đầu năm 10 năm trước
+        const endDate = new Date(new Date().getFullYear() + 1, 0, 1); // Ngày đầu năm kế tiếp (lấy hết năm hiện tại)
+
+        filterCondition = {
+            ngayDatHang: {
+                $gte: startDate, 
+                $lt: endDate
+            },
+            "trangThaiDonHang": {
+                $elemMatch: {
+                    "maTrangThai": status.maTrangThai
+                }
+            }
+        };
+    }
+    
+    const result = await getOrdersAndRevenue(filterCondition);
+    
+    if (result) {
+        return res.json({
+            revenue: result.revenue,
+            orders: result.orders
+        });
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy đơn hàng nào' });
+    }
+}
