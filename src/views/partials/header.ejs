@@ -7,10 +7,10 @@
             </a>
     
             <ul class="flex items-center justify-between h-16 [&_li]:cursor-pointer">
-                <li class="rounded-full px-3 text-black bg-[#E4E4E7]">
+                <li class="rounded-full px-3 text-black <%= locals.currentPath === '/' ? 'bg-[#E4E4E7]' : '' %>">
                     <a href="/">Trang chủ</a>
                 </li>
-                <li class="rounded-full px-3 text-black">
+                <li class="rounded-full px-3 text-black <%= locals.currentPath.includes('/product') ? 'bg-[#E4E4E7]' : '' %>">
                     <a href="/product">Sản phẩm</a>
                 </li>
                 <li class="px-3 text-black group">
@@ -96,7 +96,7 @@
 					  </div>
 					</div>
 				  </li>
-                <li><a href="#" class="hover:text-gray-800 px-3 text-black">Về chúng tôi</a></li>
+                <li><a href="#" class="hover:text-gray-800 px-3 text-black  <%= locals.currentPath.includes('/about') ? 'bg-[#E4E4E7]' : '' %>">Về chúng tôi</a></li>
                 <li><a href="#" class="hover:text-gray-800 px-3 text-black">Liên hệ</a></li>
             </ul>
     

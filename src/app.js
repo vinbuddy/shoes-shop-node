@@ -87,6 +87,9 @@ const initializeSession = (redisClient) => {
             res.locals.brandsHeader = _brands;
             res.locals.featuredProductsHeader = _featuredProducts;
             res.locals.formatVNCurrencyHeader = formatVNCurrency;
+
+            // pass current path
+            res.locals.currentPath = req.path;
             next();
         });
 
