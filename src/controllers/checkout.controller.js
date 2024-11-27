@@ -224,7 +224,7 @@ export async function checkoutHandler(req, res) {
             maNguoiTao: null,
             chiTietDonHang: orderDetailItems,
             thongTinGiaoHang: {
-                phiVanChuyen: shippingFee,
+                phiVanChuyen: Number(shippingFee),
                 diaChiGiaoHang: fullAddress,
                 tenNguoiNhan: receiverName,
                 soDienThoaiNguoiNhan: phoneNumber,
@@ -233,7 +233,7 @@ export async function checkoutHandler(req, res) {
                 phuongThucThanhToan: paymentMethod,
                 trangThaiThanhToan: "Đang chờ",
             },
-            tongTienThanhToan: totalOrderPrice,
+            tongTienThanhToan: Number(totalOrderPrice) + Number(shippingFee),
             trangThaiDonHang: [
                 {
                     maTrangThai: firstTrangThai.maTrangThai,
@@ -273,11 +273,11 @@ export async function checkoutHandler(req, res) {
                 return res.redirect(url);
             }
             default: {
-                // Insert tempOrder to db
-                await DonHangModel.create({
-                    ...tempOrder,
+                // Update trạng thái đơn hàng
+                await DonHangModel.findByIdAndUpdate(newOrder._id, {
+                    maDonHang: newOrder._id,
                     thongTinThanhToan: {
-                        ...tempOrder.thongTinThanhToan,
+                        ...newOrder.thongTinThanhToan,
                         trangThaiThanhToan: "Hoàn thành",
                     },
                 });
@@ -308,19 +308,9 @@ export async function checkoutHandler(req, res) {
                     })
                 );
 
-                // Clear tempOrder from session
-                req.session.tempOrder = null;
-                req.session.selectedItems = null;
-
-                req.session.save((err) => {
-                    if (err) {
-                        throw new Error("Không thể lưu session.");
-                    }
-                });
-
                 return res.render("checkout/result", {
                     ...VIEW_OPTIONS.CHECKOUT_RESULT,
-                    order: tempOrder,
+                    order: newOrder,
                 });
             }
         }
@@ -342,9 +332,18 @@ export async function renderCheckoutResultPage(req, res) {
     try {
         const statusCode = req.query?.vnp_ResponseCode?.toString() || req.query?.resultCode?.toString();
         const tempOrder = req.session.tempOrder;
+        console.log("tempOrder: ", tempOrder);
 
         if (!tempOrder) {
             throw new Error("Không tìm thấy đơn hàng.");
+        }
+
+        // Kiểm tra phuong thức thanh toán
+        if (tempOrder.thongTinThanhToan.phuongThucThanhToan === "Tiền mặt") {
+            return res.render("checkout/result", {
+                ...VIEW_OPTIONS.CHECKOUT_RESULT,
+                order: tempOrder,
+            });
         }
 
         if (statusCode !== "00" && statusCode !== "0") {
