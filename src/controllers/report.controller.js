@@ -4,9 +4,18 @@ export async function renderRevenueReportPage(req, res, next) {
     return res.render("admin/report/revenueReport", {
         layout: "./layouts/admin",
         page: "revenueReport",
-        title: "Báo cáo doanh thu",
+        title: "Thống kê doanh thu",
         user: user,
     });
 }
 
-//API
+export async function renderExpenditureReportPage(req, res, next) {
+    const user = req.session.user;
+
+    return res.render("admin/report/expenditureReport", {
+        layout: "./layouts/admin",
+        page: "expenditureReport",
+        title: "Thống Kê Chi Tiêu",
+        user: user,
+    });
+}

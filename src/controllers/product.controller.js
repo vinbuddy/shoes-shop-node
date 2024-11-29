@@ -9,8 +9,6 @@ import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
 import env from "dotenv";
-import PhieuNhapModel from "../models/phieuNhap.js";
-import SanPhamModel from "../models/sanPham.model.js";
 
 env.config();
 
@@ -459,14 +457,14 @@ export async function renderAdminGoodsReceiptList(req, res, next) {
         }
 
         const user = req.session.user;
-        const product = await SanPhamModel.findOne({tenSanPham : productName});
+        const product = await ProductModel.findOne({tenSanPham : productName});
         if (product) {
             filter = {
                 productId: {'chiTiet.maSanPham': product.id}
             }
         }
 
-        const phieuNhap = await PhieuNhapModel.find(filter)
+        const phieuNhap = await GoodsReceiptModel.find(filter)
                         .skip(skip)
                         .limit(itemsPerPage)
                         .populate("nhaCungCap")
@@ -499,7 +497,7 @@ export async function renderAdminGoodsReceiptDetails(req, res, next) {
         const user = req.session.user;
         const { id } = req.params;
 
-        const details = await PhieuNhapModel.findOne({maPhieuNhap: id})
+        const details = await GoodsReceiptModel.findOne({maPhieuNhap: id})
                         .populate("nhaCungCap")
                         .populate("chiTiet.maSanPham")
                         .populate("chiTiet.danhSachKichCo.maKichCo")
@@ -644,7 +642,7 @@ export async function updateSizeList(req, res) {
 // [GET] /api/product/
 export async function getProductReceiptByProductId(req, res) {
     const productId = req.params.id;
-    const product = await PhieuNhapModel.find({'chiTiet.maSanPham': productId})
+    const product = await GoodsReceiptModel.find({'chiTiet.maSanPham': productId})
                         .populate("chiTiet.maSanPham")
                         .populate("chiTiet.danhSachKichCo.maKichCo")
                         .exec();
@@ -653,5 +651,109 @@ export async function getProductReceiptByProductId(req, res) {
         return res.json(product);
     } else {
         return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+    }
+}
+
+const getDetailsAndExpenditure = async (filterCondition) => {
+    try {
+        const goodsReceipts = await GoodsReceiptModel.find(filterCondition)
+            .populate('chiTiet.maSanPham')
+            .exec();
+
+        const expenditure = await GoodsReceiptModel.aggregate([
+            {
+                // Tách chi tiết từng sản phẩm
+                $unwind: "$chiTiet"
+            },
+            {
+                // Tách danh sách kích cỡ
+                $unwind: "$chiTiet.danhSachKichCo"
+            },
+            {
+                // Tính tổng chi phí cho từng kích cỡ
+                $addFields: {
+                    expenditureForSize: {
+                        $multiply: [
+                            "$chiTiet.danhSachKichCo.soLuongKichCo",
+                            "$chiTiet.danhSachKichCo.giaKichCo"
+                        ]
+                    }
+                }
+            },
+            {
+                // Nhóm theo ngày nhập và tính tổng chi tiêu
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$ngayNhap" } },
+                    totalAmount: { $sum: "$expenditureForSize" } // Tổng chi phí
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: "$_id",
+                    totalAmount: 1
+                }
+            },
+            {
+                $sort: { date: 1 }
+            }
+        ]);
+
+        return { goodsReceipts, expenditure };
+    } catch (error) {
+        console.error('Lỗi tìm nạp dữ liệu:', error);
+        throw new Error('Không thể tìm nạp phiếu nhập.');
+    }
+}
+// Get All Goods Receipts
+// [GET] /product/api/get-goods-receipts
+export async function apiGetGoodsReceipts(req, res) {
+    const {filterTime} = req.params;
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+    
+    let filterCondition = {}
+
+    if (filterTime === 'day') {
+        filterCondition = {
+            ngayNhap: {
+                $gte: new Date(year, month - 1, 1),
+                $lt: new Date(year, month, 1)
+            },
+        };
+    }
+    else if (filterTime === 'month') {
+        const startDate = new Date(year, 0, 1);
+        const endDate = new Date(year + 1, 0, 1); 
+
+        filterCondition = {
+            ngayNhap: {
+                $gte: startDate, 
+                $lt: endDate
+            },
+        };
+    }
+    else {
+        // Year
+        const startDate = new Date(new Date().getFullYear() - 10, 0, 1); // Ngày đầu năm 10 năm trước
+        const endDate = new Date(new Date().getFullYear() + 1, 0, 1); // Ngày đầu năm kế tiếp (lấy hết năm hiện tại)
+
+        filterCondition = {
+            ngayNhap: {
+                $gte: startDate, 
+                $lt: endDate
+            },
+        };
+    }
+    
+    const result = await getDetailsAndExpenditure(filterCondition);
+    
+    if (result) {
+        return res.json({
+            expenditure: result.expenditure,
+            goodsReceipts: result.goodsReceipts
+        });
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy đơn hàng nào' });
     }
 }

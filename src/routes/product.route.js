@@ -8,6 +8,7 @@ import {
     getSizeById,
     updateSizeList,
     getProductReceiptByProductId,
+    apiGetGoodsReceipts,
 } from "../controllers/product.controller.js";
 
 const router = express.Router();
@@ -17,9 +18,10 @@ router.get("/:id", renderProductDetailPage);
 
 router.post("/api/create-goods-receipt", createGoodsReceipt);
 router.get("/api/getAllProduct/", getAllProduct);
-router.get("/api/:id", getProductById);
+router.get("/api/get-goods-receipts/:filterTime", apiGetGoodsReceipts)
 router.get("/api/get-product-receipt-by-prod-id/:id", getProductReceiptByProductId);
-router.get("/api/product-size/:id", getSizeById);
 router.post("/api/update-sizes/:id", updateSizeList);
+router.get("/api/product-size/:id", getSizeById);
+router.get("/api/:id", getProductById);
 
 export default router;
