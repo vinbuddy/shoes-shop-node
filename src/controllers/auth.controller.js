@@ -410,7 +410,7 @@ export async function adminLoginHandler(req, res) {
             }
         });
 
-        return res.redirect("/admin/goods-receipt-list");
+        return res.redirect("/admin/profile");
     } catch (error) {
         return res.render("admin/auth/login", {
             ...VIEW_OPTIONS.LOGIN,

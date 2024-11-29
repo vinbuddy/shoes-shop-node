@@ -1,0 +1,375 @@
+<div class="grid grid-cols-12 gap-10">
+    <div class="col-span-8">
+        <div class="flex items-center justify-between gap-5 mb-10">
+            <h3 class="text-xl font-bold">Bán hàng</h3>
+    
+            <form id="search-form" class="input input-bordered flex items-center gap-2 rounded-full">
+                <input type="search" class="grow" placeholder="Tìm kiếm sản phẩm" name="search" value="<%= filters && filters.name ? filters.name : "" %>" />
+                <button class="btn btn-sm rounded-full">Tìm kiếm</button>
+            </form>  
+        </div>
+        <div class="grid grid-cols-12 gap-10">
+            <!-- Sidebar filter -->
+            <section class="col-span-3">
+                <div class="sticky top-[20px]">
+                    <form id="filter-form" action="/admin/sale" method="get">
+                        <div>
+                            <input hidden type="text" name="name" value="<%= filters && filters.name ? filters.name : "" %>" />
+                        </div>
+                       
+                        <div id="filter-inputs" class="join join-vertical w-full">
+                            <!-- Category -->
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="categoryAccordion" checked="checked"/>
+                                <div class="collapse-title text-base font-medium">Danh mục</div>
+                                <div class="collapse-content">
+                                    <ul>
+                                        <% if (categories && categories.length > 0) { %>
+                                            <% categories.forEach(category => { %>
+                                                <li class="flex items-center gap-2 mb-3">
+                                                    <input type="checkbox" 
+                                                        id="category-<%= category.maDanhMuc %>" 
+                                                        name="category[]" 
+                                                        value="<%= category._id %>" 
+                                                        class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                                        <% if (filters.category && filters.category.includes(category._id.toString())) { %> 
+                                                           checked <% } %> 
+                                                     />
+                                                    <label class="cursor-pointer" for="category-<%= category.maDanhMuc %>">
+                                                        <%= category.tenDanhMuc %>
+                                                    </label>
+                                                </li>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <li class="mb-3">Không có danh mục nào.</li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="brandAccordion" <%= filters?.brandAccordion === "on" ? "checked" : "" %> />
+                                <div class="collapse-title text-base font-medium">Hãng</div>
+                                <div class="collapse-content">
+                                    <ul>
+                                        <% if (brands && brands.length > 0) { %>
+                                            <% brands.forEach(brand => { %>
+                                                <li class="flex items-center gap-2 mb-3">
+                                                    <input type="checkbox" 
+                                                        id="brand-<%= brand.maHangSanXuat %>" 
+                                                        name="brand[]" 
+                                                        value="<%= brand._id %>" 
+                                                        class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                                           <% if (filters.brand && filters.brand.includes(brand._id.toString())) { %> 
+                                                           checked <% } %> />
+                                                    <label class="cursor-pointer" for="brand-<%= brand.maHangSanXuat %>">
+                                                        <%= brand.tenHangSanXuat %>
+                                                    </label>
+                                                </li>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <li class="mb-3">Không có hãng nào.</li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="sizeAccordion" <%= filters?.sizeAccordion === "on" ? "checked" : "" %> />
+                                <div class="collapse-title text-base font-medium">Kích cỡ</div>
+                                <div class="collapse-content">
+                                    <ul class="flex flex-wrap gap-5">
+                                        <% if (sizes && sizes.length > 0) { %>
+                                            <% sizes.forEach(size => { %>
+                                                <li class="flex items-center gap-2">
+                                                    <input type="checkbox" 
+                                                        id="size-<%= size.maKichCo %>" 
+                                                        name="size[]" 
+                                                        value="<%= size._id %>" 
+                                                        class="checkbox checkbox-sm [--chkbg:#0578f8]"
+                                                        <% if (filters.size && filters.size.includes(size._id.toString())) { %> 
+                                                        checked <% } %>/>
+                                                    <label class="cursor-pointer" for="size-<%= size.maKichCo %>">
+                                                        <%= size.tenKichCo %>
+                                                    </label>
+                                                </li>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <li>Không có kích cỡ nào.</li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="priceAccordion" <%= filters?.priceAccordion === "on" ? "checked" : "" %> />
+                                <div class="collapse-title text-base font-medium">Giá</div>
+                                <div class="collapse-content">
+                                    <div class="flex flex-col items-center justify-between gap-4">
+                                        <input
+                                            id="price-from"
+                                            type="text"
+                                            placeholder="Từ"
+                                            class="input input-bordered w-full input-sm"
+                                        />
+                                        <input type="text" hidden name="minPrice" value="<%= filters.minPrice %>">
+                                        <input type="text" hidden name="maxPrice" value="<%= filters.maxPrice %>">
+        
+                                        <input
+                                            id="price-to"
+                                            type="text"
+                                            placeholder="Đến"
+                                            class="input input-bordered w-full input-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                            <i class="bx bx-filter-alt"></i>
+                            &nbsp; Lọc
+                        </button>
+                        <a href="/admin/product" class="btn rounded-xl w-full mt-4">
+                            Hủy lọc
+                        </a>
+                    </form>
+                </div>
+            </section>
+    
+            <!-- Products -->
+            <section class="col-span-9">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                    <% if (products && products.length > 0) { %>
+                        <% products.forEach(product => { %>
+    
+                            <% 
+                                // Lấy khuyến mãi áp dụng cho sản phẩm
+                                const applicablePromotions = promotions.filter(promo =>
+                                    promo.danhSachSanPhamApDung.some(
+                                        productId => productId.toString() === product.maSanPham.toString()
+                                    )
+                                );
+    
+                                // Lấy giá trị giảm cao nhất
+                                const maxDiscount = applicablePromotions.length > 0 
+                                    ? Math.max(...applicablePromotions.map(promo => promo.giaTriKhuyenMai)) 
+                                    : 0;
+    
+                                // Tính giá sau khuyến mãi (nếu có)
+                                const finalPrice = product.danhSachKichCo[0]?.giaKichCo 
+                                    ? product.danhSachKichCo[0].giaKichCo * (1 - maxDiscount / 100) 
+                                    : null;
+                            %>
+    
+                            <a href="/product/<%= product.maSanPham %>" class="group">
+                                <div
+                                    class="relative aspect-h-1 aspect-w-1 w-full min-h-[180px] max-h-[180px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7 border hover:border-primary"
+                                >
+                                    <img
+                                        src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
+                                        alt="<%= product.tenSanPham %>"
+                                        class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                    />
+    
+                                    <% if (maxDiscount > 0) { %>
+                                        <label class="absolute top-3 right-3 badge badge-error text-white">
+                                            Giảm <%= maxDiscount %>%
+                                        </label>
+                                    <% } %>
+                                </div>
+                                <h3 class="mt-4 text-sm text-gray-700"><%= product.tenSanPham %></h3>
+                                
+                                <% if (maxDiscount > 0) { %>
+                                    
+                                   <div class="flex items-center gap-2">
+                                        <p class="mt-1 text-lg font-medium text-primary">
+                                            <%= formatVNCurrency(finalPrice || 0) %>
+                                        </p>
+                                        <p class="mt-1 text-gray-700 line-through">
+                                            <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                        </p>
+    
+                                    </div>
+                                <% } else { %>
+                                    <p class="mt-1 text-lg font-medium text-gray-900">
+                                        <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                    </p>
+                                <% } %>
+                            </a>
+                        <% }) %>
+                    <% } %>
+                    
+                    
+                </div>
+    
+                <% if (products.length === 0) { %>
+                    <div class="flex justify-center">
+                        <div>
+                            <img class="size-40" src="/images/no-result.png" alt="">
+                            <p>Không có sản phẩm nào.</p>
+                        </div>
+                    </div>
+                <% } %>
+    
+                <!-- Pagination -->
+                 <% if (totalPages > 1) { %>
+                    <nav class="mt-10 flex justify-center">
+                        <ul class="list-style-none flex">
+                            <li>
+                                <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                                
+                                <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                                    class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                                    Trang trước
+                                 </a>
+                            </li>
+                            
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                                   class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+                           
+                            <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                            <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                                class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                                 Trang sau
+                             </a>
+                        </ul>
+                    </nav>
+                <% } %>
+            </section>
+        </div>
+    </div>
+    <section class="col-span-4">
+        <div class="rounded-xl p-4 border sticky top-[20px]">
+            <h3 class="font-medium text-lg mb-5">
+                Các sản phẩm đã chọn
+            </h3>
+
+            <ul>
+                <li class="flex items-center gap-3 mb-3 last:mb-0">
+                    <img class="size-14 rounded-xl object-cover border" src="https://res.cloudinary.com/dnxbiidd0/image/upload/v1729331833/thumbnails/nld1a3zsox7yleh1dwoa.webp" alt="">
+                    <div class="flex-1">
+                        <p class="truncate">Tên sản phẩm</p>
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm">
+                                <span>x1</span>
+                                &nbsp;
+                                -
+                                &nbsp;
+                                <span>2.700.000 đ</span>
+                            </p>
+                            <!-- delete icon -->
+                            <button class="btn btn-sm btn-circle btn-ghost">
+                                <i class="bx bx-trash text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                   
+                </li>
+            </ul>
+
+            <h3 class="font-medium text-lg mt-10 mb-5">
+                Thanh toán
+            </h3>
+
+            <div>
+                <div class="flex items-center py-2 justify-between mb-3">
+                    <p class="text-sm">Số sản phẩm</p>
+                    <p class="text-sm">1</p>
+                </div>
+                <div class="flex items-center py-2 justify-between mb-3 border-b border-dashed">
+                    <p class="text-sm">Tổng cộng</p>
+                    <p class="text-sm">2.700.000 đ</p>
+                </div>
+                <div class="flex items-center py-2 justify-between mb-3">
+                    <p class="text-sm">Tổng thanh toán</p>
+                    <p class="text-sm">2.700.000 đ</p>
+                </div>
+
+                <button type="submit" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                   Thanh toán
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const priceFromInput = document.getElementById('price-from');
+        const priceToInput = document.getElementById('price-to');
+        const minPriceInput = document.querySelector('input[name="minPrice"]');
+        const maxPriceInput = document.querySelector('input[name="maxPrice"]');
+
+        const categoryInput = document.querySelector('input[name="category"]');
+        const brandInput = document.querySelector('input[name="brand"]');
+        const sizeInput = document.querySelector('input[name="size"]');
+
+        const productNameInput = document.querySelector('input[name="name"]');
+        const searchInput = document.querySelector('input[name="search"]');
+
+        const filterForm = document.getElementById('filter-form');
+        const searchForm = document.getElementById('search-form');
+
+        searchInput.addEventListener('change', function() {
+            productNameInput.value = searchInput.value.trim();
+        });
+
+        searchInput.addEventListener("search", function() {
+            if (this.value.trim() === "") {
+                productNameInput.value = "";
+                searchForm.submit();
+            }
+        });
+
+
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterForm.submit();
+        });
+
+        // Price input range
+
+        function formatVNCurrency() {
+            let value = this.value.replace(/[^0-9]/g, '');
+            const numericValue = Number(value);
+
+            if (isNaN(numericValue)) {
+                this.value = ''; 
+                minPriceInput.value = ''; 
+                maxPriceInput.value = ''; 
+                return;
+            } 
+
+            this.value = numericValue.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            }).replace('₫', '').trim();
+
+            if (this.id === 'price-from') {
+                minPriceInput.value = numericValue;
+            } else {
+                maxPriceInput.value = numericValue;
+            }
+            
+
+        }
+        
+        priceFromInput.addEventListener('input', formatVNCurrency);
+        priceToInput.addEventListener('input', formatVNCurrency);
+
+        // Render price input 
+        priceFromInput.value = minPriceInput.value ? Number(minPriceInput.value).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim() : '';
+
+        priceToInput.value = maxPriceInput.value ? Number(maxPriceInput.value).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim() : '';
+
+
+    })
+</script>
