@@ -1,4 +1,26 @@
-<div class="tp-main-wrapper bg-gray-100" x-data="{ sideMenu: false }"></div>
+<div class="tp-main-wrapper bg-gray-100" x-data="{ sideMenu: false }">
+    <% if (locals.message && locals.message.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+            <p><%= message %></p>
+        
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-green-600'></i>
+            </button>
+          </div>
+    <% } %>
+
+    <% if (locals.error && locals.error.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+            <p>
+                <%= error %>
+            </p>
+
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-red-600'></i>
+            </button>
+        </div>
+        
+    <% } %>
     <div class="tp-main-content" x-data="{ searchOverlay: false }">
         <div class="body-content px-8 py-8 bg-gray-100">
             <div class="flex justify-between mb-10">
@@ -19,19 +41,23 @@
             <div class="bg-white rounded-md shadow-md py-4">
                 <div class="tp-search-box flex items-center justify-between px-8 py-8 flex-wrap">
                     <div class="search-input relative">
-                        <input class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" type="text" placeholder="Search by order id" />
-                        <button class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500">
+                        <input id="searchOrderId" class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" type="text" placeholder="Mã đơn hàng" />
+                        <button id="searchOrderButton" class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500">
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                 <path d="M18.9999 19L14.6499 14.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                             </svg>
                         </button>
                     </div>
+                    
                     <div class="flex justify-end space-x-6">
+                        <% if (searchStatus !== '') { %>
                         <div class="search-select mr-3 flex items-center space-x-3">
                             <span class="text-sm inline-block leading-none -translate-y-[2px]">Chuyển trạng thái tiếp theo:</span>
                         <button id="nextStatus" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</button>
+                        
                         </div>
+                        <% } %>
                         <div class="search-select mr-3 flex items-center space-x-3">
                             <span class="text-sm inline-block leading-none -translate-y-[2px]">Trạng thái:</span>
                             <select id="selectStatus" class="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -48,13 +74,14 @@
                     <table class="w-full text-sm text-left text-gray-500">
                         <thead class="bg-gray-50">
                             <tr class="border-b border-gray-200 text-xs">
+                                <% if (searchStatus !== '') { %>
                                 <th scope="col" class="py-3 text-xs text-gray-400 uppercase font-semibold w-1/12">
                                     <div class="tp-checkbox -translate-y-[3px]">
                                         <input id="selectAllOrder" type="checkbox" />
                                         <label for="selectAllOrder"></label>
                                     </div>
-                                
                                 </th>
+                                <% } %>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold">Khách hàng</th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Số lượng</th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Tổng tiền</th>
@@ -68,13 +95,14 @@
                         <tbody>
                             <% orders.forEach(order => { %>
                             <tr class="bg-white border-b border-gray-200 last:border-0 text-start mx-9">
+                                <% if (searchStatus !== '') { %>
                                 <td class="pr-3 whitespace-nowrap">
                                     <div class="tp-checkbox">
                                         <input id="order-1" type="checkbox" />
                                         <label for="order-1"></label>
                                     </div>
                                 </td>
-                                
+                                <% } %>
                                 <td class=" hidden pr-8 py-5 whitespace-nowrap">
                                     <p id="orderId" > <%= order.maDonHang%> </p>
                                 </td>
@@ -104,9 +132,6 @@
                                     <% } else { %>
                                     <span class="text-sm text-green-600 px-3 py-1 rounded-md leading-none bg-green-100 font-medium  whitespace-nowrap"> <%=  order.thongTinThanhToan.trangThaiThanhToan %></span>
                                      <% } %>
-
-
-
                                      
                                 </td>
                                 <td class="px-3 py-3 font-normal text-gray-600 text-right"><%= new Date(order.ngayDatHang).toLocaleDateString() %> </td>
@@ -118,10 +143,13 @@
                                     </div>
                                 </td>
                                 <td class="px-9 py-3 text-end">
+                                   
                                     <div class="flex items-center justify-end space-x-2">
+                                        <% if (searchStatus === '') { %>
+                                        <a href="/admin/order/nextStatus/<%= order._id %>" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</a>
+                                        <% } %>
                                         <div class="relative" x-data="{ printTooltip: false }">
                                             <button
-                                            
                                                 class="w-auto px-3 h-10 leading-10 text-xs bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center justify-center"
                                                 x-on:mouseenter="printTooltip = true"
                                                 x-on:mouseleave="printTooltip = false"
@@ -159,6 +187,7 @@
         </div>
     </div>
 </div>
+
 <% if (totalPages > 1) { %>
         <nav class="mt-10 flex justify-center">
             <ul class="list-style-none flex">
@@ -236,4 +265,14 @@
             alert('No orders selected.');
         }
     });
+   
+    document.getElementById('searchOrderButton').addEventListener('click', function() {
+        const keywword = document.getElementById('searchOrderId').value.trim();
+        if (keywword) {
+            window.location.href = `/admin/order/search/${keywword}`;
+        } else {
+            alert('Please enter an order ID.');
+        }
+    });
+                    
 </script>

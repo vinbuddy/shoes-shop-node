@@ -23,6 +23,10 @@ export async function renderUserOrderPage(req, res) {
             path: "chiTietDonHang.maKichCoSanPham",
             select: "tenKichCo",
         })
+        .populate({
+            path: "thongTinDoiTraHang.chiTietDoiTraHang.maSanPham",
+            select: "hinhAnhDaiDien",
+        })
         .exec();
 
     const pendingOrders = [];
@@ -54,9 +58,6 @@ export async function renderUserOrderPage(req, res) {
                 cancelOrders.push(order);
                 break;
             case 5: // yêu cầu trả hàng
-            case 6: // chấp nhận yêu cầu
-            case 7: // trả hàng thành công
-            case 8: // từ chối trả hàng
                 refundOrders.push(order);
                 break;
             default:

@@ -61,6 +61,8 @@ export async function createSupplier(req, res) {
         }
         const newSupplier = new NhaSanXuatModel({ tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi });
         await newSupplier.save();
+        req.flash("message", "Thêm nhà cung cấp thành công");
+
         return res.redirect("/admin/supplier");
     } catch (error) {
         return res.render("admin/supplier/create", {

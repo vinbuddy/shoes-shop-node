@@ -78,21 +78,22 @@ const trangThaiDonHangSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
-const thongTinTraHangSchema = new mongoose.Schema({
-    lyDoTraHang: {
+const thongTinDoiTraHangSchema = new mongoose.Schema({
+    chiTietDoiTraHang: [chiTietDonHangSchema],
+    lyDoDoiTraHang: {
         type: String,
         default: null,
         required: true,
     },
-    motaTraHang: {
+    motaDoiTraHang: {
         type: String,
         default: null,
     },
-    ngayTraHang: {
+    ngayDoiTraHang: {
         type: Date,
         default: null,
     },
-    nhanHangTraLai: {
+    nhanHangDoiTraLai: {
         type: Boolean,
         default: false,
     },
@@ -102,6 +103,24 @@ const thongTinTraHangSchema = new mongoose.Schema({
             default: [],
         },
     ],
+
+    thongTinChuyenKhoan: {
+        type: String,
+        default: null,
+    },
+    trangThaiDoi: {
+        type: Boolean,
+        default: false,
+    },
+    trangThaiTra: {
+        type: Boolean,
+        default: false,
+    },
+    trangThaiDoiTra: {
+        type: String,
+        enum: ["yêu cầu", "từ chối", "chấp nhận", "hoàn thành"],
+        default: "yêu cầu",
+    },
 });
 const donHangSchema = new mongoose.Schema({
     maDonHang: {
@@ -131,7 +150,7 @@ const donHangSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    thongTinTraHang: thongTinTraHangSchema,
+    thongTinDoiTraHang: thongTinDoiTraHangSchema,
 });
 
 const DonHangModel = mongoose.model("DonHang", donHangSchema);

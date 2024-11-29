@@ -89,7 +89,7 @@
                 aria-controls="refunded-orders"
                 aria-selected="false"
                 onclick="switchTab(event, 'refunded-orders')"
-                >Trả hàng</a
+                >Trả/Đổi hàng</a
             >
         </li>
     </ul>
@@ -166,12 +166,17 @@
                                 <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng </button>
                             <%} else { %> 
                             <% if (statusOrder === 2 ) { %>
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','exchange')">Yêu cầu đổi hàng</button>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','return')">Yêu cầu trả hàng</button>
                                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="completedOrder('<%= order._id %>')">Hoàn thành</button>
                             <% } } %>
                             <%  if (statusOrder === 5) { %>
-                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="cancelRefundOrder('<%= order._id %>')">Huỷ yêu cầu trả hàng</button>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="cancelRefundOrder('<%= order._id %>')">Huỷ yêu cầu đổi/trả hàng</button>
+
                                 <% } %>
+                                <%  if (statusOrder === 3) { %>
+                                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+                                    <% } %>
                         </div>          
                     </div>
                 <% }) %>
@@ -200,7 +205,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -319,7 +324,8 @@
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
                             <!-- Cancel Order Button -->
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="refundOrder('<%= order._id %>')">Yêu cầu trả hàng</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','exchange')">Yêu cầu đổi hàng</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','return')">Yêu cầu trả hàng</button>
                             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="completedOrder('<%= order._id %>')">Hoàn thành</button>
                         </div>          
                     </div>
@@ -368,6 +374,8 @@
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+
                             <!-- Cancel Order Button -->
                         </div>          
                     </div>
@@ -432,25 +440,27 @@
                            
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
-                            <% order.chiTietDonHang.forEach(detail => { %>
+                            <%  if( order.thongTinDoiTraHang) { %>
+                                <% order.thongTinDoiTraHang.chiTietDoiTraHang.forEach(detail => { %>
+                                   
                                 <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
-                                    <!-- Hình ảnh sản phẩm -->
-                                    <div class="flex items-center space-x-2">
-                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
-                                        
-                                        <!-- Thông tin sản phẩm -->
-                                        <div>
-                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
-                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
-                                        </div>
+                                <!-- Hình ảnh sản phẩm -->
+                                <div class="flex items-center space-x-2">
+                                    <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                    
+                                    <!-- Thông tin sản phẩm -->
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                        <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
                                     </div>
-                
-                                    <!-- Đơn giá -->
-                                    <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
-                                    </p>
                                 </div>
-                            <% }) %>
+            
+                                <!-- Đơn giá -->
+                                <p class="text-indigo-600 font-semibold text-sm">
+                                    <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                </p>
+                            </div> 
+                                <% })} %>
                         </div>
                         <!-- Thông tin đơn hàng -->
                         <div class="flex justify-between items-center mt-4">
@@ -467,7 +477,7 @@
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-blue-800/80" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
                             <% if(order.statusOrder == 5) { %>
-                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="cancelRefundOrder('<%= order._id %>')">Huỷ yêu cầu trả hàng</button>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="cancelRefundOrder('<%= order._id %>')">Huỷ yêu cầu đổi/trả hàng</button>
                             <% } %>
                             <!-- Cancel Order Button -->
                         </div>          
@@ -510,12 +520,14 @@
         });
     }
 
-    function refundOrder(orderId) {
+    function refundOrder(orderId,type) {
         showModal('Bạn có chắc chắn muốn trả hàng cho đơn hàng này không?', function() {
-            window.location.href = '/order/refundRequest/' + orderId;
+            window.location.href = '/order/refundRequest/' + orderId + '?type='+type;
         });
     }
-    
+    function reviewdOrder(orderId) {
+        window.location.href = '/user/order/review/' + orderId;
+    }
     function cancelRefundOrder(orderId) {
         showModal('Bạn có chắc chắn muốn huỷ trả hàng cho đơn hàng này không?', function() {
             window.location.href = '/order/cancelRefund/' + orderId;

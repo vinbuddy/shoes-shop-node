@@ -13,10 +13,12 @@ import {
     renderAdminOrderPage,
     renderAdminOrderDetailPage,
     updateOrderStatus,
-    nextStatus,
+    nextStatusRequest,
     renderRefundAdminPage,
     fetchRefundOrders,
-    refundStatusHandle,
+    refundStatusRequest,
+    nextStatusHandler,
+    SearchOrders,
 } from "../controllers/order.controller.js";
 import multer from "multer";
 const uploadFile = multer({ storage: multer.memoryStorage() });
@@ -47,8 +49,10 @@ router.get("/order", renderAdminOrderPage);
 
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
-router.post("/order/nextStatus", nextStatus);
-router.post("/order/refundStatus", refundStatusHandle);
+router.post("/order/nextStatus", nextStatusRequest);
+router.get("/order/nextStatus/:id", nextStatusHandler);
+router.post("/order/refundStatus", refundStatusRequest);
 router.get("/order/refund", renderRefundAdminPage);
 router.get("/refund/:tabId", fetchRefundOrders);
+router.get("/order/search/:keyword", SearchOrders);
 export default router;

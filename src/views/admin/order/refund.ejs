@@ -25,7 +25,7 @@
                 aria-controls="request-refund"
                 aria-selected="false"
                 onclick="switchTab(event, 'request-refund')"
-                >Yêu cầu trả hàng</a
+                >Yêu cầu đổi/trả hàng</a
             >
         </li>
         <li class="mr-1">
@@ -38,7 +38,7 @@
                 aria-controls="accept-refund"
                 aria-selected="false"
                 onclick="switchTab(event, 'accept-refund')"
-                >Chấp nhận trả hàng</a
+                >Chấp nhận</a
             >
         </li>
         <li class="mr-1">
@@ -51,7 +51,7 @@
                 aria-controls="deny-refund"
                 aria-selected="false"
                 onclick="switchTab(event, 'deny-refund')"
-                >Từ chối trả hàng
+                >Từ chối
             </a>
         </li>
         <li class="mr-1">
@@ -64,7 +64,7 @@
                 aria-controls="completed-refund"
                 aria-selected="false"
                 onclick="switchTab(event, 'completed-refund')"
-                >Trả hàng thành công</a
+                >Xác nhận thành công</a
             >
         </li>
     </ul>
@@ -172,18 +172,20 @@
         });
     }
     function completedRefund() {
-        showModal("Xác nhận trả hàng thành công không?", function () {});
+        showModal("Xác nhận trả hàng thành công không?", function () {
+            nextStatus("completed");
+        });
     }
 
     function getStatusColor(status) {
         switch (status) {
-            case 5:
+            case "yêu cầu":
                 return "yellow";
-            case 6:
+            case "chấp nhận":
                 return "teal";
-            case 7:
+            case "từ chối":
                 return "red";
-            case 8:
+            case "hoàn thành":
                 return "green";
             default:
                 return "gray";
@@ -225,6 +227,7 @@
                 thead = document.querySelector(` thead`);
                 thead.innerHTML = ``;
                 boxSearch.innerHTML = ``;
+                console.log(data.orders);
                 if (data.orders.length > 0) {
                     boxSearch.innerHTML = `
                 <div class="search-input relative">
@@ -261,9 +264,9 @@
                 `;
                     boxSearch.innerHTML += `
                     <div class="flex items gap-4">
-                        <button   class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-yellow-800/80 rounded ${tabId === "request-refund" ? "" : "hidden"}" onclick="acceptRefund()">Chấp nhận trả hàng </button>
-                        <button  class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-teal-800/80 rounded ${tabId === "request-refund" ? "" : "hidden"}" onclick="denyRefund()">Từ chối trả hàng </button>
-                        <button  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-green-800/80 rounded ${tabId === "accept-refund" ? "" : "hidden"}" onclick="completedRefund()">Trả hàng thành công </button>
+                        <button   class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-yellow-800/80 rounded ${tabId === "request-refund" ? "" : "hidden"}" onclick="acceptRefund()">Chấp nhận </button>
+                        <button  class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-teal-800/80 rounded ${tabId === "request-refund" ? "" : "hidden"}" onclick="denyRefund()">Từ chối </button>
+                        <button  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-green-800/80 rounded ${tabId === "accept-refund" ? "" : "hidden"}" onclick="completedRefund()">Xác nhận thành công </button>
                     </div>
 
                 `;
@@ -279,8 +282,9 @@
                         <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/4 text-right">Lý do trả hàng</th>
                         <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Tổng tiền</th>
                         <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Trạng thái</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Loại</th>
                         <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Thanh toán</th>
-                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/6 text-right">Ngày trả hàng</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Ngày trả hàng</th>
                         <th scope="col" class="px-9 py-3 text-xs text-gray-400 uppercase font-semibold w-1/6 text-right">Hành động</th>
                     </tr>
                 `;
@@ -302,10 +306,17 @@
                     }
                     row.innerHTML += `
                         <td class="px-3 py-3 font-normal">${order.maKhachHang.tenKhachHang}</td>
-                        <td class="px-3 py-3 font-normal text-gray-600 text-right">${order.thongTinTraHang.lyDoTraHang.substring(0, 20)}...</td>
+                        <td class="px-3 py-3 font-normal text-gray-600 text-right">${order.thongTinDoiTraHang.lyDoDoiTraHang.substring(0, 30)}...</td>
                         <td class="px-3 py-3 font-normal text-gray-600 text-right">${order.tongTienThanhToan.toLocaleString("vi-VN")}₫</td>
                         <td class="px-3 py-3 text-right">
-                            <span class="text-sm text-${getStatusColor(order.trangThai)}-600 px-3 py-1 rounded-md leading-none bg-${getStatusColor(order.trangThai)}-50 font-medium whitespace-nowrap">${order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai}</span>
+                            <span class="text-sm text-${getStatusColor(order.thongTinDoiTraHang.trangThaiDoiTra)}-600 px-3 py-1 rounded-md leading-none bg-${getStatusColor(order.trangThai)}-50 font-medium whitespace-nowrap">${order.thongTinDoiTraHang.trangThaiDoiTra}</span>
+                        </td>
+                        <td class="px-3 py-3 text-right">
+                            ${
+                                order.thongTinDoiTraHang.trangThaiTra === true
+                                    ? '<span class="text-sm text-yellow-600 px-3 py-1 rounded-md leading-none bg-yellow-50 font-medium whitespace-nowrap">Trả hàng</span>'
+                                    : '<span class="text-sm text-red-600 px-3 py-1 rounded-md leading-none bg-red-50 font-medium whitespace-nowrap">Đổi hàng</span>'
+                            }
                         </td>
                         <td>
                             <span class="text-sm text-${order.thongTinThanhToan.trangThaiThanhToan === "Đang chờ" ? "yellow" : "green"}-600 px-3 py-1 rounded-md leading-none bg-${order.thongTinThanhToan.trangThaiThanhToan === "Đang chờ" ? "yellow" : "green"}-50 font-medium whitespace-nowrap">${order.thongTinThanhToan.trangThaiThanhToan}</span>
