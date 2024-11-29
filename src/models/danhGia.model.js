@@ -3,37 +3,37 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const danhGiaSchema = new Schema({
-    MaDanhGia: {
+    maDanhGia: {
         type: mongoose.Schema.Types.ObjectId,
         default: () => new mongoose.Types.ObjectId(),
         unique: true,
     },
-    MaSanPham: {
+    maSanPham: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "SanPham",
         required: null,
     },
-    MaDonHang: {
+    maDonHang: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "DonHang",
         default: null,
     },
-    MaKhachHang: {
+    maKhachHang: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "KhachHang",
         default: null,
     },
-    SoDiem: {
+    soDiem: {
         type: Number,
         required: true,
         min: 1,
         max: 5,
     },
-    NoiDungDanhGia: {
+    noiDungDanhGia: {
         type: String,
         default: null,
     },
-    NgayDanhGia: {
+    ngayDanhGia: {
         type: Date,
         default: Date.now,
     },

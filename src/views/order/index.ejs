@@ -175,8 +175,13 @@
 
                                 <% } %>
                                 <%  if (statusOrder === 3) { %>
-                                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+                                    <%  if(order.daDanhgia === true) { %>
+
+                                        <button class="bg-green-700 text-white font-bold py-2 px-4 rounded ">Đã đánh giá</button>
+                                    <% } else { %>
+                                        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
                                     <% } %>
+                                <% } %>
                         </div>          
                     </div>
                 <% }) %>
@@ -374,7 +379,12 @@
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
-                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+                            <%  if(order.daDanhgia === true) { %>
+
+                                <button class="bg-green-700 text-white font-bold py-2 px-4 rounded ">Đã đánh giá</button>
+                            <% } else { %>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+                            <% } %>
 
                             <!-- Cancel Order Button -->
                         </div>          
