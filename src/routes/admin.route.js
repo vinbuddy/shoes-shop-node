@@ -17,6 +17,10 @@ import {
 } from "../controllers/product.controller.js";
 
 import {
+    renderAdminCustomerPage,
+} from "../controllers/customer.controller.js";
+
+import {
     createEmployeeHandler,
     deleteEmployeeHandler,
     editEmployeeHandler,
@@ -50,6 +54,10 @@ import {
     renderAdminEditPromotionPage,
     renderAdminPromotionPage,
 } from "../controllers/promotion.controller.js";
+
+import {
+    searchCustomer,
+} from "../controllers/customer.controller.js"
 
 import multer from "multer";
 
@@ -111,6 +119,9 @@ router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
 
 router.get("/profile", renderAdminProfilePage)
+
+router.get("/customer", renderAdminCustomerPage);
+router.get("/customer/search-customer", searchCustomer)
 
 // Employee
 router.get("/employee", renderAdminEmployeePage);
