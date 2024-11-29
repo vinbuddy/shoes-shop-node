@@ -142,6 +142,7 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 // API
+// [GET] /api/get-all-success-order/month
 const getOrdersAndRevenue = async (filterCondition) => {
     try {
         const orders = await DonHangModel.find(filterCondition)
@@ -185,7 +186,10 @@ export async function apiGetOrder(req, res) {
     } = req.params;
     const year = new Date().getFullYear();
     const month = new Date().getMonth() + 1;
-    const status = await TrangThaiModel.findOne({tenTrangThai: 'Chờ xác nhận'}).exec(); //Hoàn thành
+    
+    const status = await TrangThaiModel.find().exec(); //Hoàn thành
+    const statusCode = status[3].maTrangThai;
+
     let filterCondition = {}
 
     if (timeType === 'day') {
@@ -196,7 +200,7 @@ export async function apiGetOrder(req, res) {
             },
             "trangThaiDonHang": {
                 $elemMatch: {
-                    "maTrangThai": status.maTrangThai
+                    "maTrangThai": statusCode
                 }
             }
         };
@@ -215,7 +219,7 @@ export async function apiGetOrder(req, res) {
             },
             "trangThaiDonHang": {
                 $elemMatch: {
-                    "maTrangThai": status.maTrangThai
+                    "maTrangThai": statusCode
                 }
             }
         };
@@ -232,7 +236,7 @@ export async function apiGetOrder(req, res) {
             },
             "trangThaiDonHang": {
                 $elemMatch: {
-                    "maTrangThai": status.maTrangThai
+                    "maTrangThai": statusCode
                 }
             }
         };
@@ -240,6 +244,39 @@ export async function apiGetOrder(req, res) {
     
     const result = await getOrdersAndRevenue(filterCondition);
     
+    if (result) {
+        return res.json({
+            revenue: result.revenue,
+            orders: result.orders
+        });
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy đơn hàng nào' });
+    }
+}
+
+// [GET] /api/get-orders-today
+export async function apiGetOrdersToday(req, res) {
+    const date = new Date();
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth();
+    const day = new Date().getDate();
+
+    const status = await TrangThaiModel.find().exec(); //Hoàn thành
+    const statusCode = status[3].maTrangThai;
+    let filterCondition = {
+        ngayDatHang: {
+            $gte: new Date(year, month, day), // Lớn hơn hoặc bằng ngày hiện tại
+            // $lt: new Date(year, month, day + 1) // Nhỏ hơn ngày hôm sau 
+        },
+        "trangThaiDonHang": {
+            $elemMatch: {
+                "maTrangThai": statusCode
+            }
+        }
+    };
+
+    const result = await getOrdersAndRevenue(filterCondition);
+
     if (result) {
         return res.json({
             revenue: result.revenue,

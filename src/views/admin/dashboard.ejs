@@ -1,0 +1,76 @@
+<div class="container mx-auto p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b pb-4">
+        <h1 class="text-2xl font-semibold">Bảng điều khiển</h1>
+        <div class="flex items-center">
+            <div class="m-2">
+                <button
+                    id="exportBtn"
+                    class="block px-4 py-2 bg-blue-700 text-white rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                >
+                    <i class="bx bxs-file-export"></i>Xuất báo cáo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tổng Quan Doanh Thu -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Tổng Doanh Thu Trong Ngày</h3>
+            <p id="totalRevenues" class="text-xl font-bold text-green-600">0 VNĐ</p>
+        </div>
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Số Lượng Khách Hàng</h3>
+            <p id="totalCustomers" class="text-xl font-bold text-blue-600">0 khách hàng</p>
+        </div>
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Tổng Số Đơn Hàng Thành Công</h3>
+            <p id="totalOrders" class="text-xl font-bold text-indigo-600">0 đơn hàng</p>
+        </div>
+    </div>
+</div>
+<script defer>
+    // Lấy thông tin đơn hàng thông qua API
+    function loadSuccessOrder() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `/order/api/get-orders-today`,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    resolve(response);
+                },
+                error: function (error) {
+                    reject("Lỗi trong quá trình nhận dữ liệu: " + error);
+                },
+            });
+        });
+    }
+    function loadCustomerList() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `/user/api/get-all-customers`,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    resolve(response);
+                },
+                error: function (error) {
+                    reject("Lỗi trong quá trình nhận dữ liệu: " + error);
+                },
+            });
+        });
+    }
+    (async () => {
+        const successOrders = await loadSuccessOrder();
+        const customers = await loadCustomerList();
+        let sum = 0;
+        successOrders.revenue.forEach(item => {
+            sum += item.totalAmount;
+        });
+        $("#totalRevenues").text(sum.toLocaleString() + " VNĐ");
+        $("#totalOrders").text(successOrders.orders.length + " đơn hàng");
+        $("#totalCustomers").text(customers.customers.length + " khách hàng");
+    })();
+</script>

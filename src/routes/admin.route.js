@@ -1,4 +1,9 @@
 import express from "express";
+
+import {
+    renderAdminDashboard
+} from "../controllers/home.controller.js"
+
 import {
     renderAdminGoodsReceiptDetails,
     renderAdminGoodsReceiptList,
@@ -51,6 +56,8 @@ import multer from "multer";
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
+
+router.get('/dashboard', renderAdminDashboard);
 
 router.get('/goods-receipt-list', renderAdminGoodsReceiptList);
 router.get('/goods-receipt-details/:id', renderAdminGoodsReceiptDetails);

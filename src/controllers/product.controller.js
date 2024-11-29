@@ -653,7 +653,7 @@ export async function getProductReceiptByProductId(req, res) {
         return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
     }
 }
-
+// [GET] /api/get-goods-receipts/month
 const getDetailsAndExpenditure = async (filterCondition) => {
     try {
         const goodsReceipts = await GoodsReceiptModel.find(filterCondition)

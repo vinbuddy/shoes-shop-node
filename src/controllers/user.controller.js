@@ -1,4 +1,5 @@
 import DonHangModel from "../models/donHang.model.js";
+import KhachHangModel from "../models/khachHang.model.js";
 import TrangThaiModel from "../models/trangThai.model.js";
 // import NguoiDungModel from "../models/nguoidung.model.js";
 
@@ -86,4 +87,17 @@ export async function renderAdminProfilePage(req, res) {
         title: "Admin Profile",
         user: user,
     });
+}
+
+//API
+// [GET] /api/get-all-customers
+export async function apiGetAllCustomer(req, res) {
+    const customers = await KhachHangModel.find().exec();
+    if (customers) {
+        return res.json({
+            customers
+        });
+    } else {
+        return res.status(404).json({ error: 'Không tìm thấy khách hàng nào' });
+    }
 }
