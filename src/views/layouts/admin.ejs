@@ -15,13 +15,13 @@
                         class="h-screen flex flex-col justify-between sticky top-0 z-[1] p-5 overflow-y-auto border-r scrollbar"
                     >
                         <div>
-                            <a href="" class="flex items-center gap-4">
+                            <a href="/" class="flex items-center gap-4">
                                 <img class="size-10" src="/images/logo.png" alt="" />
                                 <h1 class="font-bold text-xl text-primary">Shoes Shop</h1>
                             </a>
                             <ul class="mt-5 [&_li]:cursor-pointer">
                                 <li>
-                                    <a class="flex items-center py-4">
+                                    <a href="/" class="flex items-center py-4">
                                         <i class="bx bxs-dashboard"></i>
                                         <span class="ms-2.5"> Trang chủ </span>
                                     </a>
@@ -54,7 +54,7 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="flex items-center py-4">
+                                                    <a href="/admin/goods-receipt-list" class="flex items-center py-4">
                                                         <i class="bx bx-transfer-alt"></i>
                                                         <span class="ms-2.5"> Nhập hàng </span>
                                                     </a>
@@ -102,9 +102,15 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="flex items-center py-4">
+                                    <a href="/admin/employee" class="flex items-center py-4">
                                         <i class="bx bxs-user"></i>
                                         <span class="ms-2.5"> Nhân viên </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/admin/promotion" class="flex items-center py-4">
+                                        <i class="bx bxs-discount"></i>
+                                        <span class="ms-2.5"> Khuyến mãi </span>
                                     </a>
                                 </li>
                             </ul>
@@ -118,10 +124,10 @@
                                     alt=""
                                 />
 
-                                <p class="text-[#a1a1aa] text-sm truncate ms-2">Nhân Viên 1</p>
+                                <p class="text-[#a1a1aa] text-sm truncate ms-2"><%- user.tenNguoiDung %></p>
                             </div>
 
-                            <button class="w-full btn btn-sm btn-error text-white">Đăng xuất</button>
+                            <button onclick="window.location.href = '/admin/auth/admin-logout'" class="w-full btn btn-sm btn-error text-white">Đăng xuất</button>
                         </div>
                     </aside>
                 </section>
@@ -130,6 +136,7 @@
                 </section>
             </div>
         </div>
+        <%- include('../partials/import-script.ejs') %>
         <%- script %>
     </body>
 </html>

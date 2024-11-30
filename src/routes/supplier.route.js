@@ -8,6 +8,7 @@ import {
     renderUpdatePage,
     restoreSupplier,
     searchSupplier,
+    getSupplierById,
 } from "../controllers/supplier.controller.js";
 
 const router = express.Router();
@@ -20,4 +21,6 @@ router.get("/restore/:id", restoreSupplier);
 router.post("/edit/:id", updateSupplier);
 router.post("/create", createSupplier);
 router.get("/search", searchSupplier);
+
+router.get("/api/:id", getSupplierById);
 export default router;

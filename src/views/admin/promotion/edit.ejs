@@ -1,0 +1,316 @@
+<div class="flex justify-between items-center mb-5">
+    <h3 class="text-xl font-bold mb-5">Chỉnh sửa chương trình khuyến mãi</h3>
+</div>
+<form id="create-promotion-form" action="/admin/promotion/edit" method="POST">
+    <input type="hidden" name="maChuongTrinhKhuyenMai" value="<%= promotion.maChuongTrinhKhuyenMai %>">
+    <div class="grid grid-cols-2 gap-5">
+        <div class="form-control mb-5">
+            <label for="tenChuongTrinhKhuyenMai" class="block label label-text">Tên chương trình</label>
+            <input value="<%= promotion.tenChuongTrinhKhuyenMai %>" type="text" name="tenChuongTrinhKhuyenMai" id="tenChuongTrinhKhuyenMai" class="input input-bordered w-full">
+            
+        </div>
+        <div class="form-control mb-5">
+            <label for="giaTriKhuyenMai" class="block label label-text">Giá trị khuyến mãi ( phần trăm )</label>
+            <input value="<%= promotion.giaTriKhuyenMai %>" type="number" name="giaTriKhuyenMai" id="giaTriKhuyenMai" class="input input-bordered w-full">
+        </div>
+    </div>
+    <label class="form-control mb-5">
+        <div class="label">
+            <span class="label-text">Nhập mô tả sản phẩm</span>
+        </div>
+        <textarea name="moTa" id="moTa" class="textarea textarea-bordered h-24"><%= promotion.moTa %></textarea>
+    </label>
+    <div class="grid grid-cols-2 gap-5">
+        <div class="form-control mb-5">
+            <label for="ngayBatDau" class="block label label-text">Ngày bắt đầu</label>
+            <input type="date" name="ngayBatDau" id="ngayBatDau" class="input input-bordered w-full" value="<%= promotion.ngayBatDau %>">
+        </div>
+        <div class="form-control mb-5">
+            <label for="ngayKetThuc" class="block label label-text">Ngày kết thúc</label>
+            <input type="date" name="ngayKetThuc" id="ngayKetThuc" class="input input-bordered w-full" value="<%= promotion.ngayKetThuc %>">
+        </div>
+    </div>
+
+    <!-- Chọn danh sách sản phẩm -->
+    <div class="grid grid-cols-2 gap-5 mt-10">
+        <section class="border rounded-xl p-5">
+            <div class="label mb-5">
+                <span>Chọn các sản phẩm</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <!-- head -->
+                    <thead>
+                        <tr>
+                            <th>
+                                <!-- <label>
+                                    <input type="checkbox" class="checkbox" />
+                                </label> -->
+                            </th>
+                            <th>Mã sản phẩm</th>
+                            <th>Tên sản phẩm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% products && products.forEach(product => { %>
+                            <tr>
+                                <td>
+                                    <label>
+                                        <input type="checkbox" name="products[]" value="<%= product.maSanPham %>" class="checkbox" />
+                                    </label>
+                                </td>
+                                <td><%= product.maSanPham %></td>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar">
+                                            <div class="h-12 w-12">
+                                                <img
+                                                    class="!object-contain"
+                                                    src="<%= product.hinhAnhDaiDien || '/images/no-result.png' %>"
+                                                    alt="<%= product.tenSanPham %>"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold"><%= product.tenSanPham %></div>
+                                            <div class="text-sm opacity-50"><%= product.moTaSanPham.substring(0, 50) %>...</div> <!-- Show a short description -->
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                        <% }) %>
+                        
+                    </tbody>
+                </table>
+            </div>
+        
+            <!-- Pagination -->
+            <% if (totalPages > 1) { %>
+                <nav class="mt-10 flex justify-center">
+                    <ul class="list-style-none flex">
+                        <li>
+                            <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                            
+                            <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                                class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                                Trang trước
+                             </a>
+                        </li>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                               class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                                <%= i %>
+                            </a>
+                        <% } %>
+                       
+                        <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                        <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                            class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                             Trang sau
+                         </a>
+                    </ul>
+                </nav>
+            <% } %>
+        </section>
+        <section class="border rounded-xl p-5">
+            <div class="label mb-5">
+                <span>Sản phẩm đã chọn</span>
+            </div>
+            <ul id="selected-products">
+
+            </ul>
+        </section>
+    </div>
+
+    <button type="submit" class="btn btn-lg bg-primary text-white hover:bg-primary w-full mt-7">Cập nhật chương trình khuyến mãi</button>
+
+</form>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+<script>
+    const validation = new JustValidate("#create-promotion-form");
+    validation
+        .addField("#tenChuongTrinhKhuyenMai", [
+            {
+                rule: "required",
+                errorMessage: "Tên chương trình là bắt buộc",
+            },
+            {
+                rule: "maxLength",
+                value: 255,
+                errorMessage: "Tên chương trình không được vượt quá 255 ký tự",
+            },
+        ])
+        .addField("#giaTriKhuyenMai", [
+            {
+                rule: "required",
+                errorMessage: "Giá trị khuyến mãi là bắt buộc",
+            },
+            {
+                rule: "integer",
+                errorMessage: "Giá trị khuyến mãi phải là số",
+            },
+        ])
+        .addField("#moTa", [
+            {
+                rule: "required",
+                errorMessage: "Mô tả là bắt buộc",
+            },
+            {
+                rule: "maxLength",
+                value: 500,
+                errorMessage: "Mô tả sản phẩm không được vượt quá 500 ký tự",
+            },
+        ])
+        .addField("#ngayBatDau", [
+            {
+                rule: "required",
+                errorMessage: "Ngày bắt đầu là bắt buộc",
+            },
+        ])
+        .addField("#ngayKetThuc", [
+            {
+                rule: "required",
+                errorMessage: "Ngày kết thúc là bắt buộc",
+            },
+        ]);
+        
+
+    validation.onSuccess((event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        // Kiểm tra ngày bắt đầu và ngày kết thúc
+        const ngayBatDau = new Date(document.getElementById("ngayBatDau").value);
+        const ngayKetThuc = new Date(document.getElementById("ngayKetThuc").value);
+
+        if (ngayBatDau > ngayKetThuc) {
+            alert("Ngày kết thúc phải sau ngày bắt đầu");
+            return;
+        }
+       
+        event.target.submit(); // Submit the form when validation is successful
+    });
+</script>
+
+<script>
+
+    const restoreFormDataFromURL = () => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (![...params.keys()].length) return;
+
+        document.getElementById("tenChuongTrinhKhuyenMai").value = params.get("tenChuongTrinhKhuyenMai") || document.getElementById("tenChuongTrinhKhuyenMai").value;
+        document.getElementById("giaTriKhuyenMai").value = params.get("giaTriKhuyenMai") || document.getElementById("giaTriKhuyenMai").value;
+        document.getElementById("moTa").value = params.get("moTa") || document.getElementById("moTa").value;
+        document.getElementById("ngayBatDau").value = params.get("ngayBatDau") || document.getElementById("ngayBatDau").value;
+        document.getElementById("ngayKetThuc").value = params.get("ngayKetThuc") || document.getElementById("ngayKetThuc").value;
+
+        const selectedProducts = params.get("products") ? params.get("products").split(",") : [];
+        selectedProducts.forEach((productId) => {
+            const checkbox = document.querySelector(`input[name="products[]"][value="${productId}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+    };
+
+    document.addEventListener("DOMContentLoaded", restoreFormDataFromURL);
+
+
+    const appendFormDataToURL = () => {
+        const params = new URLSearchParams(window.location.search);
+
+        params.set("tenChuongTrinhKhuyenMai", document.getElementById("tenChuongTrinhKhuyenMai").value);
+        params.set("giaTriKhuyenMai", document.getElementById("giaTriKhuyenMai").value);
+        params.set("moTa", document.getElementById("moTa").value);
+        params.set("ngayBatDau", document.getElementById("ngayBatDau").value);
+        params.set("ngayKetThuc", document.getElementById("ngayKetThuc").value);
+        params.set(
+            "products",
+            Array.from(document.querySelectorAll('input[name="products[]"]:checked')).map((el) => el.value).join(",")
+        );
+
+        window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
+    };
+
+    document.getElementById("create-promotion-form").addEventListener("input", appendFormDataToURL);
+    document.getElementById("create-promotion-form").addEventListener("change", appendFormDataToURL);
+
+</script>
+
+<!-- Selected Product -->
+<script>
+    const selectedProductsContainer = document.getElementById("selected-products");
+
+    document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            const productId = this.value;
+            const productName = this.closest("tr").querySelector("td:nth-child(3) .font-semibold").textContent;
+
+            if (this.checked) {
+                // Thêm sản phẩm vào danh sách
+                addSelectedProduct(productId, productName);
+            } else {
+                // Xóa sản phẩm khỏi danh sách
+                removeSelectedProduct(productId);
+            }
+        });
+    });
+
+    function addSelectedProduct(productId, productName) {
+        // Kiểm tra xem sản phẩm đã tồn tại chưa
+        if (document.getElementById(`selected-${productId}`)) return;
+
+        // Tạo phần tử danh sách mới
+        const listItem = document.createElement("li");
+        listItem.id = `selected-${productId}`;
+        listItem.className = "flex items-center justify-between p-2";
+
+        // Nội dung sản phẩm
+        listItem.innerHTML = `
+            <span>${productName}</span>
+            <button
+                class="btn btn-sm btn-error text-white"
+                data-product-id="${productId}"
+                onclick="removeProductByButton('${productId}')"
+            >
+                Xóa
+            </button>
+        `;
+
+        selectedProductsContainer.appendChild(listItem);
+    }
+
+    function removeSelectedProduct(productId) {
+        const listItem = document.getElementById(`selected-${productId}`);
+        if (listItem) {
+            selectedProductsContainer.removeChild(listItem);
+        }
+    }
+
+    function removeProductByButton(productId) {
+        const checkbox = document.querySelector(`input[name="products[]"][value="${productId}"]`);
+        if (checkbox) checkbox.checked = false;
+
+        removeSelectedProduct(productId);
+
+        appendFormDataToURL();
+    }
+
+    function restoreSelectedProductsFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const selectedProducts = params.get("products") ? params.get("products").split(",") : [];
+
+        selectedProducts.forEach((productId) => {
+            const productName = document.querySelector(`input[name="products[]"][value="${productId}"]`)
+                .closest("tr")
+                .querySelector("td:nth-child(3) .font-semibold").textContent;
+
+            addSelectedProduct(productId, productName);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", restoreSelectedProductsFromURL);
+
+
+</script>

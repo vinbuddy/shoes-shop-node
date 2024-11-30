@@ -14,6 +14,7 @@ import { connectToRedis, getRedis } from "./utils/redis.js";
 import { initializeLoginWithGoogleService } from "./utils/google.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
+import flash from "connect-flash";
 
 import DanhMucModel from "./models/danhMuc.model.js";
 import HangSanXuatModel from "./models/hangSanXuat.model.js";
@@ -43,13 +44,20 @@ app.use(cookieParser());
 
 const initializeSession = (redisClient) => {
     app.use(
+        // session({
+        //     store: new RedisStore({ client: redisClient }),
+        //     secret: process.env.SESSION_SECRET_KEY,
+        //     resave: false,
+        //     saveUninitialized: false,
+        // })
         session({
             store: new RedisStore({ client: redisClient }),
             secret: process.env.SESSION_SECRET_KEY,
-            resave: false,
-            saveUninitialized: false,
+            resave: true,
+            saveUninitialized: true,
         })
     );
+    app.use(flash());
 };
 
 (async () => {
@@ -79,6 +87,12 @@ const initializeSession = (redisClient) => {
             res.locals.brandsHeader = _brands;
             res.locals.featuredProductsHeader = _featuredProducts;
             res.locals.formatVNCurrencyHeader = formatVNCurrency;
+            next();
+        });
+
+        app.use((req, res, next) => {
+            res.locals.message = req.flash("message");
+            res.locals.error = req.flash("error");
             next();
         });
 

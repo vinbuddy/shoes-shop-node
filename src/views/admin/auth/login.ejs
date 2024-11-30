@@ -1,0 +1,93 @@
+<section class="border-red-500 bg-gray-200 min-h-screen flex items-center justify-center p-10">
+    <div class="bg-gray-100 p-7 flex items-center rounded-3xl shadow-xl w-full md:max-w-3xl gap-10">
+        <div class="w-full md:w-1/2 h-full">
+            <h2 class="text-2xl font-bold text-[#002D74]">Đăng nhập quản trị</h2>
+            <form class="mt-6" id="login-form" action="/admin/auth/admin-login" method="POST">
+                <div>
+                    <label class="block text-gray-700">Địa chỉ Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        placeholder="Nhập địa chỉ Email"
+                        class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
+                        autofocus
+                        autocomplete
+                    />
+                </div>
+
+                <div class="mt-4">
+                    <label class="block text-gray-700">Mật khẩu</label>
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        placeholder="Nhập mật khẩu"
+                        class="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
+                    />
+                </div>
+
+                <div class="text-right mt-2">
+                    <a href="/auth/forgot" class="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700"
+                        >Quên mật khẩu?</a
+                    >
+                </div>
+
+                <% if (locals?.error) { %>
+                    <p class="text-red-500 text-center my-5">
+                        <%= error %>
+                    </p>
+                <% } %>
+
+                <button
+                    type="submit"
+                    class="w-full block bg-primary hover:bg-blue-400 focus:bg-blue-400 text-white font-semibold rounded-lg px-4 py-3 mt-6"
+                >
+                    Đăng nhập
+                </button>
+            </form>
+        </div>
+
+        <div class="w-0 md:w-1/2 hidden md:block h-full">
+            <img src="/images/login-bg.jpg" class="rounded-2xl h-full" alt="page img" />
+        </div>
+    </div>
+</section>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+
+<script>
+    const validation = new JustValidate("#login-form");
+
+    validation
+        .addField("#email", [
+            {
+                rule: "required",
+                errorMessage: "Email là bắt buộc",
+            },
+            {
+                rule: "email",
+                errorMessage: "Email không hợp lệ!",
+            },
+        ])
+        .addField("#password", [
+            {
+                rule: "required",
+                errorMessage: "Mật khẩu là bắt buộc",
+            },
+            {
+                rule: "minLength",
+                value: 6,
+                errorMessage: "Mật khẩu phải có ít nhất 6 ký tự",
+            },
+            {
+                rule: "maxLength",
+                value: 16,
+                errorMessage: "Mật khẩu phải có tối đa 16 ký tự",
+            },
+        ]);
+
+    validation.onSuccess((event) => {
+        event.target.submit(); // Gửi form khi không có lỗi
+    });
+</script>

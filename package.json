@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon src/app.js",
+        "start": "nodemon",
         "dev": "nodemon src/app.js",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix --quiet && echo 'Lint fix completed!'",
@@ -21,6 +21,7 @@
         "axios": "^1.7.7",
         "bcrypt": "^5.1.1",
         "cloudinary": "^2.5.1",
+        "connect-flash": "^0.1.1",
         "connect-redis": "^7.1.1",
         "cookie-parser": "^1.4.7",
         "crypto": "^1.0.1",

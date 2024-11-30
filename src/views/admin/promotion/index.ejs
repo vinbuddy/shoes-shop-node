@@ -1,0 +1,107 @@
+<div>
+    <% if (locals.message && locals.message.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+            <p><%= message %></p>
+        
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-green-600'></i>
+            </button>
+          </div>
+    <% } %>
+
+    <% if (locals.error && locals.error.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+            <p>
+                <%= error %>
+            </p>
+
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-red-600'></i>
+            </button>
+        </div>
+        
+    <% } %>
+
+    <div class="flex justify-between items-center mb-5">
+        <h3 class="text-xl font-bold mb-5">Danh sách chương trình khuyến mãi</h3>
+
+        <a href="/admin/promotion/create" class="btn bg-primary text-white hover:bg-primary rounded-xl">
+            <i class="bx bx-plus"></i>
+            Thêm khuyến mãi
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="table">
+            <!-- head -->
+            <thead>
+                <tr>
+                    <th>Mã khuyến mãi</th>
+                    <th>Tên khuyến mãi</th>
+                    <th>Giá trị giảm</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% locals.promotions && promotions.forEach(promotion => { %>
+                    <tr>
+                        <td><%= promotion.maChuongTrinhKhuyenMai %></td>
+                        <td>
+                            <%= promotion.tenChuongTrinhKhuyenMai %>
+                        </td>
+                        <td><%= promotion.giaTriKhuyenMai + " %" %></td>
+                        <td>
+                           <span class="badge-ghost badge"> <%= new Date(promotion.ngayBatDau).toLocaleDateString() %></span>
+                        </td>
+                        <td>
+                            <span class="bg-red-100 badge text-red-600"> <%= new Date(promotion.ngayKetThuc).toLocaleDateString() %></span>
+                        </td>
+                        <th class="flex items-center gap-3">
+                            <a href="/admin/promotion/edit/<%= promotion.maChuongTrinhKhuyenMai %>?products=<%= encodeURIComponent(promotion.danhSachSanPhamApDung.join(',')) %>" 
+                                class="btn btn-ghost btn-sm"
+                                title="Chỉnh sửa">
+                                 <i class="bx bx-edit"></i>
+                             </a>
+                            <a href="/admin/promotion/delete/<%= promotion.maChuongTrinhKhuyenMai %>" class="btn btn-ghost hover:bg-red-500 hover:text-white btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa chương trình này?');">
+                                <i class="bx bx-trash"></i>
+                            </a>
+                        </th>
+                    </tr>
+                <% }) %>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+        <nav class="mt-10 flex justify-center">
+            <ul class="list-style-none flex">
+                <li>
+                    <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                    
+                    <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                        class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                        Trang trước
+                     </a>
+                </li>
+                
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                       class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                        <%= i %>
+                    </a>
+                <% } %>
+               
+                <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                    class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                     Trang sau
+                 </a>
+            </ul>
+        </nav>
+    <% } %>
+</div>
+
