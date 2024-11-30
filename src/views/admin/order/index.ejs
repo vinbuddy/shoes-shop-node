@@ -217,7 +217,7 @@
     <% } %>
 </div>
 <script>
-    document.getElementById('selectAllOrder').addEventListener('change', function() {
+    document.getElementById('selectAllOrder')?.addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = this.checked;
@@ -232,7 +232,7 @@
     });
 </script>
 <script>
-    document.getElementById('nextStatus').addEventListener('click', function() {
+    document.getElementById('nextStatus')?.addEventListener('click', function() {
         const checkedOrders = [];
         const checkboxes = document.querySelectorAll('.tp-checkbox input[type="checkbox"]:checked');
         checkboxes.forEach(checkbox => {
@@ -268,6 +268,7 @@
    
     document.getElementById('searchOrderButton').addEventListener('click', function() {
         const keywword = document.getElementById('searchOrderId').value.trim();
+        console.log(keywword);
         if (keywword) {
             window.location.href = `/admin/order/search/${keywword}`;
         } else {

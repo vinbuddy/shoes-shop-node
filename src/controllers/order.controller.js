@@ -545,32 +545,37 @@ export const nextStatusHandler = async (req, res) => {
 
     return res.redirect("/admin/order/");
 };
-
-export const SearchOrders = async (req, res) => {
-    // const { keyword } = req.params;
-    // const page = parseInt(req.query.page) || 1;
-    // const limit = 10;
-    // const skip = (page - 1) * limit;
-    // const query = {};
-    // query.maDonHang = { $regex: new RegExp(keyword, "i") };
-    // const orders = await DonHangModel.find(query)
-    //     .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
-    //     .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
-    //     .sort({ "trangThaiDonHang.thoiGian": -1 })
-    //     .skip(skip)
-    //     .limit(limit)
-    //     .exec();
-    // const totalOrders = await DonHangModel.countDocuments(query);
-    // const totalPages = Math.ceil(totalOrders / limit);
-    // return res.render("admin/order", {
-    //     ...VIEW_OPTIONS.ADMIN_LIST,
-    //     orders: orders,
-    //     currentPage: page,
-    //     totalPages: totalPages,
-    //     filters: req.query,
-    //     searchKeyword: keyword,
-    // });
-};
+export async function SearchOrders(req, res) {
+    const { keyword } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    if (!mongoose.Types.ObjectId.isValid(keyword)) {
+        return res.redirect("/admin/order");
+    }
+    const maDH = new mongoose.Types.ObjectId(keyword);
+    const orders = await DonHangModel.find(maDH)
+        .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
+        .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
+        .sort({ "trangThaiDonHang.thoiGian": -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec();
+    const status = await TrangThaiModel.find();
+    const totalOrders = await DonHangModel.countDocuments(maDH);
+    const searchStatus = req.query.status;
+    const totalPages = Math.ceil(totalOrders / limit);
+    return res.render("admin/order", {
+        ...VIEW_OPTIONS.ADMIN_LIST,
+        orders: orders,
+        statuses: status,
+        currentPage: page,
+        totalPages: totalPages,
+        filters: req.query,
+        searchKeyword: keyword,
+        searchStatus: searchStatus,
+    });
+}
 
 export async function reviewOrderHandler(req, res) {
     const { orderId, item, rating, message } = req.body;
