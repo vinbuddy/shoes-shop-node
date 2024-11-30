@@ -158,7 +158,7 @@
                                     : null;
                             %>
     
-                            <a href="/product/<%= product.maSanPham %>" class="group">
+                            <label for="modal-<%= product.maSanPham %>" class="group cursor-pointer">
                                 <div
                                     class="relative aspect-h-1 aspect-w-1 w-full min-h-[180px] max-h-[180px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7 border hover:border-primary"
                                 >
@@ -192,7 +192,102 @@
                                         <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
                                     </p>
                                 <% } %>
-                            </a>
+                            </label>
+
+                            <input type="checkbox" id="modal-<%= product.maSanPham %>" class="modal-toggle" />
+                            <div class="modal" role="dialog">
+                                <div class="modal-box">
+                                    <h3 class="text-lg font-bold">Chi tiết sản phẩm</h3>
+                                    <section class="pt-4">
+                                        <div>
+                                            <div class="flex items-center gap-3 mb-3 last:mb-0">
+                                                <img class="size-14 rounded-xl object-contain border" src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>" alt="">
+                                                <div class="flex-1">
+                                                    <h1 class="font-bold truncate"><%= product ? product.tenSanPham : "Unknown Name" %></h1>
+                                                    <% if (maxDiscount > 0) { %>
+                                                        <label class="mt-3 badge badge-error text-white">
+                                                            Giảm <%= maxDiscount %>%
+                                                        </label>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-7">
+                                                <h2 class="text-base font-semibold mb-2">Kích cỡ</h2>
+                                                <div class="size-list grid grid-cols-4 gap-3">
+                                                    
+                                                    <% if (product && product.danhSachKichCo.length > 0) { %>
+                                                        <% product.danhSachKichCo.forEach((size, index) => { %>
+                            
+                                                            <% 
+                                                                const finalPrice = size.giaKichCo - maxDiscount > 0
+                                                                    ? size.giaKichCo - maxDiscount
+                                                                    : 0;
+                                                            %>
+                            
+                                                            <button 
+                                                                data-sizeQuantity="<%= size.soLuongKichCo %>" 
+                                                                data-sizePrice="<%= finalPrice > 0 ? finalPrice : size.giaKichCo %>" 
+                                                                data-sizeId="<%= size.maKichCo.maKichCo%>" 
+                                                                <%= size.soLuongKichCo === 0 ? 'disabled' : '' %>
+                                                                class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-center border p-2 rounded-xl">
+                                                                    <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
+                            
+                                                                    <% if (maxDiscount > 0) { %>
+                                                                        <span class="line-through text-sm text-gray-400">
+                                                                            <%= formatVNCurrency(size.giaKichCo) %>
+                                                                        </span>
+                                                                        <span class="text-primary font-bold">
+                                                                            <%= formatVNCurrency(finalPrice) %>
+                                                                        </span>
+                                                                        
+                                                                    <% } else { %>
+                                                                        <span>
+                                                                            <%= formatVNCurrency(size.giaKichCo) %>
+                                                                        </span>
+                                                                    <% } %>
+                                                            </button>
+                                                        <% }) 
+                                                    } %>
+                                                </ul>
+                                            </div>
+                                        
+                                            <div class="mt-7">
+                                                <h2 class="text-base font-semibold mb-2">Chọn số lượng ( Vui lòng chọn kích cỡ trước )</h2>
+                                                <div class="flex items-center h-[50px] text-neutral-700">
+                                                    <button class="w-[50px] h-full border rounded-tl-xl rounded-bl-xl decrease decrease-btn">
+                                                        <i class='bx bx-minus'></i>
+                                                    </button>
+                                                    <div class="inline-flex justify-center items-center w-[50px] h-full border-t border-b quantity-select-value">
+                                                        1
+                                                    </div>
+                                                    <button class="w-[50px] h-full border rounded-tr-xl rounded-br-xl increase increase-btn">
+                                                        <i class='bx bx-plus'></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                            
+                                            <p class="mt-5">
+                                                <span class="text-base font-semibold">Giá mua:</span> &nbsp;
+                                                <span id="order-price" class="text-xl font-bold text-primary ">
+                                                    0 đ
+                                                </span>
+                                            </p>
+                                            
+                                            <div class="mt-7">
+                                                <label 
+                                                    disabled 
+                                                    for="modal-<%= product.maSanPham %>" 
+                                                    class="add-to-cart-btn btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                                                    Chọn sản phẩm
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                
+                                <label class="modal-backdrop" for="modal-<%= product.maSanPham %>">Close</label>
+                            </div>
                         <% }) %>
                     <% } %>
                     
@@ -273,15 +368,15 @@
             </h3>
 
             <div>
-                <div class="flex items-center py-2 justify-between mb-3">
+                <div class="flex items-center py-4 justify-between">
                     <p class="text-sm">Số sản phẩm</p>
                     <p class="text-sm">1</p>
                 </div>
-                <div class="flex items-center py-2 justify-between mb-3 border-b border-dashed">
+                <div class="flex items-center py-4 justify-between border-b border-dashed">
                     <p class="text-sm">Tổng cộng</p>
                     <p class="text-sm">2.700.000 đ</p>
                 </div>
-                <div class="flex items-center py-2 justify-between mb-3">
+                <div class="flex items-center py-4 justify-between">
                     <p class="text-sm">Tổng thanh toán</p>
                     <p class="text-sm">2.700.000 đ</p>
                 </div>
@@ -372,4 +467,78 @@
 
 
     })
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Hàm định dạng tiền tệ
+        const formatVNCurrency = (value) => {
+            return value.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            });
+        };
+
+        // Gắn sự kiện vào từng modal khi người dùng mở
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach((modal) => {
+            const modalId = modal.getAttribute('id'); // Lấy id của modal
+            const increaseBtns = modal.querySelectorAll('.increase-btn');
+            const decreaseBtns = modal.querySelectorAll('.decrease-btn');
+            const selectedQuantity = modal.querySelector('.quantity-select-value');
+            const sizeItems = modal.querySelectorAll('.size-list button');
+            const orderPrice = modal.querySelector('#order-price');
+            const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+
+            let selectedSizeQuantity = 0;
+            let selectedSizePrice = 0;
+
+            // Hàm render giá sau khi thay đổi số lượng
+            const renderSizePrice = (quantity) => {
+                if (orderPrice) {
+                    orderPrice.innerHTML = formatVNCurrency(selectedSizePrice * quantity);
+                }
+            };
+
+            // Xử lý tăng số lượng
+            increaseBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (selectedQuantity && selectedQuantity.innerHTML < selectedSizeQuantity) {
+                        selectedQuantity.innerHTML = Number(selectedQuantity.innerHTML) + 1;
+                        renderSizePrice(Number(selectedQuantity.innerHTML));
+                    }
+                });
+            });
+
+            // Xử lý giảm số lượng
+            decreaseBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (selectedQuantity && selectedQuantity.innerHTML > 1) {
+                        selectedQuantity.innerHTML = Number(selectedQuantity.innerHTML) - 1;
+                        renderSizePrice(Number(selectedQuantity.innerHTML));
+                    }
+                });
+            });
+
+            // Xử lý chọn kích cỡ
+            sizeItems.forEach((item) => {
+                item.addEventListener('click', () => {
+                    sizeItems.forEach((btn) => btn.classList.remove('border-primary'));
+                    item.classList.add('border-primary');
+
+                    selectedSizeQuantity = Number(item.getAttribute('data-sizeQuantity'));
+                    selectedSizePrice = Number(item.getAttribute('data-sizePrice'));
+
+                    // Cập nhật giá mua ban đầu
+                    renderSizePrice(Number(selectedQuantity.innerHTML));
+
+                    // Mở khóa nút thêm vào giỏ hàng
+                    if (addToCartBtn) {
+                        addToCartBtn.removeAttribute('disabled');
+                    }
+                });
+            });
+        });
+    });
+
 </script>
