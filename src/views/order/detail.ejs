@@ -26,7 +26,7 @@
 
     <!-- Trạng thái đơn hàng -->
     <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
-        <h3 class="text-xl font-semibold mb-6">Trạng Thái Đơn Hàng</h3>
+        <h3 class="text-xl font-semibold mb-6">Đơn Hàng</h3>
         <!-- Timeline Container -->
 
         <div class="relative border-l-4 border-green-500">
@@ -40,7 +40,7 @@
             <% }) %>
         </div>
     </div>
-
+   
     <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
         <!-- Sản phẩm -->
         <% order.chiTietDonHang.forEach(product => { %>
@@ -72,7 +72,7 @@
             </div>
             <div class="flex justify-between mt-2 border-t pt-2">
                 <p class="font-semibold">Thành tiền</p>
-                <p class="font-bold text-lg text-red-500">₫<%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %></p>
+                <p class="font-bold text-lg text-primary">₫<%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %></p>
             </div>
         </div>
 
@@ -93,4 +93,25 @@
         <% } %>
         
     </div>
+    <% if(order.thongTinDoiTraHang != null) { %>
+        <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
+            <h3 class="text-xl font-semibold mb-6">Danh sách sản phẩm đổi trả</h3>
+            <% order.thongTinDoiTraHang.chiTietDoiTraHang.forEach(product => { %>
+                <div class="border-b pb-4 mb-4">
+                    <div class="flex items-center space-x-4">
+                        <img
+                            src="<%= product.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
+                            alt="<%= product.maSanPham.tenSanPham %>"
+                            class="w-24 h-24 object-cover rounded-lg shadow-sm"
+                        />
+                        <div>
+                            <h4 class="font-semibold text-lg"><%= product.maSanPham.tenSanPham %></h4>
+                            <p class="text-gray-700">Size: <span class="font-semibold"><%= product.maKichCoSanPham.tenKichCo %></span> </p>
+                            <p class="font-semibold">x<%= product.soLuongDaChon%></p>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+        </div>
+        <% } %>
 </div>

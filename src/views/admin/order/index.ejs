@@ -108,8 +108,12 @@
                                 </td>
                                 <td class="pr-8 py-5 whitespace-nowrap">
                                     <a href="#" class="flex items-center space-x-5 hover:text-blue-500 text-gray-700">
-                                        <img class="w-12 h-12 rounded-full" src="<%= order.maKhachHang.anhDaiDien  %>" alt="" />
-                                        <span class="font-medium"><%= order.maKhachHang.tenKhachHang %> </span>
+                                        <% if(order.maKhachHang) { %>
+                                        <img class="w-12 h-12 rounded-full" src="<%= order.maKhachHang?.anhDaiDien  %>" alt="" />
+                                        <span class="font-medium"><%= order.maKhachHang?.tenKhachHang %> </span>
+                                        <% } else { %>
+                                        <span class="font-medium">Khách vãng lai</span>
+                                        <% } %>
                                     </a>
                                 </td>
                                 <td class="px-3 py-3 font-normal text-gray-600 text-right"><%= order.chiTietDonHang.reduce((total, item) => total + item.soLuongDaChon, 0) %></td>
@@ -271,9 +275,7 @@
         console.log(keywword);
         if (keywword) {
             window.location.href = `/admin/order/search/${keywword}`;
-        } else {
-            alert('Please enter an order ID.');
-        }
+        } 
     });
                     
 </script>

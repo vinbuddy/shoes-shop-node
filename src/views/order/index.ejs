@@ -136,7 +136,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -148,7 +148,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -224,7 +224,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -262,7 +262,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -274,7 +274,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -311,7 +311,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -323,7 +323,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -362,7 +362,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -374,7 +374,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -417,7 +417,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -429,7 +429,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -477,7 +477,7 @@
             
                                 <!-- Đơn giá -->
                                 <p class="text-indigo-600 font-semibold text-sm">
-                                    <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                    <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                 </p>
                             </div> 
                                 <% })} %>
@@ -489,7 +489,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= (order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0)).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->

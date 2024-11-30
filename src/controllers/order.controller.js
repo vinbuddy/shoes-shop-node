@@ -92,6 +92,8 @@ export const renderAdminOrderDetailPage = async (req, res) => {
         .populate({ path: "trangThaiDonHang.maTrangThai", select: "maTrangThai tenTrangThai" })
         .populate({ path: "chiTietDonHang.maSanPham", select: "tenSanPham giaSanPham hinhAnhDaiDien" })
         .populate({ path: "chiTietDonHang.maKichCoSanPham", select: "tenKichCo" })
+        .populate({ path: "thongTinDoiTraHang.chiTietDoiTraHang.maSanPham" })
+        .populate({ path: "thongTinDoiTraHang.chiTietDoiTraHang.maKichCoSanPham" })
         .exec();
     const status = await TrangThaiModel.find();
     return res.render("admin/order/detail", {
@@ -398,22 +400,33 @@ export const fetchRefundOrders = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
+    const keyword = req.query.keyword;
+    let orders;
+    if (mongoose.Types.ObjectId.isValid(keyword)) {
+        const maDH = new mongoose.Types.ObjectId(keyword);
+        orders = await DonHangModel.find({
+            "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+            _id: maDH,
+        })
+            .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
+            .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
+            .sort({ "trangThaiDonHang.thoiGian": -1 })
+            .skip(skip)
+            .limit(limit)
+            .exec();
+    } else {
+        orders = await DonHangModel.find({
+            "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+        })
+            .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
+            .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
+            .sort({ "trangThaiDonHang.thoiGian": -1 })
+            .skip(skip)
+            .limit(limit)
+            .exec();
+    }
 
-    const orders = await DonHangModel.find({
-        "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
-    })
-        .populate({ path: "maKhachHang", select: "tenKhachHang anhDaiDien" })
-        .populate({ path: "trangThaiDonHang.maTrangThai", select: "tenTrangThai" })
-        .sort({ "trangThaiDonHang.thoiGian": -1 })
-        .skip(skip)
-        .limit(limit)
-        .exec();
-
-    const totalOrders = await DonHangModel.countDocuments({
-        "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
-    });
-    const totalPages = Math.ceil(totalOrders / limit);
-
+    let totalPages = 0;
     const orderList = [];
     for (const order of orders) {
         if (order.thongTinDoiTraHang != undefined && order.thongTinDoiTraHang._id != undefined) {
@@ -423,26 +436,50 @@ export const fetchRefundOrders = async (req, res) => {
                 orderList.push({
                     ...order._doc,
                 });
+                const totalOrders = await DonHangModel.countDocuments({
+                    "thongTinDoiTraHang.trangThaiDoiTra": { $exists: true, $ne: null },
+                    "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+                });
+                totalPages = Math.ceil(totalOrders / limit);
             } else if (tabId == "request-refund" && status === "yêu cầu") {
                 orderList.push({
                     ...order._doc,
                 });
+                const totalOrders = await DonHangModel.countDocuments({
+                    "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+                    "thongTinDoiTraHang.trangThaiDoiTra": "yêu cầu",
+                });
+                totalPages = Math.ceil(totalOrders / limit);
             } else if (tabId == "accept-refund" && status === "chấp nhận") {
                 orderList.push({
                     ...order._doc,
                 });
+                const totalOrders = await DonHangModel.countDocuments({
+                    "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+                    "thongTinDoiTraHang.trangThaiDoiTra": "chấp nhận",
+                });
+                totalPages = Math.ceil(totalOrders / limit);
             } else if (tabId == "deny-refund" && status === "từ chối") {
                 orderList.push({
                     ...order._doc,
                 });
+                const totalOrders = await DonHangModel.countDocuments({
+                    "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+                    "thongTinDoiTraHang.trangThaiDoiTra": "từ chối",
+                });
+                totalPages = Math.ceil(totalOrders / limit);
             } else if (tabId == "completed-refund" && status === "hoàn thành") {
                 orderList.push({
                     ...order._doc,
                 });
+                const totalOrders = await DonHangModel.countDocuments({
+                    "trangThaiDonHang.maTrangThai": { $exists: true, $ne: null },
+                    "thongTinDoiTraHang.trangThaiDoiTra": "hoàn thành",
+                });
+                totalPages = Math.ceil(totalOrders / limit);
             }
         }
     }
-
     return res.json({
         orders: orderList,
         currentPage: page,
@@ -480,6 +517,16 @@ export const refundStatusRequest = async (req, res) => {
                         },
                     }
                 );
+                if (type === "completed") {
+                    await DonHangModel.findOneAndUpdate(
+                        { maDonHang: orderId },
+                        {
+                            $set: {
+                                "thongTinThanhToan.trangThaiHoanTien": "Hoàn thành",
+                            },
+                        }
+                    );
+                }
             } else {
                 return res.status(400).json({ message: "Invalid request" });
             }
@@ -564,6 +611,7 @@ export async function SearchOrders(req, res) {
     const status = await TrangThaiModel.find();
     const totalOrders = await DonHangModel.countDocuments(maDH);
     const searchStatus = req.query.status;
+
     const totalPages = Math.ceil(totalOrders / limit);
     return res.render("admin/order", {
         ...VIEW_OPTIONS.ADMIN_LIST,
