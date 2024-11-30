@@ -31,10 +31,15 @@ export async function addSize(req, res) {
 
     const size = new KichCoModel({
         tenKichCo: tenKichCo,
-        moTaKichCo: moTaKichCo
+        moTaKichCo: moTaKichCo,
+        trangThaiXoa: false
     });
 
     const savedSize = await size.save();
+    savedSize.maKichCo = savedSize._id;
+
+    await savedSize.save();
+
     return res.status(200).json({
         message: 'Dữ liệu đã lưu thành công.',
         size: savedSize
