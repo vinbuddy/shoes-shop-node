@@ -1,4 +1,4 @@
-<div class="grid grid-cols-12 gap-10">
+<div id="page" class="grid grid-cols-12 gap-10">
     <div class="col-span-8">
         <div class="flex items-center justify-between gap-5 mb-10">
             <h3 class="text-xl font-bold">Bán hàng</h3>
@@ -228,7 +228,8 @@
                                                             <button 
                                                                 data-sizeQuantity="<%= size.soLuongKichCo %>" 
                                                                 data-sizePrice="<%= finalPrice > 0 ? finalPrice : size.giaKichCo %>" 
-                                                                data-sizeId="<%= size.maKichCo.maKichCo%>" 
+                                                                data-sizeId="<%= size.maKichCo.maKichCo%>"
+                                                                data-sizeName="<%= size.maKichCo.tenKichCo %>" 
                                                                 <%= size.soLuongKichCo === 0 ? 'disabled' : '' %>
                                                                 class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-center border p-2 rounded-xl">
                                                                     <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
@@ -276,6 +277,9 @@
                                             
                                             <div class="mt-7">
                                                 <label 
+                                                    data-productId="<%= product.maSanPham %>"
+                                                    data-productImage="<%= product.hinhAnhDaiDien %>"
+                                                    data-productName="<%= product.tenSanPham %>"
                                                     disabled 
                                                     for="modal-<%= product.maSanPham %>" 
                                                     class="add-to-cart-btn btn bg-primary text-white hover:bg-primary rounded-xl w-full">
@@ -340,7 +344,7 @@
                 Các sản phẩm đã chọn
             </h3>
 
-            <ul>
+            <ul id="selected-product-list">
                 <li class="flex items-center gap-3 mb-3 last:mb-0">
                     <img class="size-14 rounded-xl object-cover border" src="https://res.cloudinary.com/dnxbiidd0/image/upload/v1729331833/thumbnails/nld1a3zsox7yleh1dwoa.webp" alt="">
                     <div class="flex-1">
@@ -370,23 +374,117 @@
             <div>
                 <div class="flex items-center py-4 justify-between">
                     <p class="text-sm">Số sản phẩm</p>
-                    <p class="text-sm">1</p>
+                    <p id="total-product" class="text-sm">1</p>
                 </div>
                 <div class="flex items-center py-4 justify-between border-b border-dashed">
                     <p class="text-sm">Tổng cộng</p>
-                    <p class="text-sm">2.700.000 đ</p>
+                    <p id="sub-total" class="text-sm">2.700.000 đ</p>
                 </div>
                 <div class="flex items-center py-4 justify-between">
                     <p class="text-sm">Tổng thanh toán</p>
-                    <p class="text-sm">2.700.000 đ</p>
+                    <p id="total-payment" class="text-sm">2.700.000 đ</p>
                 </div>
 
-                <button type="submit" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                <label id="open-invoice-modal-btn" for="modal-invoice" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
                    Thanh toán
-                </button>
+                </label>
             </div>
         </div>
     </section>
+</div>
+
+<!-- Invoice Modal-->
+<input type="checkbox" id="modal-invoice" class="modal-toggle" />
+
+<div class="modal" role="dialog">
+    <div id="invoice-wrapper-modal" class="modal-box max-w-3xl !rounded-none">
+        <h3 class="text-lg font-bold">Thông tin hóa đơn</h3>
+        <section class="pt-4">
+            <div id="invoice-section">
+                <div id="invoice-inner" class="bg-white rounded-2xl border shadow-lg px-8 py-10 mx-auto">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center">
+                            <img class="h-8 w-8 mr-2" src="/images/logo.png"
+                                alt="Logo" />
+                            <div class="text-gray-700 font-semibold text-lg">Shoes Shop</div>
+                        </div>
+                        <div class="text-gray-700">
+                            <div class="font-bold text-xl mb-2">HÓA ĐƠN</div>
+                            <div class="text-sm">
+                                Ngày: 
+                                <span id="invoice-date"></span>
+                            </div>
+                            <div class="text-sm">
+                                Mã đơn #: 
+                                <span id="invoice-id"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-b-2 border-gray-300 pb-8 mb-8">
+                        <h2 class="text-2xl font-bold mb-4">Thông tin</h2>
+                        <div class="text-gray-700 mb-2">
+                            Nhân viên: 
+                            <span>
+                                <%= locals?.session?.user?.tenNguoiDung %>
+                            </span>
+                        </div>
+                    </div>
+                    <table id="invoice-selected-product-table" class="table mb-8">
+                        <thead>
+                            <tr>
+                                <th class="text-gray-700 font-bold uppercase py-2">Sản phẩm</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Số lượng</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Kích cỡ</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Giá</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <td class="py-4 text-gray-700">Product 1</td>
+                                <td class="py-4 text-gray-700">1</td>
+                                <td class="py-4 text-gray-700">1</td>
+                                <td class="py-4 text-gray-700">$100.00</td>
+                                <td class="py-4 text-gray-700">$100.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 text-gray-700">Product 2</td>
+                                <td class="py-4 text-gray-700">2</td>
+                                <td class="py-4 text-gray-700">2</td>
+                                <td class="py-4 text-gray-700">$50.00</td>
+                                <td class="py-4 text-gray-700">$100.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 text-gray-700">Product 3</td>
+                                <td class="py-4 text-gray-700">3</td>
+                                <td class="py-4 text-gray-700">3</td>
+                                <td class="py-4 text-gray-700">$75.00</td>
+                                <td class="py-4 text-gray-700">$225.00</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                    <div class="flex items-center justify-end mb-8">
+                        <div class="text-gray-700 mr-2">Tạm tính:</div>
+                        <div id="invoice-sub-total" class="text-gray-700">$425.00</div>
+                    </div>
+                    <div class="flex items-center justify-end mb-8">
+                        <div class="text-gray-700 mr-2">Tổng tiền:</div>
+                        <div id="invoice-total-payment" class="text-gray-700 font-bold text-xl">$450.50</div>
+                    </div>
+                    <div class="border-t-2 border-gray-300 pt-8 mb-8">
+                        <div class="text-gray-700 mb-2">Cảm ơn bạn đã mua sắm tại Shoes Shop!</div>
+                        <div class="text-gray-700 mb-2">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email: support@shoesshop.com hoặc gọi điện thoại: 0123-456-789.</div>
+                    </div>
+                </div>
+                <button id="checkout-btn" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full mt-8">
+                    Thanh toán và in hóa đơn
+                 </button>
+                <label id="invoice-label-close-btn" for="modal-invoice"></label>
+            </div>
+        </section>
+    </div>
+    <label class="modal-backdrop" for="modal-invoice">Close</label>
+
 </div>
 
 <script>
@@ -470,17 +568,89 @@
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Hàm định dạng tiền tệ
-        const formatVNCurrency = (value) => {
-            return value.toLocaleString("vi-VN", {
-                style: "currency",
-                currency: "VND",
+    let selectedProducts = null
+    // Hàm định dạng tiền tệ
+    const formatVNCurrency = (value) => {
+        return value.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+    };
+        // Gắn sự kiện vào từng modal khi người dùng mở
+        const modals = document.querySelectorAll('.modal');
+
+        // Biến lưu trữ sản phẩm đã chọn
+        selectedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        const productList = document.getElementById("selected-product-list");
+
+        const totalProductElement = document.getElementById("total-product");
+        const subTotalElement = document.getElementById("sub-total");
+        const totalPaymentElement = document.getElementById("total-payment");
+
+        const renderProductList = () => {
+            productList.innerHTML = ""; // Xóa danh sách cũ
+
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            selectedProducts.forEach((product, index) => {
+                totalItems += product.quantity;
+                totalPrice += product.selectedPrice * product.quantity;
+
+                const productItem = document.createElement("li");
+                productItem.className = "flex items-center gap-3 mb-3 last:mb-0";
+
+                productItem.innerHTML = `
+                    <img class="size-14 rounded-xl object-contain border" src="${product.productImage}" alt="Sản phẩm">
+                    <div class="flex-1 max-w-full overflow-hidden">
+                        <p class="truncate">${product.productName}</p>
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm">
+                                <span>x${product.quantity}</span>
+                                &nbsp;
+                                -
+                                &nbsp;
+                                <span>${formatVNCurrency(product.selectedPrice * product.quantity)}</span>
+                            </p>
+                            <!-- delete icon -->
+                            <button class="btn btn-sm btn-circle btn-ghost delete-btn" data-index="${index}">
+                                <i class="bx bx-trash text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productList.appendChild(productItem);
+            });
+
+            // Xử lý nếu danh sách trống
+            if (selectedProducts.length === 0) {
+                const emptyItem = document.createElement("li");
+                emptyItem.className = "flex items-center justify-center h-20";
+                emptyItem.innerHTML = "Chưa có sản phẩm nào được chọn.";
+                productList.appendChild(emptyItem);
+            }
+
+            // Cập nhật tổng số sản phẩm và tổng tiền
+            totalProductElement.innerText = `${totalItems} sản phẩm`;
+            subTotalElement.innerText = formatVNCurrency(totalPrice);
+            totalPaymentElement.innerText = formatVNCurrency(totalPrice);
+
+            // Gắn sự kiện xóa sản phẩm
+            const deleteBtns = document.querySelectorAll(".delete-btn");
+            deleteBtns.forEach((btn) => {
+                btn.addEventListener("click", (e) => {
+                    const index = Number(btn.getAttribute("data-index"));
+                    selectedProducts.splice(index, 1); // Xóa sản phẩm khỏi mảng
+                    localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts)); // Cập nhật localStorage
+                    renderProductList(); // Render lại danh sách
+                });
             });
         };
 
-        // Gắn sự kiện vào từng modal khi người dùng mở
-        const modals = document.querySelectorAll('.modal');
+        // Render danh sách sản phẩm khi trang tải
+        renderProductList();
+
         modals.forEach((modal) => {
             const modalId = modal.getAttribute('id'); // Lấy id của modal
             const increaseBtns = modal.querySelectorAll('.increase-btn');
@@ -490,8 +660,13 @@
             const orderPrice = modal.querySelector('#order-price');
             const addToCartBtn = modal.querySelector('.add-to-cart-btn');
 
+            
             let selectedSizeQuantity = 0;
             let selectedSizePrice = 0;
+            let selectedSizeId = null;
+            let selectedProductImage = null;
+            let selectedProductName = null;
+            let selectedSizeName = null;
 
             // Hàm render giá sau khi thay đổi số lượng
             const renderSizePrice = (quantity) => {
@@ -528,6 +703,8 @@
 
                     selectedSizeQuantity = Number(item.getAttribute('data-sizeQuantity'));
                     selectedSizePrice = Number(item.getAttribute('data-sizePrice'));
+                    selectedSizeId = item.getAttribute('data-sizeId');
+                    selectedSizeName = item.getAttribute('data-sizeName');
 
                     // Cập nhật giá mua ban đầu
                     renderSizePrice(Number(selectedQuantity.innerHTML));
@@ -538,7 +715,139 @@
                     }
                 });
             });
-        });
-    });
 
+            // Xử lý thêm vào giỏ hàng
+            if (!addToCartBtn) return;
+
+
+            addToCartBtn.addEventListener('click', () => {
+                const productId = addToCartBtn.getAttribute('data-productId');
+                const quantity = Number(selectedQuantity.innerHTML);
+                const productImage = addToCartBtn.getAttribute('data-productImage');
+                const productName = addToCartBtn.getAttribute('data-productName');
+
+                const product = {
+                    productId: productId,
+                    sizeId: selectedSizeId,
+                    quantity: quantity,
+                    selectedPrice: selectedSizePrice,
+                    productImage: productImage,
+                    productName: productName,
+                    sizeName: selectedSizeName,
+                };
+
+                // Kiểm tra xem sản phẩm đã tồn tại trong danh sách chưa
+                const existingProductIndex = selectedProducts.findIndex(
+                    (p) => p.productId === product.productId && p.sizeId === product.sizeId
+                );
+
+                if (existingProductIndex >= 0) {
+                    // Nếu đã tồn tại, cập nhật số lượng
+                    selectedProducts[existingProductIndex].quantity += quantity;
+                } else {
+                    // Nếu chưa, thêm sản phẩm vào danh sách
+                    selectedProducts.push(product);
+                }
+
+                // Lưu danh sách vào localStorage
+                localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+
+                 // Render lại danh sách sản phẩm
+                renderProductList();
+
+                // Reset quantity về 1
+                selectedQuantity.innerHTML = 1;
+            });
+        });
+</script>
+
+<!-- Invoice script -->
+<script>
+    const openInvoiceModalBtn = document.getElementById('open-invoice-modal-btn');
+
+    const invoiceDate = document.getElementById('invoice-date');
+    const invoiceId = document.getElementById('invoice-id');
+
+    const invoiceSubTotal = document.getElementById('invoice-sub-total');
+    const invoiceTotalPayment = document.getElementById('invoice-total-payment');
+
+    const invoiceSelectedProductTable = document.getElementById('invoice-selected-product-table');
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const invoiceLabelCloseBtn = document.getElementById('invoice-label-close-btn');
+
+    const invoiceSection = document.getElementById('invoice-section');
+
+    // Khi click vào openInvoiceModalBtn
+    openInvoiceModalBtn.addEventListener("click", function () {
+        // Lấy ngày hiện tại
+        const currentDate = new Date().toLocaleDateString('vi-VN');
+
+        // Hiển thị ngày hiện tại
+        invoiceDate.innerText = currentDate;
+
+        // Tạo mã hóa đơn ngẫu nhiên
+        // const invoiceCode = Math.random().toString(36).substr(2, 9).toUpperCase();
+        invoiceId.innerText = "";
+
+        // Tính tổng tiền
+        let totalPayment = 0;
+        selectedProducts.forEach(product => {
+            totalPayment += product.selectedPrice * product.quantity;
+
+            const row = invoiceSelectedProductTable.insertRow(-1);
+            row.innerHTML = `
+                <tr>
+                    <td class="py-4 break-words overflow-hidden text-ellipsis whitespace-normal line-clamp-2">${product.productName}</td>
+                    <td class="py-4">${product.quantity}</td>
+                    <td class="py-4">${product.sizeName}</td>
+                    <td class="py-4">${formatVNCurrency(product.selectedPrice)}</td>
+                    <td class="py-4">${formatVNCurrency(product.selectedPrice * product.quantity)}</td>
+                </tr>
+            `;
+        });
+
+        // Hiển thị tổng tiền
+        invoiceSubTotal.innerText = formatVNCurrency(totalPayment);
+        invoiceTotalPayment.innerText = formatVNCurrency(totalPayment);
+    })
+
+
+    // Khi click vào checkoutBtn
+    checkoutBtn.addEventListener("click", async function () {
+        // Gọi api tạo hóa đơn
+        try {
+            const response = await fetch('/admin/sale/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    selectedProducts: selectedProducts
+                })
+            });
+
+            // Xóa sản phẩm đã chọn
+            selectedProducts = [];
+
+            // Lưu vào localStorage
+
+            localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+
+            // Render lại danh sách sản phẩm
+            renderProductList();
+
+            
+            // In hóa đơn trong phạm vi 
+            window.print();
+
+            // // Đóng modal
+            invoiceLabelCloseBtn.click();
+        } catch (error) {
+            
+            console.log(error);
+            
+        }
+
+    })
 </script>

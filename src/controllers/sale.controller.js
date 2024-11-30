@@ -4,9 +4,12 @@ import BrandModel from "../models/hangSanXuat.model.js";
 import CategoryModel from "../models/danhMuc.model.js";
 import SizeModel from "../models/kichCo.model.js";
 import PromotionModel from "../models/chuongTrinhKhuyenMai.model.js";
+import DonHangModel from "../models/donHang.model.js";
+import TrangThaiModel from "../models/trangThai.model.js";
 
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
+import GioHangModel from "../models/gioHang.model.js";
 
 const VIEW_OPTIONS = {
     SALE: {
@@ -112,3 +115,91 @@ export const renderAdminSalePage = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export async function saleCheckoutRequest(req, res) {
+    try {
+        const { selectedProducts } = req.body;
+
+        const orderDetailItems = selectedProducts.map((item) => {
+            return {
+                maSanPham: item.productId,
+                maKichCoSanPham: item.sizeId,
+                soLuongDaChon: Number(item.quantity),
+                giaDaChon: Number(item.selectedPrice),
+            };
+        });
+
+        const totalOrderPrice = orderDetailItems.reduce(
+            (total, item) => total + item.soLuongDaChon * item.giaDaChon,
+            0
+        );
+
+        // Tìm trạng thái hoàn thành
+        const status = await TrangThaiModel.find();
+
+        const orderData = {
+            maKhachHang: null,
+            maNguoiTao: req.session.user.maNguoiDung,
+            chiTietDonHang: orderDetailItems,
+            thongTinGiaoHang: null,
+            thongTinThanhToan: {
+                phuongThucThanhToan: "Tiền mặt",
+                trangThaiThanhToan: "Hoàn thành",
+            },
+            tongTienThanhToan: Number(totalOrderPrice),
+            trangThaiDonHang: [
+                {
+                    maTrangThai: status[3].maTrangThai,
+                    _id: status[3].maTrangThai,
+                    thoiGian: new Date(),
+                },
+            ],
+            ngayDatHang: new Date(),
+        };
+
+        const newOrder = await DonHangModel.create(orderData);
+        const tempOrder = newOrder;
+
+        await DonHangModel.findByIdAndUpdate(newOrder._id, {
+            maDonHang: newOrder._id,
+        });
+
+        tempOrder["maDonHang"] = newOrder._id;
+
+        await DonHangModel.findByIdAndUpdate(newOrder._id, {
+            maDonHang: newOrder._id,
+        });
+
+        // Update product quantity
+        await Promise.all(
+            tempOrder.chiTietDonHang.map(async (item) => {
+                const product = await ProductModel.findOne({ maSanPham: item.maSanPham });
+                const sizeIndex = product.danhSachKichCo.findIndex(
+                    (size) => size.maKichCo.toString() === item.maKichCoSanPham.toString()
+                );
+
+                product.danhSachKichCo[sizeIndex].soLuongKichCo -= item.soLuongDaChon;
+                await product.save();
+
+                // Remove item from cart
+                await GioHangModel.findOneAndUpdate(
+                    { maKhachHang: req.session.customer.maKhachHang },
+                    {
+                        $pull: {
+                            danhSachSanPham: {
+                                maSanPham: item.maSanPham,
+                                maKichCoSanPham: item.maKichCoSanPham,
+                            },
+                        },
+                    }
+                );
+            })
+        );
+
+        return res.status(200).json({ message: "Checkout successfully" });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({ message: error.message });
+    }
+}

@@ -118,3 +118,45 @@ body {
         width: 5rem;
     }
 }
+
+@media print {
+    /* Ẩn tất cả phần tử không cần thiết */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Hiển thị phần hóa đơn */
+    #invoice-section {
+        visibility: visible !important;
+        position: static !important;
+    }
+
+    /* Đảm bảo cha của phần hóa đơn hiển thị */
+    #invoice-section,
+    #invoice-section * {
+        visibility: visible !important;
+    }
+
+    /* Chỉ in phần hóa đơn */
+    #invoice-section {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #invoice-inner {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    #invoice-wrapper-modal {
+        max-width: 100% !important;
+    }
+    /* Ẩn nút và các thành phần không cần thiết */
+    #checkout-btn,
+    #invoice-label-close-btn {
+        display: none !important;
+    }
+}
