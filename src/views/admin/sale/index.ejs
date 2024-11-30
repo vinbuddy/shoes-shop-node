@@ -477,7 +477,8 @@
                     </div>
                 </div>
                 <button id="checkout-btn" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full mt-8">
-                    Thanh toán và in hóa đơn
+                    <i id="checkout-loader" class='animate-spin hidden bx bx-loader-alt'></i>
+                    <span class="ms-2">Thanh toán và in hóa đơn</span>
                  </button>
                 <label id="invoice-label-close-btn" for="modal-invoice"></label>
             </div>
@@ -777,8 +778,9 @@
     const invoiceLabelCloseBtn = document.getElementById('invoice-label-close-btn');
 
     const invoiceSection = document.getElementById('invoice-section');
+    
+    const checkoutBtnLoader = document.getElementById('checkout-loader');
 
-    // Khi click vào openInvoiceModalBtn
     openInvoiceModalBtn.addEventListener("click", function () {
         // Lấy ngày hiện tại
         const currentDate = new Date().toLocaleDateString('vi-VN');
@@ -812,11 +814,10 @@
         invoiceTotalPayment.innerText = formatVNCurrency(totalPayment);
     })
 
-
-    // Khi click vào checkoutBtn
     checkoutBtn.addEventListener("click", async function () {
-        // Gọi api tạo hóa đơn
         try {
+            checkoutBtnLoader.classList.remove("hidden");
+
             const response = await fetch('/admin/sale/checkout', {
                 method: 'POST',
                 headers: {
@@ -827,26 +828,35 @@
                 })
             });
 
+            // Lấy order từ response
+            const data = await response.json();
+            const order = data?.order;
+
+            if (!order) {
+                throw new Error('Có lỗi xảy ra khi thanh toán.');
+            }
+
+
+            // Hiển thị thông tin mã hóa đơn
+            invoiceId.innerText = order.maDonHang;
+
             // Xóa sản phẩm đã chọn
             selectedProducts = [];
 
-            // Lưu vào localStorage
-
             localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
 
-            // Render lại danh sách sản phẩm
             renderProductList();
 
-            
-            // In hóa đơn trong phạm vi 
             window.print();
 
-            // // Đóng modal
+            // Đóng modal
             invoiceLabelCloseBtn.click();
         } catch (error) {
             
             console.log(error);
             
+        } finally {
+            checkoutBtnLoader.classList.add("hidden");
         }
 
     })

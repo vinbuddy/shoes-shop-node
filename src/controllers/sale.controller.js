@@ -9,7 +9,6 @@ import TrangThaiModel from "../models/trangThai.model.js";
 
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
-import GioHangModel from "../models/gioHang.model.js";
 
 const VIEW_OPTIONS = {
     SALE: {
@@ -180,23 +179,10 @@ export async function saleCheckoutRequest(req, res) {
 
                 product.danhSachKichCo[sizeIndex].soLuongKichCo -= item.soLuongDaChon;
                 await product.save();
-
-                // Remove item from cart
-                await GioHangModel.findOneAndUpdate(
-                    { maKhachHang: req.session.customer.maKhachHang },
-                    {
-                        $pull: {
-                            danhSachSanPham: {
-                                maSanPham: item.maSanPham,
-                                maKichCoSanPham: item.maKichCoSanPham,
-                            },
-                        },
-                    }
-                );
             })
         );
 
-        return res.status(200).json({ message: "Checkout successfully" });
+        return res.status(200).json({ message: "Checkout successfully", order: tempOrder });
     } catch (error) {
         console.error(error);
 
