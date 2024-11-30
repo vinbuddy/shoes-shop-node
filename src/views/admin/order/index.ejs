@@ -51,7 +51,7 @@
                     </div>
                     
                     <div class="flex justify-end space-x-6">
-                        <% if (searchStatus !== '') { %>
+                        <% if (searchStatus !== '' && searchStatus !== undefined) { %>
                         <div class="search-select mr-3 flex items-center space-x-3">
                             <span class="text-sm inline-block leading-none -translate-y-[2px]">Chuyển trạng thái tiếp theo:</span>
                         <button id="nextStatus" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</button>
@@ -74,7 +74,7 @@
                     <table class="w-full text-sm text-left text-gray-500">
                         <thead class="bg-gray-50">
                             <tr class="border-b border-gray-200 text-xs">
-                                <% if (searchStatus !== '') { %>
+                                <% if (searchStatus !== '' && searchStatus !== undefined) { %>
                                 <th scope="col" class="py-3 text-xs text-gray-400 uppercase font-semibold w-1/12">
                                     <div class="tp-checkbox -translate-y-[3px]">
                                         <input id="selectAllOrder" type="checkbox" />
@@ -95,7 +95,7 @@
                         <tbody>
                             <% orders.forEach(order => { %>
                             <tr class="bg-white border-b border-gray-200 last:border-0 text-start mx-9">
-                                <% if (searchStatus !== '') { %>
+                                <% if (searchStatus !== '' && searchStatus !== undefined) { %>
                                 <td class="pr-3 whitespace-nowrap">
                                     <div class="tp-checkbox">
                                         <input id="order-1" type="checkbox" />
@@ -145,7 +145,7 @@
                                 <td class="px-9 py-3 text-end">
                                    
                                     <div class="flex items-center justify-end space-x-2">
-                                        <% if (searchStatus === '') { %>
+                                        <% if (searchStatus === '' && searchStatus !== undefined) { %>
                                         <a href="/admin/order/nextStatus/<%= order._id %>" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</a>
                                         <% } %>
                                         <div class="relative" x-data="{ printTooltip: false }">

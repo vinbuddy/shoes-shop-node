@@ -577,11 +577,11 @@ export async function reviewOrderHandler(req, res) {
 
     for (let i = 0; i < item.length; i++) {
         const newReview = new DanhGiaModel({
-            MaSanPham: item[i],
-            MaDonHang: new mongoose.Types.ObjectId(orderId),
-            MaKhachHang: new mongoose.Types.ObjectId(req.session.customer._id),
-            SoDiem: rating[i],
-            NoiDungDanhGia: message[i],
+            maSanPham: item[i],
+            maDonHang: new mongoose.Types.ObjectId(orderId),
+            maKhachHang: new mongoose.Types.ObjectId(req.session.customer._id),
+            soDiem: rating[i],
+            noiDungDanhGia: message[i],
         });
         await newReview.save();
     }

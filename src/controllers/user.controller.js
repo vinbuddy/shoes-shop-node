@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+import DanhGiaModel from "../models/danhGia.model.js";
 import DonHangModel from "../models/donHang.model.js";
 import TrangThaiModel from "../models/trangThai.model.js";
 // import NguoiDungModel from "../models/nguoidung.model.js";
@@ -41,6 +43,10 @@ export async function renderUserOrderPage(req, res) {
         const id = latestStatus.maTrangThai;
         const statusOrder = status.findIndex((status) => status._id.equals(id));
         order.statusOrder = statusOrder;
+        const danhgia = await DanhGiaModel.findOne({ maDonHang: order.maDonHang });
+        if (danhgia) {
+            order.daDanhgia = true;
+        }
         switch (statusOrder) {
             case 0: // Chờ xác nhận
                 pendingOrders.push(order);

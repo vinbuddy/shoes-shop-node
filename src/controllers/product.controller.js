@@ -2,7 +2,7 @@ import BrandModel from "../models/hangSanXuat.model.js";
 import CategoryModel from "../models/danhMuc.model.js";
 import ProductModel from "../models/sanPham.model.js";
 import SupplierModel from "../models/nhaCungCap.model.js";
-import GoodsReceiptModel from "../models/phieuNhap.js"
+import GoodsReceiptModel from "../models/phieuNhap.js";
 import SizeModel from "../models/kichCo.model.js";
 import PromotionModel from "../models/chuongTrinhKhuyenMai.model.js";
 import { formatVNCurrency } from "../utils/format.js";
@@ -11,6 +11,7 @@ import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js
 import env from "dotenv";
 import PhieuNhapModel from "../models/phieuNhap.js";
 import SanPhamModel from "../models/sanPham.model.js";
+import DanhGiaModel from "../models/danhGia.model.js";
 
 env.config();
 
@@ -137,6 +138,9 @@ export async function renderProductDetailPage(req, res) {
             path: "danhSachKichCo.maKichCo",
         })
         .populate("danhSachDanhMuc");
+    const reviews = await DanhGiaModel.find({ maSanPham: new mongoose.Types.ObjectId(productId) })
+        .populate("maKhachHang")
+        .exec();
 
     // Tìm khuyến mãi đang diễn ra
     const promotions = await PromotionModel.find({
@@ -144,11 +148,18 @@ export async function renderProductDetailPage(req, res) {
         trangThaiXoa: false,
     });
 
+    const totalRating = reviews.reduce((total, review) => total + review.soDiem, 0);
+    const averageRating = (totalRating / reviews.length).toFixed(1);
+    const dataReview = {
+        reviews: reviews,
+        averageRating: averageRating,
+    };
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
         loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
         promotions: promotions,
+        dataReview: dataReview,
         formatVNCurrency: formatVNCurrency,
     });
 }
@@ -401,15 +412,15 @@ export async function deleteProductHandler(req, res) {
     }
 }
 
-export async function renderAdminCreateGoodsReceipt (req, res, next) {
+export async function renderAdminCreateGoodsReceipt(req, res, next) {
     try {
         const user = req.session.user;
         const suppliers = await SupplierModel.find({}).select();
         const products = await ProductModel.find({}).select();
         const data = {
-            'suppliers' : suppliers,
-            'products': products,
-        }
+            suppliers: suppliers,
+            products: products,
+        };
         return res.render("admin/product/goods-receipt", {
             layout: "./layouts/admin",
             page: "goods-receipt",
@@ -427,11 +438,11 @@ export async function renderAdminGoodsReceiptList(req, res, next) {
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 10;
         const skip = (page - 1) * itemsPerPage;
-        
+
         // Lọc theo ngày nhập
-        const filterDateString = req.query.filterDate || '';
+        const filterDateString = req.query.filterDate || "";
         // Lọc theo tên sản phẩm
-        const productName = req.query.productName || '';
+        const productName = req.query.productName || "";
         let filterDate;
 
         let filter = {};
@@ -440,41 +451,40 @@ export async function renderAdminGoodsReceiptList(req, res, next) {
             filterDate = new Date(filterDateString + "T00:00:00");
             if (!isNaN(filterDate.getTime())) {
                 if (filterDate) {
-                    const startOfDay  = new Date(filterDate);
+                    const startOfDay = new Date(filterDate);
                     startOfDay.setHours(0, 0, 0, 0);
-        
+
                     const endOfDay = new Date(filterDate);
                     endOfDay.setHours(23, 59, 59, 999);
-        
-                    filter.ngayNhap = { 
+
+                    filter.ngayNhap = {
                         $gte: startOfDay,
-                        $lt: endOfDay // Nhỏ hơn nửa đêm của ngày kế tiếp (23:59:59)
+                        $lt: endOfDay, // Nhỏ hơn nửa đêm của ngày kế tiếp (23:59:59)
                     };
                 }
-            }
-            else {
+            } else {
                 console.error("Định dạng ngày không hợp lệ");
             }
         }
 
         const user = req.session.user;
-        const product = await SanPhamModel.findOne({tenSanPham : productName});
+        const product = await SanPhamModel.findOne({ tenSanPham: productName });
         if (product) {
             filter = {
-                productId: {'chiTiet.maSanPham': product.id}
-            }
+                productId: { "chiTiet.maSanPham": product.id },
+            };
         }
 
         const phieuNhap = await PhieuNhapModel.find(filter)
-                        .skip(skip)
-                        .limit(itemsPerPage)
-                        .populate("nhaCungCap")
-                        .populate("chiTiet.maSanPham")
-                        .exec();
-        
-        const formattedPhieuNhap = phieuNhap.map(item => {
+            .skip(skip)
+            .limit(itemsPerPage)
+            .populate("nhaCungCap")
+            .populate("chiTiet.maSanPham")
+            .exec();
+
+        const formattedPhieuNhap = phieuNhap.map((item) => {
             const date = new Date(item.ngayNhap);
-            const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
             return { ...item._doc, ngayNhap: formattedDate };
         });
         // console.log(formattedPhieuNhap);
@@ -491,22 +501,20 @@ export async function renderAdminGoodsReceiptList(req, res, next) {
     } catch (error) {
         next(error);
     }
-    
 }
 export async function renderAdminGoodsReceiptDetails(req, res, next) {
     try {
         const user = req.session.user;
         const { id } = req.params;
 
-        const details = await PhieuNhapModel.findOne({maPhieuNhap: id})
-                        .populate("nhaCungCap")
-                        .populate("chiTiet.maSanPham")
-                        .populate("chiTiet.danhSachKichCo.maKichCo")
-                        .exec();
+        const details = await PhieuNhapModel.findOne({ maPhieuNhap: id })
+            .populate("nhaCungCap")
+            .populate("chiTiet.maSanPham")
+            .populate("chiTiet.danhSachKichCo.maKichCo")
+            .exec();
 
         const date = new Date(details.ngayNhap);
-        const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-        
+        const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
 
         console.log(details);
 
@@ -521,7 +529,6 @@ export async function renderAdminGoodsReceiptDetails(req, res, next) {
     } catch (error) {
         next(error);
     }
-    
 }
 
 // API
@@ -529,23 +536,22 @@ export async function renderAdminGoodsReceiptDetails(req, res, next) {
 // Get Product Information
 // [GET] /api/product/
 export async function getAllProduct(req, res) {
-
     const product = await ProductModel.find({}).select();
 
     if (product) {
         return res.json(product);
     } else {
-        return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+        return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
     }
 }
 export async function getProductById(req, res) {
     const productId = req.params.id;
-    
-    const product = await ProductModel.findOne({ maSanPham: productId }).sort({maSanPham: 1});
+
+    const product = await ProductModel.findOne({ maSanPham: productId }).sort({ maSanPham: 1 });
     if (product) {
         return res.json(product);
     } else {
-        return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+        return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
     }
 }
 // Get Product Size By Id
@@ -553,21 +559,21 @@ export async function getProductById(req, res) {
 export async function getSizeById(req, res) {
     const sizeId = req.params.id;
 
-    const size = await SizeModel.findOne({maKichCo : sizeId}).sort({maKichCo: 1});
-    
+    const size = await SizeModel.findOne({ maKichCo: sizeId }).sort({ maKichCo: 1 });
+
     if (size) {
         return res.json(size);
     } else {
-        return res.status(404).json({ error: 'Không tìm thấy kích cỡ này' });
+        return res.status(404).json({ error: "Không tìm thấy kích cỡ này" });
     }
 }
-// Create Goods Receipt 
+// Create Goods Receipt
 // [POST] /api/product/create-goods-receipt
 export async function createGoodsReceipt(req, res) {
     const { nhaCungCap, chiTiet } = req.body;
 
     if (!nhaCungCap || !chiTiet || !Array.isArray(chiTiet)) {
-        return res.status(400).json({ message: 'Dữ liệu không hợp lệ.' });
+        return res.status(400).json({ message: "Dữ liệu không hợp lệ." });
     }
 
     try {
@@ -575,10 +581,10 @@ export async function createGoodsReceipt(req, res) {
             nhaCungCap: nhaCungCap,
             chiTiet: chiTiet,
         });
-        
+
         for (const item of chiTiet) {
-            let prod = await ProductModel.findOne({maSanPham: item.maSanPham});
-            
+            let prod = await ProductModel.findOne({ maSanPham: item.maSanPham });
+
             if (prod) {
                 const updatedSizes = prod.danhSachKichCo.map((prodSize) => {
                     const receiptSize = item.danhSachKichCo.find((size) => size.maKichCo == prodSize.maKichCo);
@@ -588,36 +594,34 @@ export async function createGoodsReceipt(req, res) {
                     return prodSize;
                 });
 
-                await ProductModel.updateOne({maSanPham: item.maSanPham}, {danhSachKichCo: updatedSizes})
+                await ProductModel.updateOne({ maSanPham: item.maSanPham }, { danhSachKichCo: updatedSizes });
                 console.log(`Cập nhật số lượng sản phẩm: ${prod.tenSanPham} thành công.`);
-            }
-            else {
+            } else {
                 console.log(`Không tìm thấy sản phẩm với mã: ${item.maSanPham}`);
             }
         }
-        
+
         await phieuNhap.save();
         return res.status(200).json({ redirectUrl: "/admin/create-goods-receipt" });
-    }
-    catch (error) {
-        console.error('Lỗi khi lưu phiếu nhập:', error);
-        res.status(500).json({ message: 'Lỗi máy chủ. Vui lòng thử lại sau.' });
+    } catch (error) {
+        console.error("Lỗi khi lưu phiếu nhập:", error);
+        res.status(500).json({ message: "Lỗi máy chủ. Vui lòng thử lại sau." });
     }
 }
 
 export async function updateSizeList(req, res) {
     const { productId, danhSachKichCo } = req.body;
 
-    console.log(productId)
-    
+    console.log(productId);
+
     if (!Array.isArray(danhSachKichCo)) {
-        return res.status(400).json({ message: 'Dữ liệu danh sách kích cỡ không hợp lệ.' });
+        return res.status(400).json({ message: "Dữ liệu danh sách kích cỡ không hợp lệ." });
     }
 
     try {
         const product = await ProductModel.findById(productId);
         if (!product) {
-            return res.status(404).json({ message: 'Sản phẩm không tồn tại.' });
+            return res.status(404).json({ message: "Sản phẩm không tồn tại." });
         }
 
         // Kiểm tra các mã size có hợp lệ
@@ -634,23 +638,23 @@ export async function updateSizeList(req, res) {
         product.danhSachKichCo = danhSachKichCo;
         await product.save();
 
-        return res.status(200).json({ message: 'Cập nhật danh sách kích cỡ thành công.', product });
+        return res.status(200).json({ message: "Cập nhật danh sách kích cỡ thành công.", product });
     } catch (error) {
-        return res.status(500).json({ message: 'Lỗi server. Vui lòng thử lại sau.', error });
+        return res.status(500).json({ message: "Lỗi server. Vui lòng thử lại sau.", error });
     }
 }
 // Get Product Information
 // [GET] /api/product/
 export async function getProductReceiptByProductId(req, res) {
     const productId = req.params.id;
-    const product = await PhieuNhapModel.find({'chiTiet.maSanPham': productId})
-                        .populate("chiTiet.maSanPham")
-                        .populate("chiTiet.danhSachKichCo.maKichCo")
-                        .exec();
+    const product = await PhieuNhapModel.find({ "chiTiet.maSanPham": productId })
+        .populate("chiTiet.maSanPham")
+        .populate("chiTiet.danhSachKichCo.maKichCo")
+        .exec();
 
     if (product) {
         return res.json(product);
     } else {
-        return res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+        return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
     }
 }
