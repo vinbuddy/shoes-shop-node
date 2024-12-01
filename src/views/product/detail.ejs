@@ -60,19 +60,37 @@
                 <div class="mt-7">
                     <h2 class="text-base font-semibold mb-2">Kích cỡ</h2>
                     <div id="size-list" class="grid grid-cols-4 gap-3">
+                        
                         <% if (product && product.danhSachKichCo.length > 0) { %>
                             <% product.danhSachKichCo.forEach((size, index) => { %>
+
+                                <% 
+                                    const finalPrice = size.giaKichCo - discountValue > 0
+                                        ? size.giaKichCo - discountValue
+                                        : 0;
+                                %>
+
                                 <button 
                                     data-sizeQuantity="<%= size.soLuongKichCo %>" 
-                                    data-sizePrice="<%= size.giaKichCo %>" 
+                                    data-sizePrice="<%= finalPrice > 0 ? finalPrice : size.giaKichCo %>" 
                                     data-sizeId="<%= size.maKichCo.maKichCo%>" 
                                     <%= size.soLuongKichCo === 0 ? 'disabled' : '' %>
                                     class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-center border p-2 rounded-xl">
                                         <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
 
-                                        <span>
-                                            <%= formatVNCurrency(size.giaKichCo) %>
-                                        </span>
+                                        <% if (discountValue > 0) { %>
+                                            <span class="line-through text-sm text-gray-400">
+                                                <%= formatVNCurrency(size.giaKichCo) %>
+                                            </span>
+                                            <span class="text-primary font-bold">
+                                                <%= formatVNCurrency(finalPrice) %>
+                                            </span>
+                                            
+                                        <% } else { %>
+                                            <span>
+                                                <%= formatVNCurrency(size.giaKichCo) %>
+                                            </span>
+                                        <% } %>
                                 </button>
                             <% }) 
                         } %>
@@ -256,8 +274,6 @@
                     body: JSON.stringify(body)
                 });
                 const data = await response.json();
-                console.log("data: ", data);
-                console.log("response: ", response);
 
                 if (response.ok) {
                     // Reset quantity to 1

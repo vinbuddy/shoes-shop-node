@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const nguoiDungSchema = new mongoose.Schema({
     maNguoiDung: {
@@ -32,6 +33,16 @@ const nguoiDungSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+});
+
+nguoiDungSchema.pre("save", async function (next) {
+    if (this.isModified("matKhau")) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(this.matKhau, salt);
+
+        this.matKhau = hashedPassword;
+    }
+    next();
 });
 
 const NguoiDungModel = mongoose.model("NguoiDung", nguoiDungSchema);

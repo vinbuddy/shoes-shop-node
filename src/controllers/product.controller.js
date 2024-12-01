@@ -1,11 +1,16 @@
 import BrandModel from "../models/hangSanXuat.model.js";
 import CategoryModel from "../models/danhMuc.model.js";
 import ProductModel from "../models/sanPham.model.js";
+import SupplierModel from "../models/nhaCungCap.model.js";
+import GoodsReceiptModel from "../models/phieuNhap.js";
 import SizeModel from "../models/kichCo.model.js";
+import PromotionModel from "../models/chuongTrinhKhuyenMai.model.js";
 import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
 import env from "dotenv";
+import PhieuNhapModel from "../models/phieuNhap.js";
+import SanPhamModel from "../models/sanPham.model.js";
 import DanhGiaModel from "../models/danhGia.model.js";
 
 env.config();
@@ -18,6 +23,10 @@ const VIEW_OPTIONS = {
     ADMIN_LIST: {
         layout: "./layouts/admin",
         title: "Danh sách sản phẩm",
+    },
+    ADMIN_EDIT: {
+        layout: "./layouts/admin",
+        title: "Chỉnh sửa sản phẩm",
     },
     PRODUCT_DETAIL: {
         layout: "./layouts/main",
@@ -33,6 +42,12 @@ export async function renderProductPage(req, res) {
     const brands = await BrandModel.find({ trangThaiXoa: false });
     const categories = await CategoryModel.find({ trangThaiXoa: false });
     const sizes = await SizeModel.find();
+
+    // Tìm khuyến mãi đang diễn ra
+    const promotions = await PromotionModel.find({
+        ngayKetThuc: { $gte: new Date() },
+        trangThaiXoa: false,
+    });
 
     const { page = 1, name, brand, category, size, minPrice, maxPrice } = req.query;
     const pageSize = 10;
@@ -107,10 +122,11 @@ export async function renderProductPage(req, res) {
         categories: categories,
         sizes: sizes,
         products: products,
+        promotions: promotions,
         currentPage: page,
         totalPages: Math.ceil(totalProducts / pageSize),
         filters: req.query,
-        formatCurrency: formatVNCurrency,
+        formatVNCurrency: formatVNCurrency,
     });
 }
 
@@ -126,6 +142,12 @@ export async function renderProductDetailPage(req, res) {
         .populate("maKhachHang")
         .exec();
 
+    // Tìm khuyến mãi đang diễn ra
+    const promotions = await PromotionModel.find({
+        ngayKetThuc: { $gte: new Date() },
+        trangThaiXoa: false,
+    });
+
     const totalRating = reviews.reduce((total, review) => total + review.soDiem, 0);
     const averageRating = (totalRating / reviews.length).toFixed(1);
     const dataReview = {
@@ -136,6 +158,7 @@ export async function renderProductDetailPage(req, res) {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
         loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
+        promotions: promotions,
         dataReview: dataReview,
         formatVNCurrency: formatVNCurrency,
     });
@@ -257,5 +280,381 @@ export async function createProductHandler(req, res) {
             sizes: sizes,
             error: error.message,
         });
+    }
+}
+
+export async function renderAdminEditProductPage(req, res) {
+    try {
+        const productId = req.params.id;
+
+        const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(productId) })
+            .populate("maHangSanXuat")
+            .populate("danhSachDanhMuc")
+            .populate("danhSachKichCo.maKichCo");
+
+        const brands = await BrandModel.find({ trangThaiXoa: false });
+        const categories = await CategoryModel.find({ trangThaiXoa: false });
+        const sizes = await SizeModel.find();
+
+        return res.render("admin/product/edit", {
+            ...VIEW_OPTIONS.ADMIN_EDIT,
+            product: product,
+            brands: brands,
+            categories: categories,
+            sizes: sizes,
+        });
+    } catch (error) {
+        return res.render("admin/product/edit", {
+            ...VIEW_OPTIONS.ADMIN_EDIT,
+            error: error.message,
+        });
+    }
+}
+
+export async function updateProductHandler(req, res) {
+    const _productId = req.body.productId;
+    try {
+        const { productId, name, brand, category, description, sizes, retainedImages } = req.body;
+
+        const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(productId) });
+        if (!product) {
+            throw new Error("Sản phẩm không tồn tại.");
+        }
+
+        const files = req.files;
+        const productImageFiles = files["productImageFiles"];
+        const thumbnailImageFile = files["productImageThumbnail"];
+        let uploadedFiles = [];
+        let thumbnailUrl = product.hinhAnhDaiDien; // Giữ lại thumbnail cũ nếu không có file mới
+
+        // Xử lý hình ảnh đại diện (thumbnail)
+        if (thumbnailImageFile && thumbnailImageFile.length > 0) {
+            const thumbnailUpload = await uploadToCloudinary(thumbnailImageFile[0], "thumbnails");
+            thumbnailUrl = thumbnailUpload.url;
+        }
+
+        // Danh sách hình ảnh giữ lại
+        const retainedImageUrls =
+            Array.isArray(retainedImages) && retainedImages.length > 0 ? retainedImages : product.danhSachHinhAnh;
+
+        // Upload hình ảnh mới
+        if (productImageFiles && productImageFiles.length > 0) {
+            const uploadPromises = productImageFiles.map((file) => uploadToCloudinary(file, "products"));
+            uploadedFiles = await Promise.all(uploadPromises);
+        }
+
+        // Danh sách hình ảnh mới
+        const updatedImages = retainedImageUrls.concat(uploadedFiles.map((file) => file.url));
+
+        // (Tùy chọn) Xóa hình ảnh không còn được sử dụng khỏi Cloudinary
+        if (retainedImageUrls.length < product.danhSachHinhAnh.length) {
+            const imagesToDelete = product.danhSachHinhAnh.filter((url) => !retainedImageUrls.includes(url));
+            await Promise.all(imagesToDelete.map((url) => deleteFromCloudinary(url)));
+        }
+        // Xử lý danh sách kích cỡ
+        const productSizes = Object.entries(sizes).map(([maKichCo, kichCo]) => {
+            if (!maKichCo || !kichCo.maKichCo || !kichCo.giaKichCo) {
+                return null;
+            }
+            return {
+                maKichCo: new mongoose.Types.ObjectId(maKichCo),
+                soLuongKichCo: Number(kichCo.soLuongKichCo) || 0,
+                giaKichCo: Number(kichCo.giaKichCo),
+            };
+        });
+
+        // Cập nhật sản phẩm
+        product.tenSanPham = name;
+        product.maHangSanXuat = new mongoose.Types.ObjectId(brand);
+        product.danhSachDanhMuc = Array.isArray(category)
+            ? category.map((id) => new mongoose.Types.ObjectId(id))
+            : [new mongoose.Types.ObjectId(category)];
+        product.moTaSanPham = description;
+        product.hinhAnhDaiDien = thumbnailUrl;
+        product.danhSachHinhAnh = updatedImages;
+        product.danhSachKichCo = productSizes.filter((size) => size !== null) || [];
+
+        await product.save();
+
+        return res.redirect("/admin/product");
+    } catch (error) {
+        const brands = await BrandModel.find({ trangThaiXoa: false });
+        const categories = await CategoryModel.find({ trangThaiXoa: false });
+        const sizes = await SizeModel.find();
+
+        const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(_productId) })
+            .populate("maHangSanXuat")
+            .populate("danhSachDanhMuc")
+            .populate("danhSachKichCo.maKichCo");
+
+        return res.render("admin/product/edit", {
+            ...VIEW_OPTIONS.ADMIN_EDIT,
+            product: product,
+            brands: brands,
+            categories: categories,
+            sizes: sizes,
+            error: error.message,
+        });
+    }
+}
+
+export async function deleteProductHandler(req, res) {
+    const productId = req.params.id;
+    try {
+        await ProductModel.findOneAndUpdate(
+            { maSanPham: new mongoose.Types.ObjectId(productId) },
+            { trangThaiXoa: true }
+        );
+        return res.redirect("/admin/product");
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        return res.redirect("/admin/product");
+    }
+}
+
+export async function renderAdminCreateGoodsReceipt(req, res, next) {
+    try {
+        const user = req.session.user;
+        const suppliers = await SupplierModel.find({}).select();
+        const products = await ProductModel.find({}).select();
+        const data = {
+            suppliers: suppliers,
+            products: products,
+        };
+        return res.render("admin/product/goods-receipt", {
+            layout: "./layouts/admin",
+            page: "goods-receipt",
+            title: "Phiếu nhập hàng",
+            data: data,
+            user: user,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function renderAdminGoodsReceiptList(req, res, next) {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const itemsPerPage = 10;
+        const skip = (page - 1) * itemsPerPage;
+
+        // Lọc theo ngày nhập
+        const filterDateString = req.query.filterDate || "";
+        // Lọc theo tên sản phẩm
+        const productName = req.query.productName || "";
+        let filterDate;
+
+        let filter = {};
+
+        if (filterDateString) {
+            filterDate = new Date(filterDateString + "T00:00:00");
+            if (!isNaN(filterDate.getTime())) {
+                if (filterDate) {
+                    const startOfDay = new Date(filterDate);
+                    startOfDay.setHours(0, 0, 0, 0);
+
+                    const endOfDay = new Date(filterDate);
+                    endOfDay.setHours(23, 59, 59, 999);
+
+                    filter.ngayNhap = {
+                        $gte: startOfDay,
+                        $lt: endOfDay, // Nhỏ hơn nửa đêm của ngày kế tiếp (23:59:59)
+                    };
+                }
+            } else {
+                console.error("Định dạng ngày không hợp lệ");
+            }
+        }
+
+        const user = req.session.user;
+        const product = await SanPhamModel.findOne({ tenSanPham: productName });
+        if (product) {
+            filter = {
+                productId: { "chiTiet.maSanPham": product.id },
+            };
+        }
+
+        const phieuNhap = await PhieuNhapModel.find(filter)
+            .skip(skip)
+            .limit(itemsPerPage)
+            .populate("nhaCungCap")
+            .populate("chiTiet.maSanPham")
+            .exec();
+
+        const formattedPhieuNhap = phieuNhap.map((item) => {
+            const date = new Date(item.ngayNhap);
+            const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
+            return { ...item._doc, ngayNhap: formattedDate };
+        });
+        // console.log(formattedPhieuNhap);
+
+        return res.render("admin/product/goods-receipt-list", {
+            layout: "./layouts/admin",
+            page: "goods-receipt-list",
+            title: "Danh sách phiếu nhập hàng",
+            goodsReceipt: formattedPhieuNhap,
+            user: user,
+            filterDate: filterDateString,
+            productName,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+export async function renderAdminGoodsReceiptDetails(req, res, next) {
+    try {
+        const user = req.session.user;
+        const { id } = req.params;
+
+        const details = await PhieuNhapModel.findOne({ maPhieuNhap: id })
+            .populate("nhaCungCap")
+            .populate("chiTiet.maSanPham")
+            .populate("chiTiet.danhSachKichCo.maKichCo")
+            .exec();
+
+        const date = new Date(details.ngayNhap);
+        const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
+
+        console.log(details);
+
+        return res.render("admin/product/goods-receipt-details", {
+            layout: "./layouts/admin",
+            page: "goods-receipt-details",
+            title: "Chi tiết phiếu nhập hàng",
+            details,
+            user: user,
+            dateReceipt: formattedDate,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// API
+
+// Get Product Information
+// [GET] /api/product/
+export async function getAllProduct(req, res) {
+    const product = await ProductModel.find({}).select();
+
+    if (product) {
+        return res.json(product);
+    } else {
+        return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
+    }
+}
+export async function getProductById(req, res) {
+    const productId = req.params.id;
+
+    const product = await ProductModel.findOne({ maSanPham: productId }).sort({ maSanPham: 1 });
+    if (product) {
+        return res.json(product);
+    } else {
+        return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
+    }
+}
+// Get Product Size By Id
+// [GET] /api/product-size/:id
+export async function getSizeById(req, res) {
+    const sizeId = req.params.id;
+
+    const size = await SizeModel.findOne({ maKichCo: sizeId }).sort({ maKichCo: 1 });
+
+    if (size) {
+        return res.json(size);
+    } else {
+        return res.status(404).json({ error: "Không tìm thấy kích cỡ này" });
+    }
+}
+// Create Goods Receipt
+// [POST] /api/product/create-goods-receipt
+export async function createGoodsReceipt(req, res) {
+    const { nhaCungCap, chiTiet } = req.body;
+
+    if (!nhaCungCap || !chiTiet || !Array.isArray(chiTiet)) {
+        return res.status(400).json({ message: "Dữ liệu không hợp lệ." });
+    }
+
+    try {
+        const phieuNhap = new GoodsReceiptModel({
+            nhaCungCap: nhaCungCap,
+            chiTiet: chiTiet,
+        });
+
+        for (const item of chiTiet) {
+            let prod = await ProductModel.findOne({ maSanPham: item.maSanPham });
+
+            if (prod) {
+                const updatedSizes = prod.danhSachKichCo.map((prodSize) => {
+                    const receiptSize = item.danhSachKichCo.find((size) => size.maKichCo == prodSize.maKichCo);
+                    if (receiptSize) {
+                        prodSize.soLuongKichCo += receiptSize.soLuongKichCo;
+                    }
+                    return prodSize;
+                });
+
+                await ProductModel.updateOne({ maSanPham: item.maSanPham }, { danhSachKichCo: updatedSizes });
+                console.log(`Cập nhật số lượng sản phẩm: ${prod.tenSanPham} thành công.`);
+            } else {
+                console.log(`Không tìm thấy sản phẩm với mã: ${item.maSanPham}`);
+            }
+        }
+
+        await phieuNhap.save();
+        return res.status(200).json({ redirectUrl: "/admin/create-goods-receipt" });
+    } catch (error) {
+        console.error("Lỗi khi lưu phiếu nhập:", error);
+        res.status(500).json({ message: "Lỗi máy chủ. Vui lòng thử lại sau." });
+    }
+}
+
+export async function updateSizeList(req, res) {
+    const { productId, danhSachKichCo } = req.body;
+
+    console.log(productId);
+
+    if (!Array.isArray(danhSachKichCo)) {
+        return res.status(400).json({ message: "Dữ liệu danh sách kích cỡ không hợp lệ." });
+    }
+
+    try {
+        const product = await ProductModel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Sản phẩm không tồn tại." });
+        }
+
+        // Kiểm tra các mã size có hợp lệ
+        for (const kichCo of danhSachKichCo) {
+            const isValidSize = await SizeModel.findById(kichCo.maKichCo);
+            if (!isValidSize) {
+                return res.status(400).json({
+                    message: `Mã kích cỡ không hợp lệ: ${kichCo.maKichCo}`,
+                });
+            }
+        }
+
+        // Cập nhật danh sách size
+        product.danhSachKichCo = danhSachKichCo;
+        await product.save();
+
+        return res.status(200).json({ message: "Cập nhật danh sách kích cỡ thành công.", product });
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi server. Vui lòng thử lại sau.", error });
+    }
+}
+// Get Product Information
+// [GET] /api/product/
+export async function getProductReceiptByProductId(req, res) {
+    const productId = req.params.id;
+    const product = await PhieuNhapModel.find({ "chiTiet.maSanPham": productId })
+        .populate("chiTiet.maSanPham")
+        .populate("chiTiet.danhSachKichCo.maKichCo")
+        .exec();
+
+    if (product) {
+        return res.json(product);
+    } else {
+        return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
     }
 }

@@ -127,3 +127,14 @@ export async function updateNameUser(req, res) {
     req.session.customer = user;
     return res.redirect("/user/profile");
 }
+//Admin
+export async function renderAdminProfilePage(req, res) {
+    const user = req.session.user;
+
+    return res.render("admin/user/profile", {
+        layout: "./layouts/admin",
+        page: "profile",
+        title: "Admin Profile",
+        user: user,
+    });
+}
