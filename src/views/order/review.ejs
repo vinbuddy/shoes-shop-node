@@ -1,0 +1,80 @@
+<form action="/user/order/review/" method="post">
+    <input type="hidden" name="orderId" value="<%= order.maDonHang %>">
+    <div class="gap-y-4">
+        <% order.chiTietDonHang.forEach(item => { %>
+            <div class="p-4 shadow-md">
+                <div  
+                    data-productId="<%= item.maSanPham.maSanPham %>" 
+                    data-productStockQuantity="<%= item.soLuongDaChon %>"
+                    data-productPrice="<%= item.giaSanPham %>"
+                    class="flex justify-between items-center mt-6 pt-6">
+                    <div class="flex items-center">
+                        <a class="fade" href="/product/<%= item.maSanPham.maSanPham %>">
+                            <img
+                                src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
+                                width="60"
+                                class="rounded-xl ms-2"
+                            />
+                        </a>
+                        <a href="/product/<%= item.maSanPham.maSanPham %>">
+                            <div class="fade flex flex-col ml-3">
+                                <input type="hidden" name="item[]" value="<%= item.maSanPham.maSanPham %>">
+                                <span class="md:text-md font-medium max-w-[300px] truncate" title="<%= item.maSanPham.tenSanPham %>">
+                                    <%= item.maSanPham.tenSanPham %>
+                                </span>
+                                <span class="text-sm font-light text-gray-500">
+                                    Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %>
+                                    - Giá: <%= (item.giaDaChon) %>
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="flex items-center mb-5">
+                        <% for (let i = 0; i < 5; i++) { %>
+                            <svg
+                                class="w-6 h-6 ms-2 text-gray-300 dark:text-gray-500"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 22 20"
+                                data-index="<%= i %>"
+                            >
+                                <path
+                                    d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"
+                                />
+                            </svg>
+                        <% } %>
+                        <input type="hidden" name="rating[]" value="0">
+                    </div>
+                </div>
+                <label for="message-<%= item.maSanPham.maSanPham %>" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Đánh giá</label>
+                <textarea id="message-<%= item.maSanPham.maSanPham %>" name="message[]" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Viết đánh giá của bạn...."></textarea>
+            </div>
+        <% }) %>
+        <section class="mt-14"></section>
+            <button type="submit" class="w-full md:w-auto btn text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                Đánh giá
+            </button>
+        </section>
+    </div>
+</form>
+<script>
+    document.querySelectorAll('.flex.items-center.mb-5').forEach(starContainer => {
+        const stars = starContainer.querySelectorAll('svg');
+        const ratingInput = starContainer.querySelector('input[name="rating[]"]');
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                stars.forEach((s, i) => {
+                    if (i <= index) {
+                        s.classList.remove('text-gray-300', 'dark:text-gray-500');
+                        s.classList.add('text-yellow-300');
+                    } else {
+                        s.classList.remove('text-yellow-300');
+                        s.classList.add('text-gray-300', 'dark:text-gray-500');
+                    }
+                });
+                ratingInput.value = index + 1;
+            });
+        });
+    });
+</script>

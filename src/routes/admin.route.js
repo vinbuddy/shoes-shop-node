@@ -35,11 +35,18 @@ import categoryRoutes from "./category.route.js";
 import statusRoutes from "./status.route.js";
 import authRoutes from "./auth.route.js"
 import reportRoutes from "./report.route.js"
+import sizeRoutes from "./size.route.js";
 
 import {
     renderAdminOrderPage,
     renderAdminOrderDetailPage,
     updateOrderStatus,
+    nextStatusRequest,
+    renderRefundAdminPage,
+    fetchRefundOrders,
+    refundStatusRequest,
+    nextStatusHandler,
+    SearchOrders,
 } from "../controllers/order.controller.js";
 
 import { renderAdminProfilePage } from "../controllers/user.controller.js";
@@ -107,6 +114,7 @@ router.use("/category", categoryRoutes);
 router.use("/status", statusRoutes);
 router.use("/auth", authRoutes);
 router.use("/report", reportRoutes);
+router.use("/size", sizeRoutes);
 
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
@@ -130,8 +138,15 @@ router.get("/product/delete/:id", verifyWarehouseStaffRole, deleteProductHandler
 
 // Order [Nhân viên bán hàng]
 router.get("/order", renderAdminOrderPage);
+
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
+router.post("/order/nextStatus", nextStatusRequest);
+router.get("/order/nextStatus/:id", nextStatusHandler);
+router.post("/order/refundStatus", refundStatusRequest);
+router.get("/order/refund", renderRefundAdminPage);
+router.get("/refund/:tabId", fetchRefundOrders);
+router.get("/order/search/:keyword", SearchOrders);
 
 router.get("/profile", renderAdminProfilePage);
 

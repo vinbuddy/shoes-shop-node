@@ -1,0 +1,398 @@
+<div class="container mt-5">
+    <h2 class="text-2xl font-bold mb-4">Danh sách đơn hàng của tôi</h2>
+    <ul class="flex border-b mb-4" id="orderStatusTabs" role="tablist">
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-blue-500 font-bold border-b-2 hover:border-blue-500 border-blue-500"
+                id="all-orders-tab"
+                data-toggle="tab"
+                href="#all-orders"
+                role="tab"
+                aria-controls="all-orders"
+                aria-selected="true"
+                onclick="switchTab(event, 'all-orders')"
+                >Tất cả đơn</a
+            >
+        </li>
+
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-yellow-500 font-bold border-b-2 hover:border-yellow-500 border-s-yellow-400"
+                id="request-refund-tab"
+                data-toggle="tab"
+                href="#request-refund"
+                role="tab"
+                aria-controls="request-refund"
+                aria-selected="false"
+                onclick="switchTab(event, 'request-refund')"
+                >Yêu cầu đổi/trả hàng</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-teal-500 font-bold border-b-2 border-transparent hover:border-teal-500 border-teal-500"
+                id="accept-refund-tab"
+                data-toggle="tab"
+                href="#accept-refund"
+                role="tab"
+                aria-controls="accept-refund"
+                aria-selected="false"
+                onclick="switchTab(event, 'accept-refund')"
+                >Chấp nhận</a
+            >
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-red-500 font-bold border-b-2 border-transparent hover:border-red-500 border-red-500"
+                id="deny-refund-tab"
+                data-toggle="tab"
+                href="#deny-refund"
+                role="tab"
+                aria-controls="deny-refund"
+                aria-selected="false"
+                onclick="switchTab(event, 'deny-refund')"
+                >Từ chối
+            </a>
+        </li>
+        <li class="mr-1">
+            <a
+                class="inline-block py-2 px-4 text-green-500 font-bold border-b-2 border-transparent hover:border-green-500 border-green-500"
+                id="completed-refund-tab"
+                data-toggle="tab"
+                href="#completed-refund"
+                role="tab"
+                aria-controls="completed-refund"
+                aria-selected="false"
+                onclick="switchTab(event, 'completed-refund')"
+                >Xác nhận thành công</a
+            >
+        </li>
+    </ul>
+    <div class="content" id="orderStatusTabsContent">
+        <div class="tab-pane fade show" id="all-orders" role="tabpanel">
+            <div class="bg-white rounded-md shadow-md py-4">
+                <div class="tp-search-box flex items-center justify-between px-8 py-8 flex-wrap">
+                    <div class="search-input relative">
+                        <input
+                            id="searchOrderId"
+                            class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="text"
+                            placeholder="Mã đơn hàng"
+                        />
+                        <button
+                            id="searchOrderButton"
+                            class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                                <path
+                                    d="M18.9999 19L14.6499 14.65"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <div class="relative overflow-x-auto mx-8">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="bg-gray-50"></thead>
+
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Repeat similar structure for other tabs -->
+    </div>
+</div>
+<div class="pagination-controls flex justify-center mt-4"></div>
+<!-- Modal -->
+<div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/3">
+        <h3 class="text-lg font-semibold mb-4">Xác nhận</h3>
+        <p id="confirmationMessage" class="mb-4">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+        <div class="flex justify-end space-x-4">
+            <button id="confirmButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Xác nhận
+            </button>
+            <button id="cancelButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Huỷ
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showModal(message, onConfirm) {
+        event.preventDefault();
+        document.getElementById("confirmationMessage").innerText = message;
+        document.getElementById("confirmationModal").classList.remove("hidden");
+        document.getElementById("confirmButton").onclick = function () {
+            onConfirm();
+            hideModal();
+        };
+        document.getElementById("cancelButton").onclick = hideModal;
+    }
+    function getCheckedOrders() {
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+
+        const checkedOrders = [];
+        checkboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+                checkedOrders.push(checkbox.id.split("-")[1]);
+            }
+        });
+        return checkedOrders;
+    }
+    function hideModal() {
+        document.getElementById("confirmationModal").classList.add("hidden");
+    }
+
+    function acceptRefund() {
+        showModal("Xác nhận chấp nhận trả hàng không?", function () {
+            nextStatus("accept");
+        });
+    }
+    function denyRefund() {
+        showModal("Xác nhận từ chối trả hàng không?", function () {
+            nextStatus("deny");
+        });
+    }
+    function completedRefund() {
+        showModal("Xác nhận trả hàng thành công không?", function () {
+            nextStatus("completed");
+        });
+    }
+
+    function getStatusColor(status) {
+        switch (status) {
+            case "yêu cầu":
+                return "yellow";
+            case "chấp nhận":
+                return "teal";
+            case "từ chối":
+                return "red";
+            case "hoàn thành":
+                return "green";
+            default:
+                return "gray";
+        }
+    }
+
+    async function switchTab(event, tabId) {
+        event.preventDefault();
+        document.querySelectorAll('[data-toggle="tab"]').forEach((tab) => {
+            tab.classList.add("border-transparent");
+        });
+        if (event.type === "click") {
+            event.currentTarget.classList.remove("border-transparent");
+        }
+
+        await paginateOrders(tabId, 1);
+        selectAll();
+    }
+    async function selectAll() {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const checkboxes = await document.querySelectorAll('tbody input[type="checkbox"]');
+        const selectAllOrder = document.getElementById("selectAllOrder");
+        if (checkboxes.length > 0 && selectAllOrder) {
+            document.getElementById("selectAllOrder").addEventListener("change", function () {
+                const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = this.checked;
+                });
+            });
+        }
+        document.getElementById("searchOrderButton").addEventListener("click", function () {
+            switchTab(event, "all-orders");
+        });
+    }
+
+    async function paginateOrders(tabId, page) {
+        let keywword;
+        if (document.getElementById("searchOrderId")) {
+            keywword = document.getElementById("searchOrderId").value.trim();
+        }
+        fetch(`/admin/refund/${tabId}?page=${page}&&keyword=${keywword}`)
+            .then((response) => response.json())
+            .then((data) => {
+                const boxSearch = document.querySelector(`.tp-search-box`);
+                const tableBody = document.querySelector(` tbody`);
+                thead = document.querySelector(` thead`);
+                thead.innerHTML = ``;
+                boxSearch.innerHTML = ``;
+                if (data.orders.length > 0) {
+                    boxSearch.innerHTML = `
+               <div class="search-input relative">
+                        <input
+                            id="searchOrderId"
+                            class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="text"
+                            placeholder="Mã đơn hàng"
+                        />
+                        <button
+                            id="searchOrderButton"
+                            class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                                <path
+                                    d="M18.9999 19L14.6499 14.65"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                    boxSearch.innerHTML += `
+                    <div class="flex items gap-4">
+                        <button   class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-yellow-800/80 rounded ${tabId === "request-refund" ? "" : "hidden"}" onclick="acceptRefund()">Chấp nhận </button>
+                        <button  class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-teal-800/80 rounded ${tabId === "request-refund" ? "" : "hidden"}" onclick="denyRefund()">Từ chối </button>
+                        <button  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 dark:shadow-lg dark:shadow-green-800/80 rounded ${tabId === "accept-refund" ? "" : "hidden"}" onclick="completedRefund()">Xác nhận thành công </button>
+                    </div>
+
+                `;
+                    thead.innerHTML = `
+                    <tr class="border-b border-gray-200 text-xs">
+                        <th scope="col" class="py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 ${tabId === "all-orders" ? "hidden" : ""}">
+                            <div class="tp-checkbox -translate-y-[3px]">
+                                <input id="selectAllOrder" type="checkbox" />
+                                <label for="selectAllOrder"></label>
+                            </div>
+                        </th>
+                        <th scope="col" class="px-3 py-3 text-xs  uppercase font-semibold w-1/12">Khách hàng</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/4 text-right">Lý do trả hàng</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Tổng tiền</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Trạng thái</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Loại</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Thanh toán</th>
+                        <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Ngày trả hàng</th>
+                        <th scope="col" class="px-9 py-3 text-xs text-gray-400 uppercase font-semibold w-1/6 text-right">Hành động</th>
+                    </tr>
+                `;
+                }
+                tableBody.innerHTML = ""; // Clear existing rows
+
+                data.orders.forEach((order) => {
+                    const row = document.createElement("tr");
+                    row.classList.add("bg-white", "border-b", "border-gray-200", "last:border-0", "text-start", "mx-9");
+                    if (tabId !== "all-orders") {
+                        row.innerHTML = `
+                            <td class="pr-3 whitespace-nowrap">
+                                <div class="tp-checkbox">
+                                    <input id="order-${order._id}" type="checkbox" />
+                                    <label for="order-${order._id}"></label>
+                                </div>
+                            </td>
+                        `;
+                    }
+                    row.innerHTML += `
+                        <td class="px-3 py-3 font-normal">${order.maKhachHang.tenKhachHang}</td>
+                        <td class="px-3 py-3 font-normal text-gray-600 text-right">${order.thongTinDoiTraHang.lyDoDoiTraHang.substring(0, 30)}...</td>
+                        <td class="px-3 py-3 font-normal text-gray-600 text-right">${order.tongTienThanhToan.toLocaleString("vi-VN")}₫</td>
+                        <td class="px-3 py-3 text-right">
+                            <span class="text-sm text-${getStatusColor(order.thongTinDoiTraHang.trangThaiDoiTra)}-600 px-3 py-1 rounded-md leading-none bg-${getStatusColor(order.trangThai)}-50 font-medium whitespace-nowrap">${order.thongTinDoiTraHang.trangThaiDoiTra}</span>
+                        </td>
+                        <td class="px-3 py-3 text-right">
+                            ${
+                                order.thongTinDoiTraHang.trangThaiTra === true
+                                    ? '<span class="text-sm text-yellow-600 px-3 py-1 rounded-md leading-none bg-yellow-50 font-medium whitespace-nowrap">Trả hàng</span>'
+                                    : '<span class="text-sm text-red-600 px-3 py-1 rounded-md leading-none bg-red-50 font-medium whitespace-nowrap">Đổi hàng</span>'
+                            }
+                        </td>
+                        <td>
+                            <span class="text-sm text-${order.thongTinThanhToan.trangThaiThanhToan === "Đang chờ" ? "yellow" : "green"}-600 px-3 py-1 rounded-md leading-none bg-${order.thongTinThanhToan.trangThaiThanhToan === "Đang chờ" ? "yellow" : "green"}-50 font-medium whitespace-nowrap">${order.thongTinThanhToan.trangThaiThanhToan}</span>
+                        </td>
+                        <td class="px-3 py-3 font-normal text-gray-600 text-right">${new Date(order.ngayDatHang).toLocaleDateString()}</td>
+                        <td class="px-9 py-3 text-right">
+                            <div class="flex items-center justify-end space-x-2">
+                                <div class="relative" x-data="{ editTooltip: false }">
+                                    <a href="/admin/order/detail/${order._id}" class="block w-auto px-3 h-10 leading-10 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 font-medium dark:shadow-md dark:shadow-blue-800/80">Chi tiết</a>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                const paginationControls = document.querySelector(`.pagination-controls`);
+                paginationControls.innerHTML = "";
+                if (data.totalPages > 1) {
+                    for (let i = 1; i < data.totalPages; i++) {
+                        const pageButton = document.createElement("button");
+                        pageButton.classList.add("px-3", "py-1", "border", "rounded-md", "mx-1", "hover:bg-gray-200");
+                        pageButton.innerText = i;
+                        pageButton.onclick = () => paginateOrders(tabId, i);
+                        paginationControls.appendChild(pageButton);
+                    }
+                }
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        switchTab(event, "all-orders");
+    });
+    function nextStatus(type) {
+        const checkboxes = document.querySelectorAll('tbody .tp-checkbox input[type="checkbox"]:checked');
+        const checkedOrders = [];
+        checkboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+                checkedOrders.push(checkbox.id.split("-")[1]);
+            }
+        });
+        if (checkedOrders.length > 0) {
+            fetch("/admin/order/refundStatus", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderIds: checkedOrders, type: type }),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert("Failed to update order status.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("An error occurred.");
+                });
+        } else {
+            alert("Không có đơn hàng nào được chọn.");
+        }
+    }
+</script>

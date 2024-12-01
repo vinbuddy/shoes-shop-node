@@ -37,6 +37,7 @@ const thongTinThanhToanSchema = new mongoose.Schema({
         type: String, // ID giao dịch từ hệ thống thanh toán
         default: null,
     },
+
     trangThaiHoanTien: {
         type: String,
         enum: ["Chưa hoàn tiền", "Đã hoàn tiền", "Hoàn tiền thất bại"],
@@ -77,6 +78,50 @@ const trangThaiDonHangSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
+const thongTinDoiTraHangSchema = new mongoose.Schema({
+    chiTietDoiTraHang: [chiTietDonHangSchema],
+    lyDoDoiTraHang: {
+        type: String,
+        default: null,
+        required: true,
+    },
+    motaDoiTraHang: {
+        type: String,
+        default: null,
+    },
+    ngayDoiTraHang: {
+        type: Date,
+        default: null,
+    },
+    nhanHangDoiTraLai: {
+        type: Boolean,
+        default: false,
+    },
+    danhSachHinhAnh: [
+        {
+            type: String,
+            default: [],
+        },
+    ],
+
+    thongTinChuyenKhoan: {
+        type: String,
+        default: null,
+    },
+    trangThaiDoi: {
+        type: Boolean,
+        default: false,
+    },
+    trangThaiTra: {
+        type: Boolean,
+        default: false,
+    },
+    trangThaiDoiTra: {
+        type: String,
+        enum: ["yêu cầu", "từ chối", "chấp nhận", "hoàn thành"],
+        default: "yêu cầu",
+    },
+});
 const donHangSchema = new mongoose.Schema({
     maDonHang: {
         type: mongoose.Schema.Types.ObjectId,
@@ -105,6 +150,7 @@ const donHangSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    thongTinDoiTraHang: thongTinDoiTraHangSchema,
 });
 
 const DonHangModel = mongoose.model("DonHang", donHangSchema);

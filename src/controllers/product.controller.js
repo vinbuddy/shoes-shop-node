@@ -9,6 +9,7 @@ import { formatVNCurrency } from "../utils/format.js";
 import mongoose from "mongoose";
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
 import env from "dotenv";
+import DanhGiaModel from "../models/danhGia.model.js";
 
 env.config();
 
@@ -135,6 +136,9 @@ export async function renderProductDetailPage(req, res) {
             path: "danhSachKichCo.maKichCo",
         })
         .populate("danhSachDanhMuc");
+    const reviews = await DanhGiaModel.find({ maSanPham: new mongoose.Types.ObjectId(productId) })
+        .populate("maKhachHang")
+        .exec();
 
     // Tìm khuyến mãi đang diễn ra
     const promotions = await PromotionModel.find({
@@ -142,11 +146,18 @@ export async function renderProductDetailPage(req, res) {
         trangThaiXoa: false,
     });
 
+    const totalRating = reviews.reduce((total, review) => total + review.soDiem, 0);
+    const averageRating = (totalRating / reviews.length).toFixed(1);
+    const dataReview = {
+        reviews: reviews,
+        averageRating: averageRating,
+    };
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
         loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
         promotions: promotions,
+        dataReview: dataReview,
         formatVNCurrency: formatVNCurrency,
     });
 }
@@ -203,7 +214,6 @@ export async function createProductHandler(req, res) {
         const thumbnailImageFile = files["productImageThumbnail"];
         let uploadedFiles = [];
         let thumbnailUrl = null;
-
         if (productImageFiles && productImageFiles.length > 0) {
             const uploadPromises = productImageFiles.map((file) => {
                 let uploadPromise = uploadToCloudinary(file, "products");

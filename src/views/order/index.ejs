@@ -89,7 +89,7 @@
                 aria-controls="refunded-orders"
                 aria-selected="false"
                 onclick="switchTab(event, 'refunded-orders')"
-                >Trả hàng</a
+                >Trả/Đổi hàng</a
             >
         </li>
     </ul>
@@ -100,6 +100,25 @@
             <div class="space-y-8 p-4 bg-gray-100">
                 <% orders.forEach(order => { %>
                     <div class="bg-white shadow-lg rounded-xl p-6">
+                        <% 
+                        var statusOrder = status.findIndex((status) => status._id.equals((order.trangThaiDonHang[order.trangThaiDonHang.length - 1]).maTrangThai));
+                        %> 
+                        <!-- Trạng thái đơn hàng hiện tại -->
+                        <div class="flex items-center space-x-2 mb-4">
+                            <% if(statusOrder === 0) { %>
+                                <span class="text-sm font-semibold text-yellow-500 whitespace-nowrap"><%= status[statusOrder].tenTrangThai %></span>
+                            <% } else if(statusOrder === 1) { %>
+                                <span class="text-sm font-semibold text-teal-500 whitespace-nowrap"><%= status[statusOrder].tenTrangThai %></span>
+                            <% } else if(statusOrder === 2) { %>
+                                <span class="text-sm font-semibold text-green-500 whitespace-nowrap"><%= status[statusOrder].tenTrangThai %></span>
+                            <% } else if(statusOrder === 3) { %>
+                                <span class="text-sm font-semibold text-green-500 whitespace-nowrap"><%= status[statusOrder].tenTrangThai %></span>
+                            <% } else if(statusOrder === 4) { %>
+                                <span class="text-sm font-semibold text-red-500 whitespace-nowrap"><%= status[statusOrder].tenTrangThai %></span>
+                            <% } else if(statusOrder === 5 || statusOrder === 6 || statusOrder === 7 || statusOrder === 8) { %>
+                                <span class="text-sm font-semibold text-red-500 whitespace-nowrap"><%= status[statusOrder].tenTrangThai %></span>
+                            <% }%>
+                        </div>
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
@@ -117,7 +136,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -129,27 +148,42 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
-                             <% 
-                             var statusOrder = status.findIndex((status) => status._id.equals((order.trangThaiDonHang[order.trangThaiDonHang.length - 1]).maTrangThai));
-                             %> 
-                            <%  if (statusOrder === 3) { %>
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ </button>
+                            
+                            <%  if (statusOrder === 4) { %>
+                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-blue-800/80" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ </button>
                                 
                             <% } else { %>
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
+                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-blue-800/80" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
                             <% } %>
                             <!-- Cancel Order Button -->
-                            <% if (statusOrder === 0 || statusOrder === 1 || statusOrder === 2) { %>
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
-                            <% } else if (statusOrder === 4) { %>
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="returnOrder('<%= order._id %>')">Trả hàng</button>
-                            <% } %>
+                            <% if (statusOrder === 0 || statusOrder === 1 ) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng </button>
+                            <%} else { %> 
+                            <% if (statusOrder === 2 ) { %>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','exchange')">Yêu cầu đổi hàng</button>
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','return')">Yêu cầu trả hàng</button>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="completedOrder('<%= order._id %>')">Hoàn thành</button>
+                            <% } } %>
+                            <%  if (statusOrder === 5) { %>
+                                <% if(order.thongTinDoiTraHang.trangThaiDoiTra =="hoàn thành") { %> 
+                                    <button class="bg-green-700 text-white font-bold py-2 px-4 rounded ">Đổi trả thành công</button>
+                                <% } else { %>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="cancelRefundOrder('<%= order._id %>')">Huỷ yêu cầu đổi/trả hàng</button>
+                                <% }} %>
+                                <%  if (statusOrder === 3) { %>
+                                    <%  if(order.daDanhgia === true) { %>
+
+                                        <button class="bg-green-700 text-white font-bold py-2 px-4 rounded ">Đã đánh giá</button>
+                                    <% } else { %>
+                                        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+                                    <% } %>
+                                <% } %>
                         </div>          
                     </div>
                 <% }) %>
@@ -161,6 +195,7 @@
                 <% pendingOrders.forEach(order => { %>
                     <div class="bg-white shadow-lg rounded-xl p-6">
                         <!-- Danh sách chi tiết sản phẩm -->
+                        <span class="text-sm font-semibold text-yellow-500">Chờ xác nhận</span>
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
                                 <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
@@ -177,7 +212,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -189,7 +224,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -208,6 +243,8 @@
             <div class="space-y-8 p-4 bg-gray-100">
                 <% shippedOrders.forEach(order => { %>
                     <div class="bg-white shadow-lg rounded-xl p-6">
+                        <span class="text-sm font-semibold text-teal-500">Đang giao</span>
+
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
@@ -225,7 +262,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -237,7 +274,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -256,6 +293,7 @@
             <div class="space-y-8 p-4 bg-gray-100">
                 <% deliveredOrders.forEach(order => { %>
                     <div class="bg-white shadow-lg rounded-xl p-6">
+                        <span class="text-sm font-semibold text-green-500">Đã giao</span>
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
@@ -273,7 +311,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -285,7 +323,7 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
@@ -293,7 +331,9 @@
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
                             <!-- Cancel Order Button -->
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Trả hàng</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','exchange')">Yêu cầu đổi hàng</button>
+                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80" onclick="refundOrder('<%= order._id %>','return')">Yêu cầu trả hàng</button>
+                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="completedOrder('<%= order._id %>')">Hoàn thành</button>
                         </div>          
                     </div>
                 <% }) %>
@@ -304,6 +344,7 @@
             <div class="space-y-8 p-4 bg-gray-100">
                 <% completedOrders.forEach(order => { %>
                     <div class="bg-white shadow-lg rounded-xl p-6">
+                        <span class="text-sm font-semibold text-green-500">Hoàn thành</span>
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
@@ -321,7 +362,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -333,13 +374,20 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <%  if(order.daDanhgia === true) { %>
+
+                                <button class="bg-green-700 text-white font-bold py-2 px-4 rounded ">Đã đánh giá</button>
+                            <% } else { %>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="reviewdOrder('<%= order._id %>')">Đánh giá</button>
+                            <% } %>
+
                             <!-- Cancel Order Button -->
                         </div>          
                     </div>
@@ -351,6 +399,7 @@
             <div class="space-y-8 p-4 bg-gray-100">
                 <% cancelOrders.forEach(order => { %>
                     <div class="bg-white shadow-lg rounded-xl p-6">
+                        
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
                             <% order.chiTietDonHang.forEach(detail => { %>
@@ -368,7 +417,7 @@
                 
                                     <!-- Đơn giá -->
                                     <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
+                                        <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
                                     </p>
                                 </div>
                             <% }) %>
@@ -380,15 +429,13 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
                             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết huỷ</button>
-                            <!-- Cancel Order Button -->
-                            
                         </div>          
                     </div>
                 <% }) %>
@@ -398,28 +445,42 @@
             <!-- Refunded orders content -->
             <div class="space-y-8 p-4 bg-gray-100">
                 <% refundOrders.forEach(order => { %>
+                        
                     <div class="bg-white shadow-lg rounded-xl p-6">
+                        <% if(order.thongTinDoiTraHang.trangThaiDoi) { %>
+                            <span class="text-sm font-semibold text-red-500">Đổi hàng:</span>
+                        <% } else { %>
+                            <span class="text-sm font-semibold text-red-500">Trả hàng:</span>
+                        <% } %>
+                        <% if(order.thongTinDoiTraHang.trangThaiDoiTra =="hoàn thành") { %>
+                            <span class="text-sm font-semibold text-green-500"><%= order.thongTinDoiTraHang.trangThaiDoiTra %></span>
+                        <% } else { %>
+                            <span class="text-sm font-semibold text-red-500"><%= order.thongTinDoiTraHang.trangThaiDoiTra %></span>
+                        <% } %>
+
                         <!-- Danh sách chi tiết sản phẩm -->
                         <div class="space-y-4">
-                            <% order.chiTietDonHang.forEach(detail => { %>
+                            <%  if( order.thongTinDoiTraHang) { %>
+                                <% order.thongTinDoiTraHang.chiTietDoiTraHang.forEach(detail => { %>
+                                   
                                 <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
-                                    <!-- Hình ảnh sản phẩm -->
-                                    <div class="flex items-center space-x-2">
-                                        <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
-                                        
-                                        <!-- Thông tin sản phẩm -->
-                                        <div>
-                                            <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
-                                            <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
-                                        </div>
+                                <!-- Hình ảnh sản phẩm -->
+                                <div class="flex items-center space-x-2">
+                                    <img src="<%= detail.maSanPham.hinhAnhDaiDien || '/images/no-result.png' %>" alt="" class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                    
+                                    <!-- Thông tin sản phẩm -->
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-800"><%= detail.maSanPham.tenSanPham %></h3>
+                                        <p class="text-sm font-light">Size: <span class="font-medium text-gray-700"><%= detail.maKichCoSanPham.tenKichCo %></span>, Số lượng: <span class="font-medium text-gray-700"><%= detail.soLuongDaChon %></span></p>
                                     </div>
-                
-                                    <!-- Đơn giá -->
-                                    <p class="text-indigo-600 font-semibold text-sm">
-                                        <%= detail.giaDaChon * detail.soLuongDaChon %>₫
-                                    </p>
                                 </div>
-                            <% }) %>
+            
+                                <!-- Đơn giá -->
+                                <p class="text-indigo-600 font-semibold text-sm">
+                                    <%= (detail.giaDaChon * detail.soLuongDaChon).toLocaleString('vi-VN') %>₫
+                                </p>
+                            </div> 
+                                <% })} %>
                         </div>
                         <!-- Thông tin đơn hàng -->
                         <div class="flex justify-between items-center mt-4">
@@ -428,15 +489,21 @@
                             </div>
                             <!-- Tổng tiền của đơn hàng -->
                             <div class="text-right">
-                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-red-500"><%= order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0) %>₫</span></p>
+                                <p class="text-sm text-gray-500">Thành tiền: <span class="text-lg font-semibold text-primary"><%= (order.chiTietDonHang.reduce((total, detail) => total + detail.giaDaChon * detail.soLuongDaChon, 0)).toLocaleString('vi-VN') %>₫</span></p>
                             </div>
                         </div>
                         <!-- Buttons for order actions -->
                         <div class="flex justify-end space-x-4 mt-4">
                             <!-- View Order Details Button -->
-                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết</button>
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-blue-800/80" onclick="viewOrderDetails('<%= order._id %>')">Xem chi tiết </button>
+                            <% if(order.statusOrder == 5) { %>
+                                <% if(order.thongTinDoiTraHang.trangThaiDoiTra =="hoàn thành") { %> 
+                                    <button class="bg-green-700 text-white font-bold py-2 px-4 rounded ">Đổi trả thành công</button>
+                                <% } else { %>
+                                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80" onclick="cancelRefundOrder('<%= order._id %>')">Huỷ yêu cầu đổi/trả hàng</button>
+                                <% } %>
+                            <% } %>
                             <!-- Cancel Order Button -->
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="cancelOrder('<%= order._id %>')">Huỷ đơn hàng</button>
                         </div>          
                     </div>
                 <% }) %>
@@ -444,7 +511,59 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/3">
+        <h3 class="text-lg font-semibold mb-4">Xác nhận</h3>
+        <p id="confirmationMessage" class="mb-4">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+        <div class="flex justify-end space-x-4">
+            <button id="confirmButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-green-800/80">Xác nhận</button>
+            <button id="cancelButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded dark:shadow-md dark:shadow-red-800/80">Huỷ</button>
+        </div>
+    </div>
+</div>
 
+<script>
+    function showModal(message, onConfirm) {
+        document.getElementById('confirmationMessage').innerText = message;
+        document.getElementById('confirmationModal').classList.remove('hidden');
+        document.getElementById('confirmButton').onclick = function() {
+            onConfirm();
+            hideModal();
+        };
+        document.getElementById('cancelButton').onclick = hideModal;
+    }
+
+    function hideModal() {
+        document.getElementById('confirmationModal').classList.add('hidden');
+    }
+
+    function cancelOrder(orderId) {
+        showModal('Bạn có chắc chắn muốn huỷ đơn hàng này không?', function() {
+            window.location.href = '/order/cancel/' + orderId;
+        });
+    }
+
+    function refundOrder(orderId,type) {
+        showModal('Bạn có chắc chắn muốn trả hàng cho đơn hàng này không?', function() {
+            window.location.href = '/order/refundRequest/' + orderId + '?type='+type;
+        });
+    }
+    function reviewdOrder(orderId) {
+        window.location.href = '/user/order/review/' + orderId;
+    }
+    function cancelRefundOrder(orderId) {
+        showModal('Bạn có chắc chắn muốn huỷ trả hàng cho đơn hàng này không?', function() {
+            window.location.href = '/order/cancelRefund/' + orderId;
+        });
+    }
+
+    function completedOrder(orderId) {
+        showModal('Bạn có chắc chắn muốn hoàn thành đơn hàng này không?', function() {
+            window.location.href = '/order/completed/' + orderId;
+        });
+    }
+</script>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
 <script>
@@ -456,16 +575,10 @@
     };
     
     function viewOrderDetails(orderId) {
-        alert('Viewing details for order: ' + orderId);
+        window.location.href = '/user/order/' + orderId;
     }
-
-    function cancelOrder(orderId) {
-        if (confirm('Bạn có chắc chắn muốn huỷ đơn hàng này không?')) {
-            alert('Order ' + orderId + ' has been cancelled.');
-            window.location.href = '/order/cancel/' + orderId;
-        }
-    }
-
+    
+    
     function switchTab(event, tabId) {
         event.preventDefault();
         document.querySelectorAll('.tab-pane').forEach(tab => {
@@ -473,14 +586,13 @@
             tab.classList.add('hidden');
         });
         document.querySelectorAll('[data-toggle="tab"]').forEach(tab => {
-            tab.classList.remove('border-blue-500', 'text-blue-500');
+           
             tab.classList.add('border-transparent');
         });
 
         document.getElementById(tabId).classList.add('show');
         document.getElementById(tabId).classList.remove('hidden');
         document.getElementById(tabId).classList.add('show');
-        event.currentTarget.classList.add('border-blue-500', 'text-blue-500');
         event.currentTarget.classList.remove('border-transparent');
     }
 </script>
