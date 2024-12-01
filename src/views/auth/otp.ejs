@@ -50,6 +50,12 @@
                 </p>
             <% } %>
             
+            <% if (locals?.message) { %>
+                <p class="text-green-500 text-center my-5">
+                    <%= message %>
+                </p>
+            <% } %>
+            
             <div class="mt-7">
                 <button
                     type="submit"
@@ -60,7 +66,7 @@
             </div>
         </form>
         <div class="text-sm text-slate-500 mt-4">
-            Chưa nhận được OTP? <a class="font-medium text-primary hover:text-primary" href="#0">Gửi lại</a>
+            Chưa nhận được OTP? <a class="font-medium text-primary hover:text-primary" href="/auth/resend-otp?email=<%= locals?.email ? email: "" %>">Gửi lại</a>
         </div>
     </div>
 </div>
