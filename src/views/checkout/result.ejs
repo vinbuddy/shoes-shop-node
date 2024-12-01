@@ -1,8 +1,8 @@
 <div class="container pt-10 min-h-[350px]">
-    <% if (locals.error)  { %>
+    <% if (locals.error && locals.error.length > 0)  { %>
         <div class="flex items-center justify-center h-full">
             <div>
-                <p class="text-red-500 text-lg"><%= locals.error ? error: "" %></p>
+                <p class="text-red-500 text-lg"><%= error %></p>
                 <a href="/" class="btn mt-5">Trang chủ</a>
             </div>
         </div>
@@ -29,7 +29,7 @@
 
                         <div class="flex items-center justify-end border-t-2 border-dashed pt-4 gap-5">
                             <a href="/" class="bg-transparent text-black border-none">Trang chủ</a>
-                            <a href="/profile/order" class="btn bg-primary hover:bg-primary text-white rounded-full">
+                            <a href="/user/order" class="btn bg-primary hover:bg-primary text-white rounded-full">
                                 Theo dõi đơn hàng
                             </a>
                         </div>

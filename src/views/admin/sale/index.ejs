@@ -1,0 +1,863 @@
+<div id="page" class="grid grid-cols-12 gap-10">
+    <div class="col-span-8">
+        <div class="flex items-center justify-between gap-5 mb-10">
+            <h3 class="text-xl font-bold">Bán hàng</h3>
+    
+            <form id="search-form" class="input input-bordered flex items-center gap-2 rounded-full">
+                <input type="search" class="grow" placeholder="Tìm kiếm sản phẩm" name="search" value="<%= filters && filters.name ? filters.name : "" %>" />
+                <button class="btn btn-sm rounded-full">Tìm kiếm</button>
+            </form>  
+        </div>
+        <div class="grid grid-cols-12 gap-10">
+            <!-- Sidebar filter -->
+            <section class="col-span-3">
+                <div class="sticky top-[20px]">
+                    <form id="filter-form" action="/admin/sale" method="get">
+                        <div>
+                            <input hidden type="text" name="name" value="<%= filters && filters.name ? filters.name : "" %>" />
+                        </div>
+                       
+                        <div id="filter-inputs" class="join join-vertical w-full">
+                            <!-- Category -->
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="categoryAccordion" checked="checked"/>
+                                <div class="collapse-title text-base font-medium">Danh mục</div>
+                                <div class="collapse-content">
+                                    <ul>
+                                        <% if (categories && categories.length > 0) { %>
+                                            <% categories.forEach(category => { %>
+                                                <li class="flex items-center gap-2 mb-3">
+                                                    <input type="checkbox" 
+                                                        id="category-<%= category.maDanhMuc %>" 
+                                                        name="category[]" 
+                                                        value="<%= category._id %>" 
+                                                        class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                                        <% if (filters.category && filters.category.includes(category._id.toString())) { %> 
+                                                           checked <% } %> 
+                                                     />
+                                                    <label class="cursor-pointer" for="category-<%= category.maDanhMuc %>">
+                                                        <%= category.tenDanhMuc %>
+                                                    </label>
+                                                </li>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <li class="mb-3">Không có danh mục nào.</li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="brandAccordion" <%= filters?.brandAccordion === "on" ? "checked" : "" %> />
+                                <div class="collapse-title text-base font-medium">Hãng</div>
+                                <div class="collapse-content">
+                                    <ul>
+                                        <% if (brands && brands.length > 0) { %>
+                                            <% brands.forEach(brand => { %>
+                                                <li class="flex items-center gap-2 mb-3">
+                                                    <input type="checkbox" 
+                                                        id="brand-<%= brand.maHangSanXuat %>" 
+                                                        name="brand[]" 
+                                                        value="<%= brand._id %>" 
+                                                        class="checkbox checkbox-sm [--chkbg:#0578f8]" 
+                                                           <% if (filters.brand && filters.brand.includes(brand._id.toString())) { %> 
+                                                           checked <% } %> />
+                                                    <label class="cursor-pointer" for="brand-<%= brand.maHangSanXuat %>">
+                                                        <%= brand.tenHangSanXuat %>
+                                                    </label>
+                                                </li>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <li class="mb-3">Không có hãng nào.</li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="sizeAccordion" <%= filters?.sizeAccordion === "on" ? "checked" : "" %> />
+                                <div class="collapse-title text-base font-medium">Kích cỡ</div>
+                                <div class="collapse-content">
+                                    <ul class="flex flex-wrap gap-5">
+                                        <% if (sizes && sizes.length > 0) { %>
+                                            <% sizes.forEach(size => { %>
+                                                <li class="flex items-center gap-2">
+                                                    <input type="checkbox" 
+                                                        id="size-<%= size.maKichCo %>" 
+                                                        name="size[]" 
+                                                        value="<%= size._id %>" 
+                                                        class="checkbox checkbox-sm [--chkbg:#0578f8]"
+                                                        <% if (filters.size && filters.size.includes(size._id.toString())) { %> 
+                                                        checked <% } %>/>
+                                                    <label class="cursor-pointer" for="size-<%= size.maKichCo %>">
+                                                        <%= size.tenKichCo %>
+                                                    </label>
+                                                </li>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <li>Không có kích cỡ nào.</li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                <input type="checkbox" name="priceAccordion" <%= filters?.priceAccordion === "on" ? "checked" : "" %> />
+                                <div class="collapse-title text-base font-medium">Giá</div>
+                                <div class="collapse-content">
+                                    <div class="flex flex-col items-center justify-between gap-4">
+                                        <input
+                                            id="price-from"
+                                            type="text"
+                                            placeholder="Từ"
+                                            class="input input-bordered w-full input-sm"
+                                        />
+                                        <input type="text" hidden name="minPrice" value="<%= filters.minPrice %>">
+                                        <input type="text" hidden name="maxPrice" value="<%= filters.maxPrice %>">
+        
+                                        <input
+                                            id="price-to"
+                                            type="text"
+                                            placeholder="Đến"
+                                            class="input input-bordered w-full input-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                            <i class="bx bx-filter-alt"></i>
+                            &nbsp; Lọc
+                        </button>
+                        <a href="/admin/product" class="btn rounded-xl w-full mt-4">
+                            Hủy lọc
+                        </a>
+                    </form>
+                </div>
+            </section>
+    
+            <!-- Products -->
+            <section class="col-span-9">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                    <% if (products && products.length > 0) { %>
+                        <% products.forEach(product => { %>
+    
+                            <% 
+                                // Lấy khuyến mãi áp dụng cho sản phẩm
+                                const applicablePromotions = promotions.filter(promo =>
+                                    promo.danhSachSanPhamApDung.some(
+                                        productId => productId.toString() === product.maSanPham.toString()
+                                    )
+                                );
+    
+                                // Lấy giá trị giảm cao nhất
+                                const maxDiscount = applicablePromotions.length > 0 
+                                    ? Math.max(...applicablePromotions.map(promo => promo.giaTriKhuyenMai)) 
+                                    : 0;
+    
+                                // Tính giá sau khuyến mãi (nếu có)
+                                const finalPrice = product.danhSachKichCo[0]?.giaKichCo 
+                                    ? product.danhSachKichCo[0].giaKichCo * (1 - maxDiscount / 100) 
+                                    : null;
+                            %>
+    
+                            <label for="modal-<%= product.maSanPham %>" class="group cursor-pointer">
+                                <div
+                                    class="relative aspect-h-1 aspect-w-1 w-full min-h-[180px] max-h-[180px] overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7 border hover:border-primary"
+                                >
+                                    <img
+                                        src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
+                                        alt="<%= product.tenSanPham %>"
+                                        class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                    />
+    
+                                    <% if (maxDiscount > 0) { %>
+                                        <label class="absolute top-3 right-3 badge badge-error text-white">
+                                            Giảm <%= maxDiscount %>%
+                                        </label>
+                                    <% } %>
+                                </div>
+                                <h3 class="mt-4 text-sm text-gray-700"><%= product.tenSanPham %></h3>
+                                
+                                <% if (maxDiscount > 0) { %>
+                                    
+                                   <div class="flex items-center gap-2">
+                                        <p class="mt-1 text-lg font-medium text-primary">
+                                            <%= formatVNCurrency(finalPrice || 0) %>
+                                        </p>
+                                        <p class="mt-1 text-gray-700 line-through">
+                                            <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                        </p>
+    
+                                    </div>
+                                <% } else { %>
+                                    <p class="mt-1 text-lg font-medium text-gray-900">
+                                        <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                    </p>
+                                <% } %>
+                            </label>
+
+                            <input type="checkbox" id="modal-<%= product.maSanPham %>" class="modal-toggle" />
+                            <div class="modal" role="dialog">
+                                <div class="modal-box">
+                                    <h3 class="text-lg font-bold">Chi tiết sản phẩm</h3>
+                                    <section class="pt-4">
+                                        <div>
+                                            <div class="flex items-center gap-3 mb-3 last:mb-0">
+                                                <img class="size-14 rounded-xl object-contain border" src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>" alt="">
+                                                <div class="flex-1">
+                                                    <h1 class="font-bold truncate"><%= product ? product.tenSanPham : "Unknown Name" %></h1>
+                                                    <% if (maxDiscount > 0) { %>
+                                                        <label class="mt-3 badge badge-error text-white">
+                                                            Giảm <%= maxDiscount %>%
+                                                        </label>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-7">
+                                                <h2 class="text-base font-semibold mb-2">Kích cỡ</h2>
+                                                <div class="size-list grid grid-cols-4 gap-3">
+                                                    
+                                                    <% if (product && product.danhSachKichCo.length > 0) { %>
+                                                        <% product.danhSachKichCo.forEach((size, index) => { %>
+                            
+                                                            <% 
+                                                                const finalPrice = size.giaKichCo - maxDiscount > 0
+                                                                    ? size.giaKichCo - maxDiscount
+                                                                    : 0;
+                                                            %>
+                            
+                                                            <button 
+                                                                data-sizeQuantity="<%= size.soLuongKichCo %>" 
+                                                                data-sizePrice="<%= finalPrice > 0 ? finalPrice : size.giaKichCo %>" 
+                                                                data-sizeId="<%= size.maKichCo.maKichCo%>"
+                                                                data-sizeName="<%= size.maKichCo.tenKichCo %>" 
+                                                                <%= size.soLuongKichCo === 0 ? 'disabled' : '' %>
+                                                                class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-center border p-2 rounded-xl">
+                                                                    <p class="font-semibold mb-2"><%= size.maKichCo.tenKichCo %></p>
+                            
+                                                                    <% if (maxDiscount > 0) { %>
+                                                                        <span class="line-through text-sm text-gray-400">
+                                                                            <%= formatVNCurrency(size.giaKichCo) %>
+                                                                        </span>
+                                                                        <span class="text-primary font-bold">
+                                                                            <%= formatVNCurrency(finalPrice) %>
+                                                                        </span>
+                                                                        
+                                                                    <% } else { %>
+                                                                        <span>
+                                                                            <%= formatVNCurrency(size.giaKichCo) %>
+                                                                        </span>
+                                                                    <% } %>
+                                                            </button>
+                                                        <% }) 
+                                                    } %>
+                                                </ul>
+                                            </div>
+                                        
+                                            <div class="mt-7">
+                                                <h2 class="text-base font-semibold mb-2">Chọn số lượng ( Vui lòng chọn kích cỡ trước )</h2>
+                                                <div class="flex items-center h-[50px] text-neutral-700">
+                                                    <button class="w-[50px] h-full border rounded-tl-xl rounded-bl-xl decrease decrease-btn">
+                                                        <i class='bx bx-minus'></i>
+                                                    </button>
+                                                    <div class="inline-flex justify-center items-center w-[50px] h-full border-t border-b quantity-select-value">
+                                                        1
+                                                    </div>
+                                                    <button class="w-[50px] h-full border rounded-tr-xl rounded-br-xl increase increase-btn">
+                                                        <i class='bx bx-plus'></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                            
+                                            <p class="mt-5">
+                                                <span class="text-base font-semibold">Giá mua:</span> &nbsp;
+                                                <span id="order-price" class="text-xl font-bold text-primary ">
+                                                    0 đ
+                                                </span>
+                                            </p>
+                                            
+                                            <div class="mt-7">
+                                                <label 
+                                                    data-productId="<%= product.maSanPham %>"
+                                                    data-productImage="<%= product.hinhAnhDaiDien %>"
+                                                    data-productName="<%= product.tenSanPham %>"
+                                                    disabled 
+                                                    for="modal-<%= product.maSanPham %>" 
+                                                    class="add-to-cart-btn btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                                                    Chọn sản phẩm
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                
+                                <label class="modal-backdrop" for="modal-<%= product.maSanPham %>">Close</label>
+                            </div>
+                        <% }) %>
+                    <% } %>
+                    
+                    
+                </div>
+    
+                <% if (products.length === 0) { %>
+                    <div class="flex justify-center">
+                        <div>
+                            <img class="size-40" src="/images/no-result.png" alt="">
+                            <p>Không có sản phẩm nào.</p>
+                        </div>
+                    </div>
+                <% } %>
+    
+                <!-- Pagination -->
+                 <% if (totalPages > 1) { %>
+                    <nav class="mt-10 flex justify-center">
+                        <ul class="list-style-none flex">
+                            <li>
+                                <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                                
+                                <a href="<%= currentPage > 1 ? previousURL : "#" %>"
+                                    class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                                    Trang trước
+                                 </a>
+                            </li>
+                            
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
+                                   class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+                           
+                            <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                            <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
+                                class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                                 Trang sau
+                             </a>
+                        </ul>
+                    </nav>
+                <% } %>
+            </section>
+        </div>
+    </div>
+    <section class="col-span-4">
+        <div class="rounded-xl p-4 border sticky top-[20px]">
+            <h3 class="font-medium text-lg mb-5">
+                Các sản phẩm đã chọn
+            </h3>
+
+            <ul id="selected-product-list">
+                <li class="flex items-center gap-3 mb-3 last:mb-0">
+                    <img class="size-14 rounded-xl object-cover border" src="https://res.cloudinary.com/dnxbiidd0/image/upload/v1729331833/thumbnails/nld1a3zsox7yleh1dwoa.webp" alt="">
+                    <div class="flex-1">
+                        <p class="truncate">Tên sản phẩm</p>
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm">
+                                <span>x1</span>
+                                &nbsp;
+                                -
+                                &nbsp;
+                                <span>2.700.000 đ</span>
+                            </p>
+                            <!-- delete icon -->
+                            <button class="btn btn-sm btn-circle btn-ghost">
+                                <i class="bx bx-trash text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                   
+                </li>
+            </ul>
+
+            <h3 class="font-medium text-lg mt-10 mb-5">
+                Thanh toán
+            </h3>
+
+            <div>
+                <div class="flex items-center py-4 justify-between">
+                    <p class="text-sm">Số sản phẩm</p>
+                    <p id="total-product" class="text-sm">1</p>
+                </div>
+                <div class="flex items-center py-4 justify-between border-b border-dashed">
+                    <p class="text-sm">Tổng cộng</p>
+                    <p id="sub-total" class="text-sm">2.700.000 đ</p>
+                </div>
+                <div class="flex items-center py-4 justify-between">
+                    <p class="text-sm">Tổng thanh toán</p>
+                    <p id="total-payment" class="text-sm">2.700.000 đ</p>
+                </div>
+
+                <label id="open-invoice-modal-btn" for="modal-invoice" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full">
+                   Thanh toán
+                </label>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Invoice Modal-->
+<input type="checkbox" id="modal-invoice" class="modal-toggle" />
+
+<div class="modal" role="dialog">
+    <div id="invoice-wrapper-modal" class="modal-box max-w-3xl !rounded-none">
+        <h3 class="text-lg font-bold">Thông tin hóa đơn</h3>
+        <section class="pt-4">
+            <div id="invoice-section">
+                <div id="invoice-inner" class="bg-white rounded-2xl border shadow-lg px-8 py-10 mx-auto">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center">
+                            <img class="h-8 w-8 mr-2" src="/images/logo.png"
+                                alt="Logo" />
+                            <div class="text-gray-700 font-semibold text-lg">Shoes Shop</div>
+                        </div>
+                        <div class="text-gray-700">
+                            <div class="font-bold text-xl mb-2">HÓA ĐƠN</div>
+                            <div class="text-sm">
+                                Ngày: 
+                                <span id="invoice-date"></span>
+                            </div>
+                            <div class="text-sm">
+                                Mã đơn #: 
+                                <span id="invoice-id"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-b-2 border-gray-300 pb-8 mb-8">
+                        <h2 class="text-2xl font-bold mb-4">Thông tin</h2>
+                        <div class="text-gray-700 mb-2">
+                            Nhân viên: 
+                            <span>
+                                <%= locals?.session?.user?.tenNguoiDung %>
+                            </span>
+                        </div>
+                    </div>
+                    <table id="invoice-selected-product-table" class="table mb-8">
+                        <thead>
+                            <tr>
+                                <th class="text-gray-700 font-bold uppercase py-2">Sản phẩm</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Số lượng</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Kích cỡ</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Giá</th>
+                                <th class="text-gray-700 font-bold uppercase py-2">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr>
+                                <td class="py-4 text-gray-700">Product 1</td>
+                                <td class="py-4 text-gray-700">1</td>
+                                <td class="py-4 text-gray-700">1</td>
+                                <td class="py-4 text-gray-700">$100.00</td>
+                                <td class="py-4 text-gray-700">$100.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 text-gray-700">Product 2</td>
+                                <td class="py-4 text-gray-700">2</td>
+                                <td class="py-4 text-gray-700">2</td>
+                                <td class="py-4 text-gray-700">$50.00</td>
+                                <td class="py-4 text-gray-700">$100.00</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 text-gray-700">Product 3</td>
+                                <td class="py-4 text-gray-700">3</td>
+                                <td class="py-4 text-gray-700">3</td>
+                                <td class="py-4 text-gray-700">$75.00</td>
+                                <td class="py-4 text-gray-700">$225.00</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                    <div class="flex items-center justify-end mb-8">
+                        <div class="text-gray-700 mr-2">Tạm tính:</div>
+                        <div id="invoice-sub-total" class="text-gray-700">$425.00</div>
+                    </div>
+                    <div class="flex items-center justify-end mb-8">
+                        <div class="text-gray-700 mr-2">Tổng tiền:</div>
+                        <div id="invoice-total-payment" class="text-gray-700 font-bold text-xl">$450.50</div>
+                    </div>
+                    <div class="border-t-2 border-gray-300 pt-8 mb-8">
+                        <div class="text-gray-700 mb-2">Cảm ơn bạn đã mua sắm tại Shoes Shop!</div>
+                        <div class="text-gray-700 mb-2">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email: support@shoesshop.com hoặc gọi điện thoại: 0123-456-789.</div>
+                    </div>
+                </div>
+                <button id="checkout-btn" class="btn bg-primary text-white hover:bg-primary rounded-xl w-full mt-8">
+                    <i id="checkout-loader" class='animate-spin hidden bx bx-loader-alt'></i>
+                    <span class="ms-2">Thanh toán và in hóa đơn</span>
+                 </button>
+                <label id="invoice-label-close-btn" for="modal-invoice"></label>
+            </div>
+        </section>
+    </div>
+    <label class="modal-backdrop" for="modal-invoice">Close</label>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const priceFromInput = document.getElementById('price-from');
+        const priceToInput = document.getElementById('price-to');
+        const minPriceInput = document.querySelector('input[name="minPrice"]');
+        const maxPriceInput = document.querySelector('input[name="maxPrice"]');
+
+        const categoryInput = document.querySelector('input[name="category"]');
+        const brandInput = document.querySelector('input[name="brand"]');
+        const sizeInput = document.querySelector('input[name="size"]');
+
+        const productNameInput = document.querySelector('input[name="name"]');
+        const searchInput = document.querySelector('input[name="search"]');
+
+        const filterForm = document.getElementById('filter-form');
+        const searchForm = document.getElementById('search-form');
+
+        searchInput.addEventListener('change', function() {
+            productNameInput.value = searchInput.value.trim();
+        });
+
+        searchInput.addEventListener("search", function() {
+            if (this.value.trim() === "") {
+                productNameInput.value = "";
+                searchForm.submit();
+            }
+        });
+
+
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterForm.submit();
+        });
+
+        // Price input range
+
+        function formatVNCurrency() {
+            let value = this.value.replace(/[^0-9]/g, '');
+            const numericValue = Number(value);
+
+            if (isNaN(numericValue)) {
+                this.value = ''; 
+                minPriceInput.value = ''; 
+                maxPriceInput.value = ''; 
+                return;
+            } 
+
+            this.value = numericValue.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+            }).replace('₫', '').trim();
+
+            if (this.id === 'price-from') {
+                minPriceInput.value = numericValue;
+            } else {
+                maxPriceInput.value = numericValue;
+            }
+            
+
+        }
+        
+        priceFromInput.addEventListener('input', formatVNCurrency);
+        priceToInput.addEventListener('input', formatVNCurrency);
+
+        // Render price input 
+        priceFromInput.value = minPriceInput.value ? Number(minPriceInput.value).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim() : '';
+
+        priceToInput.value = maxPriceInput.value ? Number(maxPriceInput.value).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim() : '';
+
+
+    })
+</script>
+
+<script>
+    let selectedProducts = null
+    // Hàm định dạng tiền tệ
+    const formatVNCurrency = (value) => {
+        return value.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        });
+    };
+        // Gắn sự kiện vào từng modal khi người dùng mở
+        const modals = document.querySelectorAll('.modal');
+
+        // Biến lưu trữ sản phẩm đã chọn
+        selectedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+
+        const productList = document.getElementById("selected-product-list");
+
+        const totalProductElement = document.getElementById("total-product");
+        const subTotalElement = document.getElementById("sub-total");
+        const totalPaymentElement = document.getElementById("total-payment");
+
+        const renderProductList = () => {
+            productList.innerHTML = ""; // Xóa danh sách cũ
+
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            selectedProducts.forEach((product, index) => {
+                totalItems += product.quantity;
+                totalPrice += product.selectedPrice * product.quantity;
+
+                const productItem = document.createElement("li");
+                productItem.className = "flex items-center gap-3 mb-3 last:mb-0";
+
+                productItem.innerHTML = `
+                    <img class="size-14 rounded-xl object-contain border" src="${product.productImage}" alt="Sản phẩm">
+                    <div class="flex-1 max-w-full overflow-hidden">
+                        <p class="truncate">${product.productName}</p>
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm">
+                                <span>x${product.quantity}</span>
+                                &nbsp;
+                                -
+                                &nbsp;
+                                <span>${formatVNCurrency(product.selectedPrice * product.quantity)}</span>
+                            </p>
+                            <!-- delete icon -->
+                            <button class="btn btn-sm btn-circle btn-ghost delete-btn" data-index="${index}">
+                                <i class="bx bx-trash text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productList.appendChild(productItem);
+            });
+
+            // Xử lý nếu danh sách trống
+            if (selectedProducts.length === 0) {
+                const emptyItem = document.createElement("li");
+                emptyItem.className = "flex items-center justify-center h-20";
+                emptyItem.innerHTML = "Chưa có sản phẩm nào được chọn.";
+                productList.appendChild(emptyItem);
+            }
+
+            // Cập nhật tổng số sản phẩm và tổng tiền
+            totalProductElement.innerText = `${totalItems} sản phẩm`;
+            subTotalElement.innerText = formatVNCurrency(totalPrice);
+            totalPaymentElement.innerText = formatVNCurrency(totalPrice);
+
+            // Gắn sự kiện xóa sản phẩm
+            const deleteBtns = document.querySelectorAll(".delete-btn");
+            deleteBtns.forEach((btn) => {
+                btn.addEventListener("click", (e) => {
+                    const index = Number(btn.getAttribute("data-index"));
+                    selectedProducts.splice(index, 1); // Xóa sản phẩm khỏi mảng
+                    localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts)); // Cập nhật localStorage
+                    renderProductList(); // Render lại danh sách
+                });
+            });
+        };
+
+        // Render danh sách sản phẩm khi trang tải
+        renderProductList();
+
+        modals.forEach((modal) => {
+            const modalId = modal.getAttribute('id'); // Lấy id của modal
+            const increaseBtns = modal.querySelectorAll('.increase-btn');
+            const decreaseBtns = modal.querySelectorAll('.decrease-btn');
+            const selectedQuantity = modal.querySelector('.quantity-select-value');
+            const sizeItems = modal.querySelectorAll('.size-list button');
+            const orderPrice = modal.querySelector('#order-price');
+            const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+
+            
+            let selectedSizeQuantity = 0;
+            let selectedSizePrice = 0;
+            let selectedSizeId = null;
+            let selectedProductImage = null;
+            let selectedProductName = null;
+            let selectedSizeName = null;
+
+            // Hàm render giá sau khi thay đổi số lượng
+            const renderSizePrice = (quantity) => {
+                if (orderPrice) {
+                    orderPrice.innerHTML = formatVNCurrency(selectedSizePrice * quantity);
+                }
+            };
+
+            // Xử lý tăng số lượng
+            increaseBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (selectedQuantity && selectedQuantity.innerHTML < selectedSizeQuantity) {
+                        selectedQuantity.innerHTML = Number(selectedQuantity.innerHTML) + 1;
+                        renderSizePrice(Number(selectedQuantity.innerHTML));
+                    }
+                });
+            });
+
+            // Xử lý giảm số lượng
+            decreaseBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (selectedQuantity && selectedQuantity.innerHTML > 1) {
+                        selectedQuantity.innerHTML = Number(selectedQuantity.innerHTML) - 1;
+                        renderSizePrice(Number(selectedQuantity.innerHTML));
+                    }
+                });
+            });
+
+            // Xử lý chọn kích cỡ
+            sizeItems.forEach((item) => {
+                item.addEventListener('click', () => {
+                    sizeItems.forEach((btn) => btn.classList.remove('border-primary'));
+                    item.classList.add('border-primary');
+
+                    selectedSizeQuantity = Number(item.getAttribute('data-sizeQuantity'));
+                    selectedSizePrice = Number(item.getAttribute('data-sizePrice'));
+                    selectedSizeId = item.getAttribute('data-sizeId');
+                    selectedSizeName = item.getAttribute('data-sizeName');
+
+                    // Cập nhật giá mua ban đầu
+                    renderSizePrice(Number(selectedQuantity.innerHTML));
+
+                    // Mở khóa nút thêm vào giỏ hàng
+                    if (addToCartBtn) {
+                        addToCartBtn.removeAttribute('disabled');
+                    }
+                });
+            });
+
+            // Xử lý thêm vào giỏ hàng
+            if (!addToCartBtn) return;
+
+
+            addToCartBtn.addEventListener('click', () => {
+                const productId = addToCartBtn.getAttribute('data-productId');
+                const quantity = Number(selectedQuantity.innerHTML);
+                const productImage = addToCartBtn.getAttribute('data-productImage');
+                const productName = addToCartBtn.getAttribute('data-productName');
+
+                const product = {
+                    productId: productId,
+                    sizeId: selectedSizeId,
+                    quantity: quantity,
+                    selectedPrice: selectedSizePrice,
+                    productImage: productImage,
+                    productName: productName,
+                    sizeName: selectedSizeName,
+                };
+
+                // Kiểm tra xem sản phẩm đã tồn tại trong danh sách chưa
+                const existingProductIndex = selectedProducts.findIndex(
+                    (p) => p.productId === product.productId && p.sizeId === product.sizeId
+                );
+
+                if (existingProductIndex >= 0) {
+                    // Nếu đã tồn tại, cập nhật số lượng
+                    selectedProducts[existingProductIndex].quantity += quantity;
+                } else {
+                    // Nếu chưa, thêm sản phẩm vào danh sách
+                    selectedProducts.push(product);
+                }
+
+                // Lưu danh sách vào localStorage
+                localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+
+                 // Render lại danh sách sản phẩm
+                renderProductList();
+
+                // Reset quantity về 1
+                selectedQuantity.innerHTML = 1;
+            });
+        });
+</script>
+
+<!-- Invoice script -->
+<script>
+    const openInvoiceModalBtn = document.getElementById('open-invoice-modal-btn');
+
+    const invoiceDate = document.getElementById('invoice-date');
+    const invoiceId = document.getElementById('invoice-id');
+
+    const invoiceSubTotal = document.getElementById('invoice-sub-total');
+    const invoiceTotalPayment = document.getElementById('invoice-total-payment');
+
+    const invoiceSelectedProductTable = document.getElementById('invoice-selected-product-table');
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const invoiceLabelCloseBtn = document.getElementById('invoice-label-close-btn');
+
+    const invoiceSection = document.getElementById('invoice-section');
+    
+    const checkoutBtnLoader = document.getElementById('checkout-loader');
+
+    openInvoiceModalBtn.addEventListener("click", function () {
+        // Lấy ngày hiện tại
+        const currentDate = new Date().toLocaleDateString('vi-VN');
+
+        // Hiển thị ngày hiện tại
+        invoiceDate.innerText = currentDate;
+
+        // Tạo mã hóa đơn ngẫu nhiên
+        // const invoiceCode = Math.random().toString(36).substr(2, 9).toUpperCase();
+        invoiceId.innerText = "";
+
+        // Tính tổng tiền
+        let totalPayment = 0;
+        selectedProducts.forEach(product => {
+            totalPayment += product.selectedPrice * product.quantity;
+
+            const row = invoiceSelectedProductTable.insertRow(-1);
+            row.innerHTML = `
+                <tr>
+                    <td class="py-4 break-words overflow-hidden text-ellipsis whitespace-normal line-clamp-2">${product.productName}</td>
+                    <td class="py-4">${product.quantity}</td>
+                    <td class="py-4">${product.sizeName}</td>
+                    <td class="py-4">${formatVNCurrency(product.selectedPrice)}</td>
+                    <td class="py-4">${formatVNCurrency(product.selectedPrice * product.quantity)}</td>
+                </tr>
+            `;
+        });
+
+        // Hiển thị tổng tiền
+        invoiceSubTotal.innerText = formatVNCurrency(totalPayment);
+        invoiceTotalPayment.innerText = formatVNCurrency(totalPayment);
+    })
+
+    checkoutBtn.addEventListener("click", async function () {
+        try {
+            checkoutBtnLoader.classList.remove("hidden");
+
+            const response = await fetch('/admin/sale/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    selectedProducts: selectedProducts
+                })
+            });
+
+            // Lấy order từ response
+            const data = await response.json();
+            const order = data?.order;
+
+            if (!order) {
+                throw new Error('Có lỗi xảy ra khi thanh toán.');
+            }
+
+
+            // Hiển thị thông tin mã hóa đơn
+            invoiceId.innerText = order.maDonHang;
+
+            // Xóa sản phẩm đã chọn
+            selectedProducts = [];
+
+            localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+
+            renderProductList();
+
+            window.print();
+
+            // Đóng modal
+            invoiceLabelCloseBtn.click();
+        } catch (error) {
+            
+            console.log(error);
+            
+        } finally {
+            checkoutBtnLoader.classList.add("hidden");
+        }
+
+    })
+</script>

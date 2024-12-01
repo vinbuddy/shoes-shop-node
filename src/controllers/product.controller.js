@@ -510,6 +510,21 @@ export async function renderAdminGoodsReceiptDetails(req, res, next) {
 
 // API
 
+// [GET] /api/product/search?search=
+export async function searchProductRequest(req, res) {
+    const search = req.query.search;
+
+    if (!search) {
+        return res.status(400).json({ message: "Vui lòng nhập từ khóa tìm kiếm." });
+    }
+
+    const products = await ProductModel.find({
+        tenSanPham: { $regex: new RegExp(search, "i") },
+    });
+
+    return res.status(200).json({ products });
+}
+
 // Get Product Information
 // [GET] /api/product/
 export async function getAllProduct(req, res) {
