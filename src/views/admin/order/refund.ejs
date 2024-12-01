@@ -74,11 +74,15 @@
                 <div class="tp-search-box flex items-center justify-between px-8 py-8 flex-wrap">
                     <div class="search-input relative">
                         <input
+                            id="searchOrderId"
                             class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             type="text"
                             placeholder="Mã đơn hàng"
                         />
-                        <button class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500">
+                        <button
+                            id="searchOrderButton"
+                            class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500"
+                        >
                             <svg
                                 width="16"
                                 height="16"
@@ -216,27 +220,37 @@
                 });
             });
         }
+        document.getElementById("searchOrderButton").addEventListener("click", function () {
+            switchTab(event, "all-orders");
+        });
     }
+
     async function paginateOrders(tabId, page) {
-        fetch(`/admin/refund/${tabId}?page=${page}`)
+        let keywword;
+        if (document.getElementById("searchOrderId")) {
+            keywword = document.getElementById("searchOrderId").value.trim();
+        }
+        fetch(`/admin/refund/${tabId}?page=${page}&&keyword=${keywword}`)
             .then((response) => response.json())
             .then((data) => {
                 const boxSearch = document.querySelector(`.tp-search-box`);
-
                 const tableBody = document.querySelector(` tbody`);
                 thead = document.querySelector(` thead`);
                 thead.innerHTML = ``;
                 boxSearch.innerHTML = ``;
-                console.log(data.orders);
                 if (data.orders.length > 0) {
                     boxSearch.innerHTML = `
-                <div class="search-input relative">
+               <div class="search-input relative">
                         <input
+                            id="searchOrderId"
                             class="input h-11 w-full pl-14 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             type="text"
                             placeholder="Mã đơn hàng"
                         />
-                        <button class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500">
+                        <button
+                            id="searchOrderButton"
+                            class="absolute top-1/2 left-5 transform -translate-y-1/2 hover:text-blue-500"
+                        >
                             <svg
                                 width="16"
                                 height="16"
@@ -333,15 +347,16 @@
                     tableBody.appendChild(row);
                 });
 
-                const paginationControls = document.querySelector(` .pagination-controls`);
+                const paginationControls = document.querySelector(`.pagination-controls`);
                 paginationControls.innerHTML = "";
-                for (let i = 1; i < data.totalPages; i++) {
-                    const pageButton = document.createElement("button");
-
-                    pageButton.classList.add("px-3", "py-1", "border", "rounded-md", "mx-1", "hover:bg-gray-200");
-                    pageButton.innerText = i;
-                    pageButton.onclick = () => paginateOrders(tabId, i);
-                    paginationControls.appendChild(pageButton);
+                if (data.totalPages > 1) {
+                    for (let i = 1; i < data.totalPages; i++) {
+                        const pageButton = document.createElement("button");
+                        pageButton.classList.add("px-3", "py-1", "border", "rounded-md", "mx-1", "hover:bg-gray-200");
+                        pageButton.innerText = i;
+                        pageButton.onclick = () => paginateOrders(tabId, i);
+                        paginationControls.appendChild(pageButton);
+                    }
                 }
             });
     }

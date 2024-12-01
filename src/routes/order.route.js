@@ -24,6 +24,5 @@ router.post(
 router.get("/completed/:id", completedOrderHandle);
 router.get("/refundRequest/:id", renderRefundClientPage);
 router.get("/cancelRefund/:id", cancelRefundHandle);
-router.get("/refundStatus/:id", cancelRefundHandle);
 
 export default router;

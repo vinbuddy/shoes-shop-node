@@ -1,8 +1,7 @@
-import mongoose from "mongoose";
 import DanhGiaModel from "../models/danhGia.model.js";
 import DonHangModel from "../models/donHang.model.js";
 import TrangThaiModel from "../models/trangThai.model.js";
-// import NguoiDungModel from "../models/nguoidung.model.js";
+import khachHangModel from "../models/khachHang.model.js";
 
 export async function renderUserProfilePage(req, res) {
     const customer = req.session.customer;
@@ -27,7 +26,9 @@ export async function renderUserOrderPage(req, res) {
         })
         .populate({
             path: "thongTinDoiTraHang.chiTietDoiTraHang.maSanPham",
-            select: "hinhAnhDaiDien",
+        })
+        .populate({
+            path: "thongTinDoiTraHang.chiTietDoiTraHang.maKichCoSanPham",
         })
         .exec();
 
@@ -93,10 +94,16 @@ export async function renderUserOrderDetailPage(req, res) {
     const order = await DonHangModel.findById(id)
         .populate({
             path: "chiTietDonHang.maSanPham",
-            select: "tenSanPham giaSanPham hinhAnhDaiDien",
+        })
+        .populate({
+            path: "thongTinDoiTraHang.chiTietDoiTraHang.maSanPham",
         })
         .populate({
             path: "chiTietDonHang.maKichCoSanPham",
+            select: "tenKichCo",
+        })
+        .populate({
+            path: "thongTinDoiTraHang.chiTietDoiTraHang.maKichCoSanPham",
             select: "tenKichCo",
         })
         .populate({ path: "maKhachHang" })
@@ -109,4 +116,14 @@ export async function renderUserOrderDetailPage(req, res) {
         order: order,
         customer: customer,
     });
+}
+
+export async function updateNameUser(req, res) {
+    const { tenKhachHang } = req.body;
+    const customer = req.session.customer;
+    const user = await khachHangModel.findOne({ _id: customer._id });
+    user.tenKhachHang = tenKhachHang;
+    await user.save();
+    req.session.customer = user;
+    return res.redirect("/user/profile");
 }

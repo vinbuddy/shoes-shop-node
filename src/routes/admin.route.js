@@ -9,6 +9,7 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import categoryRoutes from "./category.route.js";
 import statusRoutes from "./status.route.js";
+import sizeRoutes from "./size.route.js";
 import {
     renderAdminOrderPage,
     renderAdminOrderDetailPage,
@@ -20,6 +21,7 @@ import {
     nextStatusHandler,
     SearchOrders,
 } from "../controllers/order.controller.js";
+
 import multer from "multer";
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
@@ -42,7 +44,7 @@ router.use("/brand", brandRoutes);
 router.use("/supplier", supplierRoutes);
 router.use("/category", categoryRoutes);
 router.use("/status", statusRoutes);
-
+router.use("/size", sizeRoutes);
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
 router.get("/order", renderAdminOrderPage);
@@ -55,4 +57,5 @@ router.post("/order/refundStatus", refundStatusRequest);
 router.get("/order/refund", renderRefundAdminPage);
 router.get("/refund/:tabId", fetchRefundOrders);
 router.get("/order/search/:keyword", SearchOrders);
+
 export default router;

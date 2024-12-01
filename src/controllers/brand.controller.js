@@ -24,7 +24,7 @@ export async function updateBrand(req, res) {
         const id = req.body.id;
         const { tenHangSanXuat, moTa } = req.body;
         const existingBrand = await BrandModel.findOne({ tenHangSanXuat, _id: { $ne: id } });
-
+        console.log(tenHangSanXuat, moTa, id);
         if (existingBrand) {
             return res.redirect("/admin/brand");
         }
@@ -68,6 +68,14 @@ export async function createBrand(req, res) {
         const newBrand = new BrandModel({ tenHangSanXuat, moTa });
 
         await newBrand.save();
+        await BrandModel.updateOne(
+            { _id: newBrand._id },
+            {
+                $set: {
+                    maHangSanXuat: newBrand._id,
+                },
+            }
+        );
         return res.redirect("/admin/brand");
     } catch (error) {
         return res.render("admin/brand/create", {

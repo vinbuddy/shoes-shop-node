@@ -6,6 +6,7 @@ import {
     renderCreatePage,
     createBrand,
     restoreBrand,
+    searchBrand,
 } from "../controllers/brand.controller.js";
 
 const router = express.Router();
@@ -16,4 +17,5 @@ router.get("/delete/:id", deleteBrand);
 router.get("/restore/:id", restoreBrand);
 router.post("/edit", updateBrand);
 router.post("/create", createBrand);
+router.get("/search", searchBrand);
 export default router;
