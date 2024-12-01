@@ -1,12 +1,28 @@
 <div>
-    <% if (locals.message)  { %>
-        <div role="alert" class="alert alert-success text-white mb-5">
-            <i class='bx bx-check-circle'></i>
-            <span>
-                <%= message %>
-            </span>
+    
+    <% if (locals.message && locals.message.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+            <p><%= message %></p>
+        
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-green-600'></i>
+            </button>
+          </div>
+    <% } %>
+
+    <% if (locals.error && locals.error.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+            <p>
+                <%= error %>
+            </p>
+
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-red-600'></i>
+            </button>
         </div>
-        <% } %>
+        
+    <% } %>
+
     <div class="flex justify-between items-center mb-5">
         <h3 class="text-xl font-bold mb-5">Danh sách sản phẩm</h3>
 

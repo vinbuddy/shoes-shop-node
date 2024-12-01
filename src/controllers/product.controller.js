@@ -267,19 +267,14 @@ export async function createProductHandler(req, res) {
             }
         );
 
+        req.flash("message", "Thêm sản phẩm thành công");
+
         return res.redirect("/admin/product");
     } catch (error) {
-        const brands = await BrandModel.find({ trangThaiXoa: false });
-        const categories = await CategoryModel.find({ trangThaiXoa: false });
-        const sizes = await SizeModel.find();
+        console.error("Error creating product:", error);
 
-        return res.render("admin/product/create", {
-            ...VIEW_OPTIONS.ADMIN_CREATE,
-            brands: brands,
-            categories: categories,
-            sizes: sizes,
-            error: error.message,
-        });
+        req.flash("error", error.message);
+        return res.redirect("/admin/product");
     }
 }
 
@@ -312,7 +307,6 @@ export async function renderAdminEditProductPage(req, res) {
 }
 
 export async function updateProductHandler(req, res) {
-    const _productId = req.body.productId;
     try {
         const { productId, name, brand, category, description, sizes, retainedImages } = req.body;
 
@@ -376,25 +370,14 @@ export async function updateProductHandler(req, res) {
 
         await product.save();
 
+        req.flash("message", "Cập nhật sản phẩm thành công");
+
         return res.redirect("/admin/product");
     } catch (error) {
-        const brands = await BrandModel.find({ trangThaiXoa: false });
-        const categories = await CategoryModel.find({ trangThaiXoa: false });
-        const sizes = await SizeModel.find();
+        console.error("Error updating product:", error);
 
-        const product = await ProductModel.findOne({ maSanPham: new mongoose.Types.ObjectId(_productId) })
-            .populate("maHangSanXuat")
-            .populate("danhSachDanhMuc")
-            .populate("danhSachKichCo.maKichCo");
-
-        return res.render("admin/product/edit", {
-            ...VIEW_OPTIONS.ADMIN_EDIT,
-            product: product,
-            brands: brands,
-            categories: categories,
-            sizes: sizes,
-            error: error.message,
-        });
+        req.flash("error", error.message);
+        return res.redirect("/admin/product");
     }
 }
 
@@ -405,9 +388,13 @@ export async function deleteProductHandler(req, res) {
             { maSanPham: new mongoose.Types.ObjectId(productId) },
             { trangThaiXoa: true }
         );
+
+        req.flash("message", "Xóa sản phẩm thành công");
+
         return res.redirect("/admin/product");
     } catch (error) {
         console.error("Error deleting product:", error);
+        req.flash("error", error.message);
         return res.redirect("/admin/product");
     }
 }
@@ -532,6 +519,21 @@ export async function renderAdminGoodsReceiptDetails(req, res, next) {
 }
 
 // API
+
+// [GET] /api/product/search?search=
+export async function searchProductRequest(req, res) {
+    const search = req.query.search;
+
+    if (!search) {
+        return res.status(400).json({ message: "Vui lòng nhập từ khóa tìm kiếm." });
+    }
+
+    const products = await ProductModel.find({
+        tenSanPham: { $regex: new RegExp(search, "i") },
+    });
+
+    return res.status(200).json({ products });
+}
 
 // Get Product Information
 // [GET] /api/product/

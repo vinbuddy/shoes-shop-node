@@ -32,6 +32,7 @@ export async function updateSize(req, res) {
         const updatedData = { tenKichCo, moTaKichCo };
         await SizeModel.findByIdAndUpdate(id, updatedData);
         const sizes = await SizeModel.find();
+        req.flash("message", "Sửa kích cỡ thành công");
         return res.render("admin/size/index", {
             layout: "./layouts/admin",
             page: "size",
@@ -39,9 +40,9 @@ export async function updateSize(req, res) {
             sizes: sizes,
             currentPage: 1,
             totalPages: Math.ceil(totalSizes / 10),
-            error: "Kích cỡ này đã tồn tại",
         });
     } catch (error) {
+        req.flash("error", "Sửa kích cỡ thất bại");
         console.error("Error updating size:", error);
     }
 }
@@ -57,13 +58,9 @@ export async function createSize(req, res) {
     try {
         const { tenKichCo, moTaKichCo } = req.body;
         const existingSize = await SizeModel.findOne({ tenKichCo });
+
         if (existingSize) {
-            return res.render("admin/size/create", {
-                layout: "./layouts/admin",
-                page: "size",
-                title: "create size",
-                error: "Kích cỡ này đã tồn tại",
-            });
+            throw new Error("Kích cỡ đã tồn tại");
         }
         const newSize = new SizeModel({ tenKichCo, moTaKichCo });
 
@@ -76,14 +73,11 @@ export async function createSize(req, res) {
                 },
             }
         );
+        req.flash("message", "Thêm kích cỡ thành công");
         return res.redirect("/admin/size");
     } catch (error) {
-        return res.render("admin/size/create", {
-            layout: "./layouts/admin",
-            page: "size",
-            title: "create size",
-            error: error.message,
-        });
+        req.flash("error", error.message);
+        res.redirect("/admin/size/create");
     }
 }
 
