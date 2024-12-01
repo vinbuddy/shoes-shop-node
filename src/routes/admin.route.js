@@ -24,7 +24,7 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import categoryRoutes from "./category.route.js";
 import statusRoutes from "./status.route.js";
-import authRoutes from "./auth.route.js"
+import authRoutes from "./auth.route.js";
 
 import {
     renderAdminOrderPage,
@@ -32,9 +32,7 @@ import {
     updateOrderStatus,
 } from "../controllers/order.controller.js";
 
-import {
-    renderAdminProfilePage,
-} from "../controllers/user.controller.js"
+import { renderAdminProfilePage } from "../controllers/user.controller.js";
 
 import {
     createPromotionHandler,
@@ -46,18 +44,33 @@ import {
 } from "../controllers/promotion.controller.js";
 
 import multer from "multer";
+import {
+    verifyManagerRole,
+    verifyWarehouseStaffRole,
+    // verifySalesStaffRole,
+} from "../middlewares/verifyRoleMiddleware.js";
+
+import { renderAdminSalePage, saleCheckoutRequest } from "../controllers/sale.controller.js";
 
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
-router.get('/goods-receipt-list', renderAdminGoodsReceiptList);
-router.get('/goods-receipt-details/:id', renderAdminGoodsReceiptDetails);
-router.get("/create-goods-receipt", renderAdminCreateGoodsReceipt);
+// Goods Receipt [Nhân viên kho]
+router.get("/goods-receipt-list", verifyWarehouseStaffRole, renderAdminGoodsReceiptList);
+router.get("/goods-receipt-details/:id", verifyWarehouseStaffRole, renderAdminGoodsReceiptDetails);
+router.get("/create-goods-receipt", verifyWarehouseStaffRole, renderAdminCreateGoodsReceipt);
 
-router.get("/product", renderAdminProductPage);
-router.get("/product/create", renderAdminCreateProductPage);
+router.use("/brand", brandRoutes);
+router.use("/supplier", supplierRoutes);
+router.use("/category", categoryRoutes);
+router.use("/status", statusRoutes);
+router.use("/auth", authRoutes);
 
+// Product [Nhân viên kho]
+router.get("/product", verifyWarehouseStaffRole, renderAdminProductPage);
+router.get("/product/create", verifyWarehouseStaffRole, renderAdminCreateProductPage);
+router.get("/product/edit/:id", verifyWarehouseStaffRole, renderAdminEditProductPage);
 router.post(
     "/product/create",
     uploadFile.fields([
@@ -72,17 +85,9 @@ router.post(
     ]),
     createProductHandler
 );
-router.use("/brand", brandRoutes);
-router.use("/supplier", supplierRoutes);
-router.use("/category", categoryRoutes);
-router.use("/status", statusRoutes);
-router.use("/auth", authRoutes)
-
-router.get("/product", renderAdminProductPage);
-router.get("/product/create", renderAdminCreateProductPage);
-router.get("/product/edit/:id", renderAdminEditProductPage);
 router.post(
     "/product/edit",
+    verifyWarehouseStaffRole,
     uploadFile.fields([
         {
             name: "productImageFiles",
@@ -95,19 +100,21 @@ router.post(
     ]),
     updateProductHandler
 );
-router.get("/product/delete/:id", deleteProductHandler);
+router.get("/product/delete/:id", verifyWarehouseStaffRole, deleteProductHandler);
 
+// Order [Nhân viên bán hàng]
 router.get("/order", renderAdminOrderPage);
 router.get("/order/detail/:id", renderAdminOrderDetailPage);
 router.post("/order/updateStatus/:id", updateOrderStatus);
 
-router.get("/profile", renderAdminProfilePage)
+router.get("/profile", renderAdminProfilePage);
 
-// Employee
-router.get("/employee", renderAdminEmployeePage);
-router.get("/employee/create", renderAdminCreateEmployeePage);
+// Employee [Nhân viên quản lý]
+router.get("/employee", verifyManagerRole, renderAdminEmployeePage);
+router.get("/employee/create", verifyManagerRole, renderAdminCreateEmployeePage);
 router.post(
     "/employee/create",
+    verifyManagerRole,
     uploadFile.fields([
         {
             name: "anhDaiDien",
@@ -116,9 +123,10 @@ router.post(
     ]),
     createEmployeeHandler
 );
-router.get("/employee/edit/:id", renderAdminEditEmployeePage);
+router.get("/employee/edit/:id", verifyManagerRole, renderAdminEditEmployeePage);
 router.post(
     "/employee/edit",
+    verifyManagerRole,
     uploadFile.fields([
         {
             name: "anhDaiDien",
@@ -127,14 +135,18 @@ router.post(
     ]),
     editEmployeeHandler
 );
-router.get("/employee/delete/:id", deleteEmployeeHandler);
+router.get("/employee/delete/:id", verifyManagerRole, deleteEmployeeHandler);
 
-// Promotion
-router.get("/promotion", renderAdminPromotionPage);
-router.get("/promotion/create", renderAdminCreatePromotionPage);
-router.post("/promotion/create", createPromotionHandler);
-router.get("/promotion/edit/:id", renderAdminEditPromotionPage);
-router.post("/promotion/edit", editPromotionHandler);
-router.get("/promotion/delete/:id", deletePromotionHandler);
+// Promotion [Nhân viên quản lý]
+router.get("/promotion", verifyManagerRole, renderAdminPromotionPage);
+router.get("/promotion/create", verifyManagerRole, renderAdminCreatePromotionPage);
+router.post("/promotion/create", verifyManagerRole, createPromotionHandler);
+router.get("/promotion/edit/:id", verifyManagerRole, renderAdminEditPromotionPage);
+router.post("/promotion/edit", verifyManagerRole, editPromotionHandler);
+router.get("/promotion/delete/:id", verifyManagerRole, deletePromotionHandler);
+
+// Sale [Nhân viên bán hàng]
+router.get("/sale", renderAdminSalePage);
+router.post("/sale/checkout", saleCheckoutRequest);
 
 export default router;
