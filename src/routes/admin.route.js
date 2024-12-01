@@ -50,6 +50,8 @@ import {
     // verifySalesStaffRole,
 } from "../middlewares/verifyRoleMiddleware.js";
 
+import { renderAdminSalePage, saleCheckoutRequest } from "../controllers/sale.controller.js";
+
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
@@ -142,5 +144,9 @@ router.post("/promotion/create", verifyManagerRole, createPromotionHandler);
 router.get("/promotion/edit/:id", verifyManagerRole, renderAdminEditPromotionPage);
 router.post("/promotion/edit", verifyManagerRole, editPromotionHandler);
 router.get("/promotion/delete/:id", verifyManagerRole, deletePromotionHandler);
+
+// Sale [Nhân viên bán hàng]
+router.get("/sale", renderAdminSalePage);
+router.post("/sale/checkout", saleCheckoutRequest);
 
 export default router;
