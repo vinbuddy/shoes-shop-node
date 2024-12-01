@@ -40,7 +40,6 @@ export function renderCreatePage(req, res) {
 export async function renderUpdatePage(req, res) {
     const { id } = req.params;
     const supplier = await NhaSanXuatModel.findById(id);
-    console.log(supplier);
     return res.render("admin/supplier/edit", {
         layout: "./layouts/admin",
         page: "supplier",
@@ -62,6 +61,8 @@ export async function createSupplier(req, res) {
         }
         const newSupplier = new NhaSanXuatModel({ tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi });
         await newSupplier.save();
+        req.flash("message", "Thêm nhà cung cấp thành công");
+
         return res.redirect("/admin/supplier");
     } catch (error) {
         return res.render("admin/supplier/create", {
@@ -135,11 +136,11 @@ export async function renderSupplierPageWithPagination(req, res) {
 export async function getSupplierById(req, res) {
     // Get supplier id from request params
     const supplierId = req.params.id;
-    const supplier = await SupplierModel.findById(supplierId);
-    
+    const supplier = await NhaSanXuatModel.findById(supplierId);
+
     if (supplier) {
         return res.json(supplier);
     } else {
-        return res.status(404).json({ error: 'Supplier not found' });
+        return res.status(404).json({ error: "Supplier not found" });
     }
 }

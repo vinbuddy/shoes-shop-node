@@ -15,6 +15,10 @@ const kichCoSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    trangThaiXoa: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const KichCoModel = mongoose.model("KichCo", kichCoSchema);

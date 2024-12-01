@@ -32,27 +32,27 @@
                 </tr>
             </thead>
             <tbody>
-                <% brands.forEach(function(brand) { %>
+                <% sizes.forEach(function(size) { %>
                     <tr class="border-b hover:bg-gray-100">
-                        <td class="py-3 px-6"><%= brand.tenHangSanXuat %></td>
-                        <td class="py-3 px-6"><%= brand.moTa %></td>
+                        <td class="py-3 px-6"><%= size.tenKichCo %></td>
+                        <td class="py-3 px-6"><%= size.moTaKichCo %></td>
                         <td class="py-3 px-6">
-                            <% if (brand.trangThaiXoa) { %>
+                            <% if (size.trangThaiXoa) { %>
                                 <span class="text-red-500">Đã bị xoá</span>
                             <% } else { %>
                                 <span class="text-green-500">Hoạt động</span>
                             <% } %>
                         </td>
                         <td class="py-3 px-6">
-                            <% if (!brand.trangThaiXoa) { %>
-                                <a href="#!" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded" onclick="openModal('<%= brand.maHangSanXuat %>', '<%= brand.tenHangSanXuat %>', '<%= brand.moTa %>')">
+                            <% if (!size.trangThaiXoa) { %>
+                                <a href="#!" class="font-medium text-indigo-600 hover:text-indigo-500 bg-gray-200 px-2 py-1 rounded" onclick="openModal('<%= size.maKichCo %>', '<%= size.tenKichCo %>', '<%= size.moTaKichCo %>')">
                                     <i class="fas fa-edit"></i> Sửa
                                 </a>
-                                <a href="/admin/brand/delete/<%= brand.maHangSanXuat %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                                <a href="/admin/size/delete/<%= size.maKichCo %>" class="font-medium text-red-600 hover:text-red-500 bg-gray-200 px-2 py-1 rounded ml-2">
                                     <i class="fas fa-trash-alt"></i> Xoá
                                 </a>
                             <% } else { %>
-                                <a href="/admin/brand/restore/<%= brand.maHangSanXuat %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
+                                <a href="/admin/size/restore/<%= size.maKichCo %>" class="text-green-600 hover:text-green-500 bg-gray-200 px-2 py-1 rounded ml-2">
                                     <i class="fas fa-undo"></i> Khôi phục
                                 </a>
                             <% } %>
@@ -104,13 +104,13 @@
     </div>
     <div >
         <div class="sm:rounded-md bg-white shadow-xl p-4 w-[100%] mb-4">
-            <a href="/admin/brand/create" class="w-[100%] block bg-blue-500 text-center hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
-                <i class="fas fa-plus"></i> Thêm nhãn hàng
+            <a href="/admin/size/create" class="w-[100%] block bg-blue-500 text-center hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">
+                <i class="fas fa-plus"></i> Thêm kích cỡ
             </a>
         </div>
         
-        <form action="/admin/brand/search" method="GET" class=" self-start left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
-            <input type="text" name="tenHangSanXuat" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof tenHangSanXuat !== 'undefined' ? tenHangSanXuat : '' %>">
+        <form action="/admin/size/search" method="GET" class=" self-start left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
+            <input type="text" name="tenKichCo" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof tenKichCo !== 'undefined' ? tenKichCo : '' %>">
             <select name="trangThaiXoa" class="border border-gray-300 rounded px-4 py-2 flex-1">
                 <option value="">Tất cả trạng thái</option>
                 <option value="false">Đang hoạt động</option>
@@ -126,16 +126,16 @@
     <!-- Modal -->
     <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-2/3">
-            <h2 class="text-2xl font-bold mb-4">Sửa nhãn hàng</h2>
-            <form id="editForm" action="/admin/brand/edit" method="POST">
-                <input type="hidden" id="brandId" name="id">
+            <h2 class="text-2xl font-bold mb-4">Sửa kích cỡ</h2>
+            <form id="editForm" action="/admin/size/edit" method="POST">
+                <input type="hidden" id="sizeId" name="id">
                 <div class="mb-4">
-                    <label for="brandName" class="block text-gray-700">Tên hãng sản xuất</label>
-                    <input type="text" id="brandName" name="tenHangSanXuat" class="w-full p-2 border border-gray-300 rounded mt-1">
+                    <label for="sizeName" class="block text-gray-700">Tên kích cỡ</label>
+                    <input type="text" id="sizeName" name="tenKichCo" class="w-full p-2 border border-gray-300 rounded mt-1">
                 </div>
                 <div class="mb-4">
-                    <label for="brandDescription" class="block text-gray-700">Mô tả</label>
-                    <textarea id="brandDescription" name="moTa" class="w-full p-2 border border-gray-300 rounded mt-1"></textarea>
+                    <label for="sizeDescription" class="block text-gray-700">Mô tả</label>
+                    <textarea id="sizeDescription" name="moTaKichCo" class="w-full p-2 border border-gray-300 rounded mt-1"></textarea>
                 </div>
               
                 <div class="flex justify-end">
@@ -147,10 +147,10 @@
     </div>
     
     <script>
-        function openModal(id, tenHangSanXuat, moTa) {
-            document.getElementById('brandId').value = id;
-            document.getElementById('brandName').value = tenHangSanXuat;
-            document.getElementById('brandDescription').value = moTa;
+        function openModal(id, tenKichCo, moTaKichCo) {
+            document.getElementById('sizeId').value = id;
+            document.getElementById('sizeName').value = tenKichCo;
+            document.getElementById('sizeDescription').value = moTaKichCo;
             document.getElementById('editModal').classList.remove('hidden');
             document.getElementById('editModal').classList.add('flex');
         }

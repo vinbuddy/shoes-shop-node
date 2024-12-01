@@ -24,11 +24,11 @@ export async function updateBrand(req, res) {
         const id = req.body.id;
         const { tenHangSanXuat, moTa } = req.body;
         const existingBrand = await BrandModel.findOne({ tenHangSanXuat, _id: { $ne: id } });
-
+        console.log(tenHangSanXuat, moTa, id);
         if (existingBrand) {
             return res.redirect("/admin/brand");
         }
-
+        const totalBrands = await BrandModel.countDocuments();
         const updatedData = { tenHangSanXuat, moTa };
         await BrandModel.findByIdAndUpdate(id, updatedData);
         const brands = await BrandModel.find();
@@ -37,6 +37,8 @@ export async function updateBrand(req, res) {
             page: "brand",
             title: "brand page",
             brands: brands,
+            currentPage: 1,
+            totalPages: Math.ceil(totalBrands / 10),
             error: "Nhãn hàng này đã tồn tại",
         });
     } catch (error) {
@@ -66,6 +68,14 @@ export async function createBrand(req, res) {
         const newBrand = new BrandModel({ tenHangSanXuat, moTa });
 
         await newBrand.save();
+        await BrandModel.updateOne(
+            { _id: newBrand._id },
+            {
+                $set: {
+                    maHangSanXuat: newBrand._id,
+                },
+            }
+        );
         return res.redirect("/admin/brand");
     } catch (error) {
         return res.render("admin/brand/create", {

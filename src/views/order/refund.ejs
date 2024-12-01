@@ -1,0 +1,295 @@
+<div class="container mx-auto p-6">
+    <% if (locals.error) { %>
+    <div role="alert" class="alert alert-error text-white mb-5">
+        <i class='bx bxs-error-circle'></i>
+        <span>
+            <%= error %>
+        </span>
+    </div>
+    <% } %>
+
+    <div class="flex justify-between items-center mb-5">
+        <% if(type == "return") { %>
+            <h3 class="text-2xl font-bold mb-5 text-orange-500">Yêu cầu trả đơn hàng</h3>
+            <% } else {%>
+            <h3 class="text-2xl font-bold mb-5 text-orange-500">Yêu cầu đổi sản phẩm</h3>
+            <%} %>
+    </div>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-5" role="alert">
+        <p class="font-bold">Chính sách đổi trả</p>
+        <p>Khách hàng tự trả lại cho cửa hàng, các chi phí phát sinh
+            trong quá trình trả hàng sẽ do khách hàng chịu.</p>
+    </div>
+    <div>
+        <form id="create-reason-form" action="/order/refund" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<%= order.maDonHang %>">
+            <input type="hidden" name="type" value="<%= type %>">
+            <div class="col-span-6">
+                <section class="rounded-2xl p-5 bg-gray-100/70">
+                    <h3 class="text-lg font-semibold mb-5">Các sản phẩm đã chọn</h3>
+                    <div>
+                        <!-- Selected Item -->
+                       
+                        <% order.chiTietDonHang.forEach(item => { %>
+                            <div  
+                                data-productId="<%= item.maSanPham.maSanPham %>" 
+                                data-productStockQuantity="<%= item.soLuongDaChon %>"
+                                data-productPrice="<%= item.giaSanPham %>"
+                                class=" flex justify-between items-center mt-6 pt-6">
+                                <div class="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id=""
+                                        name="selectedItem[]"
+                                        value="checked"
+                                        class="checkbox checkbox-sm [--chkbg:#0578f8]"
+                                        
+                                    />
+                                    <a class="fade" href="/product/<%= item.maSanPham.maSanPham %>">
+                                        <img
+                                            src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
+                                            width="60"
+                                            class="rounded-xl ms-2"
+                                        />
+                                    </a>
+        
+                                    <a href="/product/<%= item.maSanPham.maSanPham %>">
+                                        <div class="fade flex flex-col ml-3">
+                                            <input type="hidden" name="item[]" value="<%= item.maSanPham.maSanPham %>">
+                                            <span class="md:text-md font-medium max-w-[300px] truncate" title="<%= item.maSanPham.tenSanPham %>">
+                                                <%= item.maSanPham.tenSanPham %>
+                                            </span>
+                                            
+                                            <span class="text-sm font-light text-gray-500">
+                                                Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %>
+                                                - Giá: <%= (item.giaDaChon) %>
+                                            </span>
+                                        </div>
+                                       
+                                    </a>
+                                </div>
+                            <div class="fade pr-8 flex items-center text-lg">
+                                <button type="button" class="decrease-btn font-semibold p-2 cursor-pointer">
+                                    <i class="bx bx-minus"></i>
+                                </button>
+                                <input type="text" name="quantity[]" value="<%= item.soLuongDaChon %>" class="quantity-select-value w-12 text-center text-base focus:outline-none bg-gray-100 border px-3 rounded">
+                                   
+                                <button type="button" class="increase-btn font-semibold p-2 cursor-pointer">
+                                    <i class="bx bx-plus"></i>
+                                </button>
+                            </div>
+                            
+                            
+                            </div>
+                        <% }) %>
+                            
+                    </div>
+                </section>
+            </div>
+            <div class="grid grid-cols-12 gap-5 mt-4">
+                <div class="col-span-8 bg-gray-50 rounded-xl p-4 shadow-lg">
+                    <section>
+                        <div class="form-control w-full max-w-full mb-4">
+                            <div class="label">
+                                <% if(type == "return") { %>
+                                    <span class="label-text font-semibold text-lg">Chọn lý do hủy đơn hàng</span>
+                                <% } else { %>
+                                <span class="label-text font-semibold text-lg">Chọn lý do đổi hàng</span>
+                                <% } %>
+                            </div>
+                            <div class="mt-2 space-y-2 text-sm">
+                                <label class="flex items-center">
+                                    <input type="radio" name="reason" value="Người bán gửi sai hàng." class="mr-2">
+                                    <span>Người bán gửi sai hàng</span>
+                                </label>
+                                <label class="flex items-center"></label>
+                                    <input type="radio" name="reason" value="Hàng bể vỡ (vỡ vụn, trầy xước, không nguyên vẹn, rò rỉ chất lỏng...)" class="mr-2">
+                                    <span>Hàng bể vỡ. (vỡ vụn, trầy xước, không nguyên vẹn, rò rỉ chất lỏng...)</span>
+                                </label>
+                                <label class="flex items-center"></label>
+                                    <input type="radio" name="reason" value="Hàng lỗi, không hoạt động." class="mr-2">
+                                    <span>Hàng lỗi, không hoạt động.</span>
+                                </label>
+                                <label class="flex items-center"></label>
+                                    <input type="radio" name="reason" value="Khác với mô tả." class="mr-2">
+                                    <span>Khác với mô tả.</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="reason" value="Lý do khác." class="mr-2">
+                                    <span>Lý do khác.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="form-control mb-5 mt-5">
+                        <div class="label">
+                            <span class="label-text font-semibold text-lg">Mô tả:</span>
+                        </div>
+                        <textarea name="description" id="description" class="textarea h-24 w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4" placeholder="Nhập mô tả"></textarea>
+                    </div>
+                    <div class="form-control mb-5 mt-5">
+                        <div class="label">
+                            <span class="label-text font-semibold text-lg">Thông tin chuyển khoản:</span>
+                        </div>
+                        <input type="text" name="bank" id="bank" required class=" w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4" placeholder="STT-Tên Ngân hàng : 0123456789-Vietcombank">
+                    </div>
+                </div>
+
+                <div class="col-span-4 p-4 bg-gray-50 rounded-xl shadow-lg">
+                    <section>
+                        <div class="flex items-center gap-2 mb-5">
+                            <p class="font-semibold text-lg">Hình ảnh</p>
+                            <label class="text-white btn bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" for="reason-image-files">
+                                <i class='bx bx-upload'></i>
+                                Thêm
+                            </label>
+                        </div>
+                        <ul id="uploadImages" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto scrollbar">
+                            <input id="reason-image-files" name="reasonImageFiles" hidden type="file" accept="image/png, image/jpeg" multiple />
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            <section class="mt-14">
+                <button type="submit" class="w-full md:w-auto btn text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                    Gửi yêu cầu
+                </button>
+            </section>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
+<script>
+    const validation = new JustValidate("#create-reason-form");
+
+    validation.addField("input[name='reason']", [
+        {
+            rule: "required",
+            errorMessage: "Bắt buộc phải chọn một lý do",
+        },
+    ]);
+    validation.addField("input[name='bank']", [
+        {
+            rule: "required",
+            errorMessage: "Bắt buộc phải có thông tin chuyển khoản",
+        },
+    ]);
+    validation.addField("textarea[name='description']", [
+        {
+            rule: "required",
+            errorMessage: "Bắt buộc phải có mô tả",
+        },
+    ]);
+    validation.addField("input[name='selectedItem[]']", [
+        {
+            rule: "required",
+            errorMessage: "Bắt buộc phải chọn ít nhất một sản phẩm",
+        },
+    ]);
+        
+    validation.onSuccess((event) => {
+        if (reasonImageInputFiles.files.length === 0) {
+            alert("Vui lòng chọn ít nhất một hình ảnh sản phẩm");
+            return;
+        }
+        event.target.submit(); 
+    });
+</script>
+
+<script>
+    const reasonImageInputFiles = document.getElementById("reason-image-files");
+    const reasonImageUploads = document.getElementById("uploadImages");
+
+    const fileListTransfer = new DataTransfer();
+
+    const renderImageFiles = (files) => {
+        const lis = reasonImageUploads.querySelectorAll("li");
+        lis.forEach(li => {
+            li.remove();
+        });
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="preview-image relative group border rounded-2xl h-full">
+                        <div class="aspect-h-1 aspect-w-1 w-full h-full overflow-hidden rounded-2xl xl:aspect-h-8 xl:aspect-w-7">
+                            <img src="${e.target.result}" class="h-full w-full object-cover object-center group-hover:opacity-75" />
+                        </div>
+                        <button data-index="${i}" type="button" class="btn-remove-preview-image btn btn-circle btn-sm absolute top-2 right-2 bg-white bg-opacity-50 rounded-full">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    </div>
+                `;
+
+                reasonImageUploads.appendChild(li);
+
+                const removeBtns = li.querySelectorAll(".btn-remove-preview-image");
+                removeBtns.forEach((btn) => {
+                    btn.addEventListener("click", function(event) {
+                        const removeIndex = parseInt(this.getAttribute("data-index"));
+
+                        fileListTransfer.items.remove(removeIndex);
+                        li.remove();
+
+                        reasonImageInputFiles.files = fileListTransfer.files;
+                    });
+                });
+            };
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    reasonImageInputFiles.addEventListener("change", (event) => {
+        const files = event.target.files;
+
+        for (let i = 0; i < files.length; i++) {
+            fileListTransfer.items.add(files[i]);
+        }
+
+        reasonImageInputFiles.files = fileListTransfer.files;
+
+        renderImageFiles(reasonImageInputFiles.files);
+    });
+</script>
+<script>
+    const updateQuantity = (input, delta) => {
+        const quantityElement = input.querySelector(".quantity-select-value");
+        const productStockQuantity = parseInt(input.getAttribute("data-productStockQuantity"));
+        const productPrice = parseFloat(input.getAttribute("data-productPrice"));
+        
+        let quantity = parseInt(quantityElement.value);
+        console.log(quantity);
+        quantity += delta;
+        if (quantity < 1) {
+            quantity = 1;
+        } else if (quantity > productStockQuantity) {
+            quantity = productStockQuantity;
+        }
+
+        quantityElement.value = quantity;
+    };
+
+    document.querySelectorAll(".decrease-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            const input = this.closest("[data-productId]");
+            updateQuantity(input, -1);
+        });
+    });
+
+    document.querySelectorAll(".increase-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            const input = this.closest("[data-productId]");
+            updateQuantity(input, 1);
+        });
+    });
+</script>
