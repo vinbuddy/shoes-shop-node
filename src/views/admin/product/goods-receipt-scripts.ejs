@@ -79,7 +79,6 @@
         `);
 
         $("#add-size-btn").on("click", function () {
-            alert("add click");
             openModal();
         });
 
@@ -108,15 +107,14 @@
         const description = $("#sizeDescription").val() ? $("#sizeDescription").val() : "";
 
         if (name) {
-            const sizes = await getAllSizeInfo();
+            // Lấy thông tin hiện tại đang có trong bảng `size`
+            let sizes = await getAllSizeInfo();
             const isDuplicate = sizes.some((size) => size.tenKichCo === name);
-            const chosenSize = sizes.find((size) => size.tenKichCo === name);
+            let chosenSize = sizes.find((size) => size.tenKichCo === name);
 
             let productId = $("#productSelect").val();
             const details = await getDetailsProduct(productId);
             console.log(details);
-            // Kiểm tra xem kích cỡ đã tồn tại trong `danhSachKichCo` trong collection `sanpham`
-            const isSizeExist = details.danhSachKichCo.some((item) => item.maKichCo === chosenSize.maKichCo);
 
             // Kiểm tra để thêm thông tin size vào bảng `Size`
             if (isDuplicate) {
@@ -124,7 +122,12 @@
             } else {
                 addSize(name, description);
             }
+            // Lấy thông tin vừa cập nhật trong bảng `size`
+            sizes = await getAllSizeInfo();
+            chosenSize = sizes.find((size) => size.tenKichCo === name);
 
+            // Kiểm tra xem kích cỡ đã tồn tại trong `danhSachKichCo` trong collection `sanpham`
+            const isSizeExist = details.danhSachKichCo.some((item) => item.maKichCo === chosenSize.maKichCo);
             // Kiểm tra để thêm thông tin vào danh sách kích cở trong bảng `sanpham`
             if (isSizeExist) {
                 console.log(`Kích cỡ "${name}" đã tồn tại trong danh sách.`);
@@ -144,7 +147,7 @@
                         </div>
                     </div>
                 `);
-                
+
                 //thêm kích cỡ mới
                 const newSize = {
                     maKichCo: chosenSize.maKichCo,
@@ -153,7 +156,7 @@
                 };
 
                 details.danhSachKichCo.push(newSize);
-
+                console.log(details.danhSachKichCo);
                 console.log(`Đã thêm kích cỡ "${name}" vào danh sách.`);
 
                 // Gửi cập nhật danh sách kích cỡ lên server
@@ -205,7 +208,7 @@
     async function addSize(name, description) {
         const data = {
             tenKichCo: name,
-            moTaKichCo: description,
+            moTaKichCo: description
         };
         try {
             $.ajax({

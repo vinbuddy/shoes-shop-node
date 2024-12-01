@@ -1,0 +1,401 @@
+<div class="container mx-auto p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b pb-4">
+        <h1 class="text-2xl font-semibold">Báo Cáo Doanh Thu</h1>
+        <div class="flex items-center">
+            <div class="m-2">
+                <select
+                    id="filterType"
+                    class="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"
+                >
+                    <option value="day">Theo Ngày</option>
+                    <option value="month" selected>Theo Tháng</option>
+                    <option value="year">Theo Năm</option>
+                </select>
+            </div>
+            <div class="m-2">
+                <button id="exportBtn" class="block px-4 py-2 bg-blue-700 text-white rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"><i class='bx bxs-file-export'></i>Xuất báo cáo</button>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Tổng Quan Doanh Thu -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Tổng Doanh Thu</h3>
+            <p id="totalRevenue" class="text-xl font-bold text-green-600">0 VNĐ</p>
+        </div>
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Đơn Hàng Thành Công</h3>
+            <p id="totalOrders" class="text-xl font-bold text-blue-600">0 Đơn</p>
+        </div>
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Tăng Trưởng</h3>
+            <p id="growthRevenue" class="text-xl font-bold text-indigo-600">+15%</p>
+        </div>
+        <div class="p-4 bg-white border rounded-lg shadow-sm">
+            <h3 class="text-sm text-gray-500">Thời Gian Báo Cáo</h3>
+            <p id="realTimeReport" class="text-xl font-bold text-gray-700" id="reportTime">Tháng 11, 2024</p>
+        </div>
+    </div>
+
+    <!-- Biểu Đồ -->
+    <div class="mt-6 bg-white p-6 border rounded-lg shadow-sm">
+        <canvas id="revenueChart" width="200" height="100"></canvas>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/shim.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script defer>
+    // Lấy thông tin đơn hàng thông qua API
+    function loadSuccessOrder(filterTime) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `/order/api/get-all-success-order/${filterTime}`,
+                method: "GET",
+                dataType: "json",
+                success: function (response) {
+                    resolve(response);
+                },
+                error: function (error) {
+                    reject("Lỗi trong quá trình nhận dữ liệu: " + error);
+                },
+            });
+        });
+    }
+
+    function formatCurrentDate() {
+        const today = new Date();
+
+        const months = [
+            "Tháng 1",
+            "Tháng 2",
+            "Tháng 3",
+            "Tháng 4",
+            "Tháng 5",
+            "Tháng 6",
+            "Tháng 7",
+            "Tháng 8",
+            "Tháng 9",
+            "Tháng 10",
+            "Tháng 11",
+            "Tháng 12",
+        ];
+
+        const day = today.getDate();
+        const month = today.getMonth(); // Lưu ý getMonth() => (0 = Tháng 1)
+        const year = today.getFullYear();
+
+        const formattedDate = `${day} ${months[month]}, ${year}`;
+
+        return formattedDate;
+    }
+
+    //Kiểm tra năm nhuận
+    function isLeapYear(year) {
+        return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    }
+    // Tính độ tăng trưởng
+    function calculateGrowth(previousRevenue, currentRevenue) {
+        if (previousRevenue === 0) {
+            return currentRevenue > 0 ? 100 : 0; // Trường hợp kỳ trước không có doanh thu
+        }
+        return ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+    }
+
+    let timeStampStr = "";
+    async function loadDataChart(fitterTime, DATA_COUNT, labels) {
+        let successOrders = await loadSuccessOrder(fitterTime);
+        let datapoints = new Array(DATA_COUNT).fill(0);
+        let sum = 0;
+        let sumAtTheSameTime = 0;
+        let oldIndex = -1;
+        let latestIndex = -1;
+        let previousIndex = -1;
+        let titleLog = '';
+        let today = 1;
+
+        successOrders.revenue.forEach((item) => {
+            const date = item.date;
+            let currentIndex = 0;
+            let timeStamp = 1;
+            if (fitterTime === 'day'){
+                timeStamp = parseInt(date.split("-")[2]); // Lấy số ngày từ "YYYY-MM-DD"
+                timeStampStr = "Tháng " + date.split("-")[1] + ', ' + date.split("-")[0];
+                // Vị trí hiện tại = ngày của đơn hàng - 1 do mảng bắt đầu từ index 0
+                currentIndex = timeStamp - 1;
+                // Hiển thị trong console log
+                titleLog = "Daily Revenue";
+                // Lấy ngày hiện tại
+                today = currentDay;
+            }
+            else if (fitterTime === 'month') {
+                timeStamp = parseInt(date.split("-")[1]); // Lấy số tháng từ "YYYY-MM-DD"
+                timeStampStr = "Năm " + date.split("-")[0];
+                // Vị trí hiện tại = tháng của đơn hàng - 1 do mảng bắt đầu từ index 0
+                currentIndex = timeStamp - 1;
+                // Hiển thị trong console log
+                titleLog = "Monthly Revenue"
+                // Lấy tháng hiện tại
+                today = currentMonth;
+            }
+            else {
+                // Year
+                timeStamp = DATA_COUNT;
+                let year = parseInt(date.split("-")[0]);// Lấy số tháng từ "YYYY-MM-DD"
+                //Khoảng cách giữa năm hiện tại và năm của đơn hành thành công
+                const duringTime = currentYear - year;
+                //Gán vị trí hiện tại = vị trí cuối mảng - khoảng cách 2 năm
+                //Ví dụ (nếu 2 năm giống nhau): vị trí hiện tại = 10 - 0 - 1 = 9 (vị trí cuối mảng)
+                //Ví dụ (nếu 2 năm khác nhau - cách nhau là 3 năm): vị trí hiện tại = 10 - 7  - 1 = 2 (vị trí cuối mảng)
+                currentIndex = DATA_COUNT - duringTime - 1; // Mảng bắt đầu từ index 0
+                timeStampStr = DATA_COUNT + " năm gần đây";
+                // Hiển thị trong console log
+                titleLog = "Annual Revenue"
+                // Lấy năm hiện tại
+                today = DATA_COUNT;
+            }
+            // Tính tổng toàn bộ doanh thu của chart
+            sum += item.totalAmount;
+
+            if (oldIndex === currentIndex){
+                // tổng gán bằng giá trị doanh thu được lưu trước đó
+                sumAtTheSameTime = datapoints[oldIndex];
+                // Cộng tiếp doanh thu các đơn hàng có cùng tháng
+                sumAtTheSameTime += item.totalAmount;
+                // Gán doanh thu sau khi cộng tất cả lại với nhau
+                datapoints[currentIndex] = sumAtTheSameTime;
+            }
+            else {
+                // Nếu tháng đó chỉ có 1 đơn hàng hoặc gán doanh thu đơn hàng đầu tiên
+                datapoints[currentIndex] = item.totalAmount;
+            }
+            // Gán vị trị cũ bằng vị trí mới
+            oldIndex = currentIndex;
+            // Gán vị trí hiện tại là vị trí mới nhất
+            latestIndex = currentIndex;
+        });
+
+        console.log(titleLog);
+        console.log(datapoints);
+
+
+        previousIndex = today - 2 === -1 ? 0 : today - 2 ;
+        const previousRevenue = previousIndex === -1 ? 0 : datapoints[previousIndex];
+        const currentRevenue = today - 1 === -1 ? 0 : datapoints[today - 1];
+        console.log(`Doanh thu trước đó: ${previousRevenue}`)
+        console.log(`Doanh thu hiện tại: ${currentRevenue}`)
+        const growth = calculateGrowth(previousRevenue, currentRevenue);
+        
+        $('#growthRevenue').text(`${growth}%`);
+        $("#totalRevenue").text(sum.toLocaleString() + " VNĐ");
+        $("#totalOrders").text(successOrders.orders.length + " đơn hàng");
+        $('#realTimeReport').text(timeStampStr); // Thời điểm thống kê biểu đồ
+
+        revenueLineChart.data.labels = labels;
+        revenueLineChart.data.datasets[0].data = datapoints;
+        revenueLineChart.update();
+
+
+        //Xử lý xuất file
+        revenue_EXCEL = datapoints;
+        summary_EXCEL = {
+            totalRevenue: `${sum.toLocaleString()} VNĐ`,
+            successfulOrders: `${successOrders.orders.length} đơn hàng`,
+            reportTime: `${timeStampStr}`
+        };
+    }
+    let fitterTime = 'month';
+    let revenue_EXCEL = [];
+    let summary_EXCEL = {};
+    function prepareExcelData(fitterTime, revenue, summary) {
+        const data = [];
+        //Thêm dữ liệu tổng quan
+        data.push(["Tổng Doanh Thu", summary.totalRevenue]);
+        data.push(["Đơn Hàng Thành Công", summary.successfulOrders]);
+        data.push(["Thời Gian Báo Cáo", summary.reportTime]);
+        data.push([]);
+        
+        if (fitterTime === 'day') {
+            // Thêm tiêu đề cho phần doanh thu
+            data.push(["Ngày", "Doanh Thu"]);
+            // Thêm dữ liệu doanh thu từng tháng
+            revenue.forEach((value, index) => {
+                data.push([`Ngày ${index + 1}`, value.toLocaleString("vi-VN") + " VNĐ"]);
+            });
+        } else if (fitterTime === 'month') {
+            // Thêm tiêu đề cho phần doanh thu
+            data.push(["Tháng", "Doanh Thu"]);
+            // Thêm dữ liệu doanh thu từng tháng
+            revenue.forEach((value, index) => {
+                data.push([`Tháng ${index + 1}`, value.toLocaleString("vi-VN") + " VNĐ"]);
+            });
+        }
+        else {
+            // Year
+            // Thêm tiêu đề cho phần doanh thu
+            data.push(["Năm", "Doanh Thu"]);
+            // Thêm dữ liệu doanh thu từng tháng
+            revenue.forEach((value, index) => {
+                data.push([`Năm ${labels[index]}`, value.toLocaleString("vi-VN") + " VNĐ"]);
+            });
+        }
+        return data;
+    }
+    //Xuất file excel
+    function exportRevenueToExcel() {
+        const data = prepareExcelData(fitterTime, revenue_EXCEL, summary_EXCEL);
+        // Tạo sheet từ dữ liệu
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // Tạo workbook và thêm sheet vào
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Báo Cáo");
+
+        // Xuất file Excel
+        if (fitterTime === 'day') {
+            XLSX.writeFile(wb, `ShoesShop_Daily_Revenue_Report.xlsx`);
+        } else if (fitterTime === 'month') {
+            XLSX.writeFile(wb, `ShoesShop_Monthly_Revenue_Report.xlsx`);
+        }
+        else {
+            //Year
+            XLSX.writeFile(wb, `ShoesShop_Annual_Revenue_Report.xlsx`);
+        }
+    }
+    
+    const currentDay = new Date().getDate();
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    // Gán nhãn và datapoints theo trục x (mặc định)
+    let DATA_COUNT = 31;
+    let labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    let datapoints = [];
+    
+    // (Khởi tạo chart theo tháng)
+    loadDataChart('month', 12, labels);
+    
+    $("#exportBtn").click(() => {
+        exportRevenueToExcel();
+    });
+
+    // $("#realTimeReport").text(formatCurrentDate()); // Ngày tháng năm hiện tại
+
+    // Lấy giá trị của option thời gian đã chọn
+    $("#filterType").change(async function () {
+        fitterTime = $(this).val();
+        
+        if (fitterTime === "day") {
+
+            if (currentMonth == "2") {
+                if (isLeapYear(currentYear)) {
+                    DATA_COUNT = 29; // Năm nhuận có 29 ngày
+                    labels = [];
+                    for (let i = 1; i <= DATA_COUNT; i++) {
+                        labels.push(`${i}`);
+                    }
+                    
+                    loadDataChart(fitterTime, DATA_COUNT, labels);
+                } else {
+                    DATA_COUNT = 28; // Năm không nhuận có 28 ngày
+                    labels = [];
+                    for (let i = 1; i <= DATA_COUNT; i++) {
+                        labels.push(`${i}`);
+                    }
+
+                    loadDataChart(fitterTime, DATA_COUNT, labels);
+                }
+            } 
+            else if (currentMonth == "4" || currentMonth == "6" || currentMonth == "9" || currentMonth == "11") {
+                DATA_COUNT = 30;
+                labels = [];
+                for (let i = 1; i <= DATA_COUNT; i++) {
+                    labels.push(`${i}`);
+                }
+
+                loadDataChart(fitterTime, DATA_COUNT, labels);
+            } 
+            else {
+                DATA_COUNT = 31;
+                labels = [];
+                for (let i = 1; i <= DATA_COUNT; i++) {
+                    labels.push(`${i}`);
+                }
+
+                loadDataChart(fitterTime, DATA_COUNT, labels);
+            }
+        } 
+        else if (fitterTime === "month") {
+            DATA_COUNT = 12;
+            labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            loadDataChart(fitterTime, DATA_COUNT, labels);
+        } 
+        else {
+            // Lọc theo năm (mặc định là 10 năm)
+            DATA_COUNT = 10;
+
+            labels = [];
+            for (let i = DATA_COUNT; i > 0; i--) {
+                labels.push((currentYear - i + 1).toString());
+            }
+            
+            loadDataChart(fitterTime, DATA_COUNT, labels);
+        }
+    });
+
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: "Đơn hàng thành công",
+                data: datapoints,
+                borderColor: "rgba(49, 151, 65, 1)",
+                fill: false,
+                cubicInterpolationMode: "monotone",
+                tension: 0.4,
+            },
+        ],
+    };
+
+    const config = {
+        responsive: true,
+        type: "line",
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: "Báo cáo doanh thu đơn hàng",
+                },
+            },
+            interaction: {
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                    },
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: "Doanh thu (VND)",
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 200,
+                },
+            },
+        },
+    };
+
+    const ctx = $("#revenueChart").get(0).getContext("2d");
+    const revenueLineChart = new Chart(ctx, config);
+</script>

@@ -1,5 +1,7 @@
 import express from "express";
-import {
+import { 
+    apiGetOrder,
+    apiGetOrdersToday,
     cancelOrderHandle,
     refundOrderHandle,
     completedOrderHandle,
@@ -24,5 +26,9 @@ router.post(
 router.get("/completed/:id", completedOrderHandle);
 router.get("/refundRequest/:id", renderRefundClientPage);
 router.get("/cancelRefund/:id", cancelRefundHandle);
+
+// API
+router.get('/api/get-all-success-order/:timeType', apiGetOrder);
+router.get('/api/get-orders-today', apiGetOrdersToday);
 
 export default router;

@@ -1,0 +1,335 @@
+<div class="container mx-auto p-6">
+    <!-- Card chứa tiêu đề và biểu đồ -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-5">
+            <h1 class="m-auto text-3xl font-bold text-center text-gray-700">Thống Kê Chi Tiêu</h1>
+            <div class="m-2">
+                <select
+                    id="filterType"
+                    class="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"
+                >
+                    <option value="day">Theo Ngày</option>
+                    <option value="month" selected>Theo Tháng</option>
+                    <option value="year">Theo Năm</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Biểu đồ chi tiêu -->
+        <div class="relative mb-6">
+            <canvas id="expenditureBarChart"></canvas>
+        </div>
+
+        <!-- Tổng Chi Tiêu và Sản Phẩm -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+                <h3 class="text-xl font-semibold text-gray-600">Tổng Chi Tiêu</h3>
+                <p id="totalExpenditure" class="text-2xl text-blue-600 font-bold mt-2">0 VNĐ</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+                <h3 class="text-xl font-semibold text-gray-600">Tổng Sản Phẩm</h3>
+                <p id="totalProducts" class="text-2xl text-blue-600 font-bold mt-2">0</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+                <h3 class="text-xl font-semibold text-gray-600">Thời gian thống kê</h3>
+                <p id="realTimeReport" class="text-2xl text-blue-600 font-bold mt-2">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút xuất file (sẽ được bổ sung ở ví dụ sau) -->
+    <div class="text-center mt-6">
+        <button
+            id="exportButton"
+            class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 focus:outline-none"
+        >
+            Xuất File Excel
+        </button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/shim.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script defer>
+    $(document).ready(function () {
+        // Lấy thông tin phiếu nhập thông qua API
+        function loadGoodsReceipts(filterTime) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: `/product/api/get-goods-receipts/${filterTime}`,
+                    method: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        resolve(response);
+                    },
+                    error: function (error) {
+                        reject("Lỗi trong quá trình nhận dữ liệu: " + error);
+                    },
+                });
+            });
+        }
+
+        function isLeapYear(year) {
+            return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+        }
+
+        function prepareExcelData(fitterTime, expenditure, summary) {
+            const data = [];
+            //Thêm dữ liệu tổng quan
+            data.push(["Tổng Chi Tiêu", summary.totalExpenditure]);
+            data.push(["Số Phiếu Nhập", summary.goodsReceipts]);
+            data.push(["Thời Gian Báo Cáo", summary.reportTime]);
+            data.push([]);
+
+            if (fitterTime === "day") {
+                // Thêm tiêu đề cho phần chi tiêu
+                data.push(["Ngày", "Chi Tiêu"]);
+                // Thêm dữ liệu chi tiêu từng tháng
+                expenditure.forEach((value, index) => {
+                    data.push([`Ngày ${index + 1}`, value.toLocaleString("vi-VN") + " VNĐ"]);
+                });
+            } else if (fitterTime === "month") {
+                // Thêm tiêu đề cho phần chi tiêu
+                data.push(["Tháng", "Chi Tiêu"]);
+                // Thêm dữ liệu chi tiêu từng tháng
+                expenditure.forEach((value, index) => {
+                    data.push([`Tháng ${index + 1}`, value.toLocaleString("vi-VN") + " VNĐ"]);
+                });
+            } else {
+                // Year
+                // Thêm tiêu đề cho phần chi tiêu
+                data.push(["Năm", "Chi Tiêu"]);
+                // Thêm dữ liệu chi tiêu từng tháng
+                expenditure.forEach((value, index) => {
+                    data.push([`Năm ${labels[index]}`, value.toLocaleString("vi-VN") + " VNĐ"]);
+                });
+            }
+            return data;
+        }
+        //Xuất file excel
+        function exportExpenditureToExcel() {
+            const data = prepareExcelData(fitterTime, expenditure_EXCEL, summary_EXCEL);
+            // Tạo sheet từ dữ liệu
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            // Tạo workbook và thêm sheet vào
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Báo Cáo");
+
+            // Xuất file Excel
+            if (fitterTime === "day") {
+                XLSX.writeFile(wb, `ShoesShop_Daily_Expenditure_Report.xlsx`);
+            } else if (fitterTime === "month") {
+                XLSX.writeFile(wb, `ShoesShop_Monthly_Expenditure_Report.xlsx`);
+            } else {
+                //Year
+                XLSX.writeFile(wb, `ShoesShop_Annual_Expenditure_Report.xlsx`);
+            }
+        }
+
+        let timeStampStr = "";
+        async function loadDataChart(fitterTime, DATA_COUNT, labels) {
+            let goodsReceipts = await loadGoodsReceipts(fitterTime);
+            let datapoints = new Array(DATA_COUNT).fill(0);
+            let sum = 0;
+            let sumAtTheSameTime = 0;
+            let oldIndex = -1;
+            let latestIndex = -1;
+            let previousIndex = -1;
+            let titleLog = "";
+            let today = 1;
+
+            goodsReceipts.expenditure.forEach((item) => {
+                const date = item.date;
+                let currentIndex = 0;
+                let timeStamp = 1;
+                if (fitterTime === "day") {
+                    timeStamp = parseInt(date.split("-")[2]); // Lấy số ngày từ "YYYY-MM-DD"
+                    timeStampStr = "Tháng " + date.split("-")[1] + ", " + date.split("-")[0];
+                    // Vị trí hiện tại = ngày của phiếu nhập hàng - 1 do mảng bắt đầu từ index 0
+                    currentIndex = timeStamp - 1;
+                    // Hiển thị trong console log
+                    titleLog = "Daily Expenditure";
+                    // Lấy ngày hiện tại
+                    today = currentDay;
+                } else if (fitterTime === "month") {
+                    timeStamp = parseInt(date.split("-")[1]); // Lấy số tháng từ "YYYY-MM-DD"
+                    timeStampStr = "Năm " + date.split("-")[0];
+                    // Vị trí hiện tại = tháng của phiếu nhập hàng - 1 do mảng bắt đầu từ index 0
+                    currentIndex = timeStamp - 1;
+                    // Hiển thị trong console log
+                    titleLog = "Monthly Expenditure";
+                    // Lấy tháng hiện tại
+                    today = currentMonth;
+                } else {
+                    // Year
+                    timeStamp = DATA_COUNT;
+                    let year = parseInt(date.split("-")[0]); // Lấy số tháng từ "YYYY-MM-DD"
+                    //Khoảng cách giữa năm hiện tại và năm của đơn hành thành công
+                    const duringTime = currentYear - year;
+                    //Gán vị trí hiện tại = vị trí cuối mảng - khoảng cách 2 năm
+                    //Ví dụ (nếu 2 năm giống nhau): vị trí hiện tại = 10 - 0 - 1 = 9 (vị trí cuối mảng)
+                    //Ví dụ (nếu 2 năm khác nhau - cách nhau là 3 năm): vị trí hiện tại = 10 - 7  - 1 = 2 (vị trí cuối mảng)
+                    currentIndex = DATA_COUNT - duringTime - 1; // Mảng bắt đầu từ index 0
+                    timeStampStr = DATA_COUNT + " năm gần đây";
+                    // Hiển thị trong console log
+                    titleLog = "Annual Expenditure";
+                    // Lấy năm hiện tại
+                    today = DATA_COUNT;
+                }
+                // Tính tổng toàn bộ chi tiêu của chart
+                sum += item.totalAmount;
+
+                if (oldIndex === currentIndex) {
+                    // tổng gán bằng giá trị chi tiêu được lưu trước đó
+                    sumAtTheSameTime = datapoints[oldIndex];
+                    // Cộng tiếp chi tiêu các phiếu nhập hàng có cùng tháng
+                    sumAtTheSameTime += item.totalAmount;
+                    // Gán chi tiêu sau khi cộng tất cả lại với nhau
+                    datapoints[currentIndex] = sumAtTheSameTime;
+                } else {
+                    // Nếu tháng đó chỉ có 1 phiếu nhập hàng hoặc gán chi tiêu phiếu nhập hàng đầu tiên
+                    datapoints[currentIndex] = item.totalAmount;
+                }
+                // Gán vị trị cũ bằng vị trí mới
+                oldIndex = currentIndex;
+                // Gán vị trí hiện tại là vị trí mới nhất
+                latestIndex = currentIndex;
+            });
+
+            console.log(titleLog);
+            console.log(datapoints);
+
+            previousIndex = today - 2 === -1 ? 0 : today - 2;
+            const previousExpenditure = previousIndex === -1 ? 0 : datapoints[previousIndex];
+            const currentExpenditure = today - 1 === -1 ? 0 : datapoints[today - 1];
+            console.log(`Chi tiêu trước đó: ${previousExpenditure}`);
+            console.log(`Chi tiêu hiện tại: ${currentExpenditure}`);
+
+            $("#totalExpenditure").text(sum.toLocaleString() + " VNĐ");
+            $("#totalProducts").text(goodsReceipts.goodsReceipts.length + " phiếu nhập hàng");
+            $("#realTimeReport").text(timeStampStr); // Thời điểm thống kê biểu đồ
+
+            expenditureBarChart.data.labels = labels;
+            expenditureBarChart.data.datasets[0].data = datapoints;
+            expenditureBarChart.update();
+
+            //Xử lý xuất file
+            expenditure_EXCEL = datapoints;
+            summary_EXCEL = {
+                totalExpenditure: `${sum.toLocaleString()} VNĐ`,
+                goodsReceipts: `${goodsReceipts.goodsReceipts.length} phiếu nhập hàng`,
+                reportTime: `${timeStampStr}`,
+            };
+        }
+        // Khởi tạo biến cho phần xuất file
+        let expenditure_EXCEL = [];
+        let summary_EXCEL = {};
+
+        const currentDay = new Date().getDate();
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        let fitterTime = "month";
+        let labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let datapoints = [];
+
+        // Khởi tạo chart khi load lần đầu
+        let DATA_COUNT = 12;
+        loadDataChart(fitterTime, DATA_COUNT, labels);
+
+        // Cập nhật tổng chi tiêu và tổng sản phẩm và thời gian thống kê báo cáo
+        let totalExpenditure = 0;
+        let totalProducts = 0;
+        $("#totalExpenditure").text(totalExpenditure.toLocaleString("vi-VN") + " VNĐ");
+        $("#totalProducts").text(totalProducts);
+        $("#realTimeReport").text(currentYear);
+
+        $("#filterType").change(async function () {
+            fitterTime = $(this).val();
+
+            if (fitterTime === "day") {
+                if (currentMonth == "2") {
+                    if (isLeapYear(currentYear)) {
+                        DATA_COUNT = 29; // Năm nhuận có 29 ngày
+                        labels = [];
+                        for (let i = 1; i <= DATA_COUNT; i++) {
+                            labels.push(`${i}`);
+                        }
+
+                        loadDataChart(fitterTime, DATA_COUNT, labels);
+                    } else {
+                        DATA_COUNT = 28; // Năm không nhuận có 28 ngày
+                        labels = [];
+                        for (let i = 1; i <= DATA_COUNT; i++) {
+                            labels.push(`${i}`);
+                        }
+
+                        loadDataChart(fitterTime, DATA_COUNT, labels);
+                    }
+                } else if (currentMonth == "4" || currentMonth == "6" || currentMonth == "9" || currentMonth == "11") {
+                    DATA_COUNT = 30;
+                    labels = [];
+                    for (let i = 1; i <= DATA_COUNT; i++) {
+                        labels.push(`${i}`);
+                    }
+
+                    loadDataChart(fitterTime, DATA_COUNT, labels);
+                } else {
+                    DATA_COUNT = 31;
+                    labels = [];
+                    for (let i = 1; i <= DATA_COUNT; i++) {
+                        labels.push(`${i}`);
+                    }
+
+                    loadDataChart(fitterTime, DATA_COUNT, labels);
+                }
+            } else if (fitterTime === "month") {
+                DATA_COUNT = 12;
+                labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+                loadDataChart(fitterTime, DATA_COUNT, labels);
+            } else {
+                // Lọc theo năm (mặc định là 10 năm)
+                DATA_COUNT = 10;
+
+                labels = [];
+                for (let i = DATA_COUNT; i > 0; i--) {
+                    labels.push((currentYear - i + 1).toString());
+                }
+
+                loadDataChart(fitterTime, DATA_COUNT, labels);
+            }
+        });
+
+        // Xuất file Excel
+        $("#exportButton").on("click", function () {
+            exportExpenditureToExcel();
+        });
+
+        // Vẽ biểu đồ
+        const ctx = $("#expenditureBarChart")[0].getContext("2d");
+        const expenditureBarChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Chi Tiêu (VNĐ)",
+                        data: datapoints,
+                        backgroundColor: "rgba(0, 0, 235, 0.2)",
+                        borderColor: "rgba(0, 0, 235, 1)",
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+    });
+</script>
