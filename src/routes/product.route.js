@@ -1,5 +1,5 @@
 import express from "express";
-import { 
+import {
     renderProductPage,
     renderProductDetailPage,
     createGoodsReceipt,
@@ -9,12 +9,15 @@ import {
     updateSizeList,
     getProductReceiptByProductId,
     apiGetGoodsReceipts,
+    searchProductRequest,
 } from "../controllers/product.controller.js";
 
 const router = express.Router();
 
 router.get("/", renderProductPage);
 router.get("/:id", renderProductDetailPage);
+
+router.get("/api/search", searchProductRequest);
 
 router.post("/api/create-goods-receipt", createGoodsReceipt);
 router.get("/api/getAllProduct/", getAllProduct);

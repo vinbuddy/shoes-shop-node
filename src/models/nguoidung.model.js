@@ -26,7 +26,7 @@ const nguoiDungSchema = new mongoose.Schema({
             "https://res.cloudinary.com/dtbhvc4p4/image/upload/v1720978549/profile/344060599-e8733bc3-ac77-42c6-b036-b9f1fb31b21c_hlh6by.png",
     },
     maVaiTro: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "VaiTro",
     },
     trangThaiXoa: {

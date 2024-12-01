@@ -1,6 +1,6 @@
 <section class="border-red-500 bg-gray-200 min-h-screen flex items-center justify-center p-10">
-    <div class="bg-gray-100 p-7 flex items-center rounded-3xl shadow-xl w-full md:max-w-3xl gap-10">
-        <div class="w-full md:w-1/2 h-full">
+    <div class="bg-gray-100 p-7 flex items-center rounded-3xl shadow-xl w-full md:max-w-xl gap-10">
+        <div class="w-full h-full">
             <h2 class="text-2xl font-bold text-[#002D74]">Đăng nhập quản trị</h2>
             <form class="mt-6" id="login-form" action="/admin/auth/admin-login" method="POST">
                 <div>
@@ -27,12 +27,6 @@
                     />
                 </div>
 
-                <div class="text-right mt-2">
-                    <a href="/auth/forgot" class="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700"
-                        >Quên mật khẩu?</a
-                    >
-                </div>
-
                 <% if (locals?.error) { %>
                     <p class="text-red-500 text-center my-5">
                         <%= error %>
@@ -48,9 +42,9 @@
             </form>
         </div>
 
-        <div class="w-0 md:w-1/2 hidden md:block h-full">
+        <!-- <div class="w-0 md:w-1/2 hidden md:block h-full">
             <img src="/images/login-bg.jpg" class="rounded-2xl h-full" alt="page img" />
-        </div>
+        </div> -->
     </div>
 </section>
 

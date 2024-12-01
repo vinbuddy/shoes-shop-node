@@ -389,12 +389,11 @@ export async function adminLoginHandler(req, res) {
 
         const user = await NguoiDungModel.findOne({
             email: email,
-        });
+        }).populate("maVaiTro");
 
         if (!user) {
             throw new Error("Người dùng không tồn tại.");
         }
-        
 
         // Compare password with hashed password
         const isMatch = await bcrypt.compare(password, user.matKhau);
@@ -412,6 +411,8 @@ export async function adminLoginHandler(req, res) {
         });
         
         return res.redirect("/admin/dashboard");
+
+        return res.redirect("/admin/profile");
     } catch (error) {
         return res.render("admin/auth/login", {
             ...VIEW_OPTIONS.LOGIN,
@@ -465,17 +466,15 @@ export async function adminChangePasswordHandler(req, res) {
         const isMatch = await bcrypt.compare(oldPassword, user.matKhau);
         if (isMatch) {
             if (newPassword === confirmNewPassword) {
-
-            }
-            else {
+                //
+            } else {
                 return res.render("admin/user/profile", {
                     ...VIEW_OPTIONS.RESET_PASSWORD,
                     error: "Mật khẩu mới và nhập lại mật khẩu không khớp.",
                     user: user,
                 });
             }
-        }
-        else {
+        } else {
             return res.render("admin/user/profile", {
                 ...VIEW_OPTIONS.RESET_PASSWORD,
                 error: "Mật khẩu cũ không đúng.",
