@@ -1,10 +1,14 @@
-<% if (locals.error)  { %>
-    <div role="alert" class="alert alert-error text-white mb-5">
-        <i class='bx bx-x'></i>
-        <span>
+<% if (locals.error && locals.error.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+        <p>
             <%= error %>
-        </span>
+        </p>
+
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-red-600'></i>
+        </button>
     </div>
+    
 <% } %>
 
 <div class="flex justify-between items-center mb-5">

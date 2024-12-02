@@ -468,10 +468,8 @@ export async function adminLoginHandler(req, res) {
                 throw new Error("Không thể lưu session.");
             }
         });
-        
-        return res.redirect("/admin/dashboard");
 
-        return res.redirect("/admin/profile");
+        return res.redirect("/admin/dashboard");
     } catch (error) {
         return res.render("admin/auth/login", {
             ...VIEW_OPTIONS.LOGIN,
