@@ -113,13 +113,12 @@ export async function createEmployeeHandler(req, res) {
         newEmployee.maNguoiDung = newEmployee._id;
         await newEmployee.save();
 
+        req.flash("message", "Thêm nhân viên thành công");
         return res.redirect("/admin/employee");
     } catch (error) {
         console.log("error: ", error);
-        return res.render("admin/employee/create", {
-            ...VIEW_OPTIONS.CREATE_EMPLOYEE,
-            error: error.message,
-        });
+        req.flash("error", error.message);
+        return res.redirect("/admin/employee/create");
     }
 }
 
@@ -149,13 +148,14 @@ export async function editEmployeeHandler(req, res) {
 
         await employee.save();
 
+        req.flash("message", "Chỉnh sửa nhân viên thành công");
+
         return res.redirect("/admin/employee");
     } catch (error) {
         console.log("error: ", error);
-        return res.render("admin/employee/index", {
-            ...VIEW_OPTIONS.EDIT_EMPLOYEE,
-            error: error.message,
-        });
+
+        req.flash("error", error.message);
+        return res.redirect("/admin/employee/edit");
     }
 }
 
@@ -171,9 +171,13 @@ export async function deleteEmployeeHandler(req, res) {
         employee.trangThaiXoa = true;
         await employee.save();
 
+        req.flash("message", "Xóa nhân viên thành công");
+
         return res.redirect("/admin/employee");
     } catch (error) {
         console.log("error: ", error);
+
+        req.flash("error", error.message);
         return res.redirect("/admin/employee");
     }
 }
