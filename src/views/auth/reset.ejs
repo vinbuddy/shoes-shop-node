@@ -37,6 +37,11 @@
                         <%= error %>
                     </p>
                 <% } %>
+                <% if (locals?.message) { %>
+                    <p class="text-green-500 text-center my-5">
+                        <%= message %>
+                    </p>
+                <% } %>
 
                 <button
                     type="submit"

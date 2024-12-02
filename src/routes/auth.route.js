@@ -19,7 +19,8 @@ import {
     adminLoginHandler,
     adminLogoutHandler,
     renderAdminProfilePage,
-    adminChangePasswordHandler
+    adminChangePasswordHandler,
+    resendOTPHandler,
 } from "../controllers/auth.controller.js";
 
 env.config();
@@ -45,6 +46,7 @@ router.post("/verify-otp", verifyOTPHandler);
 router.post("/login", loginHandler);
 router.post("/forgot", forgotPasswordHandler);
 router.post("/reset-password", resetPasswordHandler);
+router.get("/resend-otp", resendOTPHandler);
 
 //Admin
 router.get("/admin-login", renderAdminLoginPage);
@@ -53,6 +55,5 @@ router.get("/profile", renderAdminProfilePage);
 
 router.post("/admin-login", adminLoginHandler);
 router.post("/change-password", adminChangePasswordHandler);
-
 
 export default router;

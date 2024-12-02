@@ -206,7 +206,7 @@ export async function loginHandler(req, res) {
             throw new Error("Người dùng không tồn tại.");
         }
 
-        if (!customer.isVerified) {
+        if (!customer.trangThaiXacThuc) {
             throw new Error("Người dùng chưa xác thực.");
         }
 
@@ -238,6 +238,65 @@ export async function loginHandler(req, res) {
         return res.render("auth/login", {
             ...VIEW_OPTIONS.LOGIN,
             error: error.message,
+        });
+    }
+}
+
+export async function resendOTPHandler(req, res) {
+    const { email } = req.query;
+
+    try {
+        if (!email) {
+            throw new Error("Email không có giá trị");
+        }
+
+        const customer = await KhachHangModel.findOne({
+            email: email,
+        });
+
+        if (!customer) {
+            throw new Error("Người dùng không tồn tại.");
+        }
+
+        if (customer.trangThaiXacThuc) {
+            throw new Error("Người dùng đã xác thực.");
+        }
+
+        const redisClient = getRedis();
+
+        const existingOTP = await redisClient.get(email);
+
+        if (existingOTP) {
+            await redisClient.del(email);
+        }
+
+        const otp = otpGenerator.generate(6, {
+            digits: true,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false,
+        });
+
+        // Set OTP to Redis with 5 minutes expiration
+        await redisClient.setEx(email, 300, otp);
+
+        await sendEmail(
+            process.env.EMAIL_APP_USER,
+            email,
+            "OTP for Shoes Shop",
+            `Your OTP is ${otp}. This OTP will expire in 5 minutes.`
+        );
+
+        return res.render("auth/otp", {
+            ...VIEW_OPTIONS.VERIFY_OTP,
+            email,
+            message: "OTP đã gửi đến email của bạn",
+        });
+    } catch (error) {
+        return res.render("auth/otp", {
+            ...VIEW_OPTIONS.VERIFY_OTP,
+            error: error.message,
+            email,
         });
     }
 }
@@ -409,10 +468,8 @@ export async function adminLoginHandler(req, res) {
                 throw new Error("Không thể lưu session.");
             }
         });
-        
-        return res.redirect("/admin/dashboard");
 
-        return res.redirect("/admin/profile");
+        return res.redirect("/admin/dashboard");
     } catch (error) {
         return res.render("admin/auth/login", {
             ...VIEW_OPTIONS.LOGIN,
