@@ -4,7 +4,7 @@ export async function renderAdminCustomerPage(req, res, next) {
     const user = req.session.user;
     const customers = await KhachHangModel.find().exec();
     return res.render("admin/customer/customers", {
-        layout: "./layouts/main",
+        layout: "./layouts/admin",
         page: "customers",
         title: "Quản lý khách hàng",
         user,
