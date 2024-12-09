@@ -51,13 +51,13 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div class="flex mt-2 mb-2 m-auto">
                         <input type="checkbox" name="" id="${data.maKichCo}" class="product-checkbox hidden peer">
-                        <label for="${data.maKichCo}" class="text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white">Size ${data.tenKichCo}</label>
+                        <label for="${data.maKichCo}" class="w-32 text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white">Size ${data.tenKichCo}</label>
                     </div>
                     <div class="mt-2 mb-2 m-auto">
-                        <input type="text" name="" id="${data.maKichCo}-quantity" class="w-20 border-2 rounded outline-none py-1 px-2">
+                        <input type="text" name="" id="${data.maKichCo}-quantity" class=" border-2 rounded outline-none py-1 px-2">
                     </div>
                     <div class=" mt-2 mb-2 m-auto">
-                        <input type="text" name="" id="${data.maKichCo}-entry-price" class="entry-price w-32 border-2 rounded outline-none py-1 px-2">
+                        <input type="text" name="" id="${data.maKichCo}-entry-price" class="entry-price border-2 rounded outline-none py-1 px-2">
                     </div>
                 </div>
             `);
@@ -65,15 +65,15 @@
         $("#product_size_price").append(`
             <div id="add-size-div" class="grid grid-cols-3 gap-2">
                 <div class="flex mt-2 mb-2 m-auto">
-                    <button id="add-size-btn" class="text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white">Thêm Size</button>
+                    <button id="add-size-btn" class="text-center border py-1 px-2 w-32 rounded-lg peer-checked:bg-primary peer-checked:text-white">Thêm Size</button>
                     <input type="checkbox" name="" id="" class="product-checkbox hidden peer">
-                    <label for="" class="text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white" hidden></label>
+                    <label for="" class="w-32 text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white" hidden></label>
                 </div>
                 <div class="mt-2 mb-2 m-auto">
-                    <input type="text" name="" id="" class="w-20 border-2 rounded outline-none py-1 px-2" hidden>
+                    <input type="text" name="" id="" class="border-2 rounded outline-none py-1 px-2" hidden>
                 </div>
                 <div class=" mt-2 mb-2 m-auto">
-                    <input type="text" name="" id="" class="entry-price w-32 border-2 rounded outline-none py-1 px-2" hidden>
+                    <input type="text" name="" id="" class="entry-price border-2 rounded outline-none py-1 px-2" hidden>
                 </div>
             </div>
         `);
@@ -299,9 +299,17 @@
 
     // Khi nhấn nút 'Thêm vào danh sách'
     $("#add_to_list").on("click", async function () {
+        if (productData === null) {
+            console.log('Vui lòng chọn sản phẩm');
+            return;
+        }
         $(`#same-entry-price`).prop("checked", false);
 
-        await saveTemporaryData();
+        let result = await saveTemporaryData();
+        if (result === false) {
+            console.log('Vui lòng điền đầy đủ kích thước và số lượng');
+            return;
+        }
         // console.log(lst)
         renderInfoTable();
     });
@@ -318,7 +326,9 @@
                 let size = await getProductSizeById(item);
                 let quantity = parseInt($(`#${item.maKichCo}-quantity`).val());
                 let price = parseInt($(`#${item.maKichCo}-entry-price`).val());
-
+                if (isNaN(price) === true || isNaN(quantity) === true){
+                    return false;
+                }
                 let sizeObj = {
                     size_id: item.maKichCo,
                     size_name: size.tenKichCo,
@@ -333,7 +343,10 @@
             // Lấy thông tin những size giày được chọn
             if ($(`#${item.maKichCo}`).prop("checked") === true) {
                 let quantity_order = parseInt($(`#${item.maKichCo}-quantity`).val());
-                if (quantity_order != 0) {
+                // if (isNaN(quantity_order) === true) {
+                    // return false;
+                // }
+                if (quantity_order !== 0) {
                     total_buy += quantity_order;
                 }
             }
@@ -342,29 +355,37 @@
         sizeArray.forEach((size) => {
             size_lst += size.size_name + " ";
         });
-
+        
+        if (sizeArray.length === 0) {
+            return false;
+        }
+        if (total_buy === 0) {
+            return false;
+        }
         const info = {
             product: productData,
             total_buy: total_buy,
             sizeArray: sizeArray,
             size_lst: size_lst,
         };
-        if (sizeArray.length == 0) {
-            return;
-        }
         // Tóm tắt thông tin sản phẩm
         for (const item of lst) {
             if (item.product.maSanPham == info.product.maSanPham) {
                 item.total_buy = info.total_buy;
                 item.sizeArray = info.sizeArray;
                 item.size_lst = info.size_lst;
-                return;
+                return true;
             }
         }
         lst.push(info);
+        return true;
     }
 
     $("#import-data").on("click", function () {
+        if (lst.length === 0 || supplierId === "" ) {
+            console.log("Vui lòng nhập đầy đủ thông tin")
+            return;
+        }
         const chiTiet = lst.map((item) => ({
             maSanPham: item.product.maSanPham,
             danhSachKichCo: item.sizeArray.map((size) => ({
