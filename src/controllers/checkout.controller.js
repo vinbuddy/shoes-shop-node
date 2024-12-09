@@ -269,7 +269,7 @@ export async function checkoutHandler(req, res) {
             }
             case "MoMo": {
                 await DonHangModel.findByIdAndDelete(newOrder._id);
-                const url = createMoMoUrl(req, res, tempOrder);
+                const url = await createMoMoUrl(req, res, tempOrder);
                 return res.redirect(url);
             }
             default: {

@@ -168,6 +168,7 @@ export async function addSize(req, res) {
     const size = new KichCoModel({
         tenKichCo: tenKichCo,
         moTaKichCo: moTaKichCo,
+        trangThaiXoa: false,
     });
 
     const savedSize = await size.save();
@@ -180,6 +181,7 @@ export async function addSize(req, res) {
         }
     );
     req.flash("message", "Thêm kích cỡ thành công");
+
     return res.status(200).json({
         message: "Dữ liệu đã lưu thành công.",
         size: savedSize,

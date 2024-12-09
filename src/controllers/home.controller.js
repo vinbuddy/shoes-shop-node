@@ -44,3 +44,14 @@ export async function renderHomePage(req, res) {
         formatVNCurrency,
     });
 }
+
+// Admin Dashboard
+export async function renderAdminDashboard(req, res, next) {
+    const user = req.session.user;
+    return res.render("admin/dashboard", {
+        layout: "./layouts/admin",
+        page: "dashboard",
+        title: "Bảng điều khiển - Shoes Shop",
+        user
+    });
+}

@@ -82,14 +82,16 @@
                                     </div>
                                 </th>
                                 <% } %>
-                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold">Khách hàng</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold 2/12">Khách hàng</th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Số lượng</th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Tổng tiền</th>
-                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Trạng thái</th>
-                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Thanh toán</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/6 text-right">Trạng thái</th>
+                                <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12  text-right">Thanh toán</th>
                                 <th scope="col" class="px-3 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Ngày</th>
                                 <th scope="col" class="px-9 py-3 text-xs text-gray-400 uppercase font-semibold w-1/6 text-right">Hoá đơn</th>
+                                <% if (searchStatus === '' || searchStatus === undefined) { %>
                                 <th scope="col" class="px-9 py-3 text-xs text-gray-400 uppercase font-semibold w-1/12 text-right">Hành động</th>
+                                <% } %>
                             </tr>
                         </thead>
                         <tbody>
@@ -130,7 +132,7 @@
                                     <span class="text-sm text-red-600 px-3 py-1 rounded-md leading-none bg-red-100 font-medium  whitespace-nowrap"> <%=  order.trangThaiDonHang[order.trangThaiDonHang.length - 1].maTrangThai.tenTrangThai %></span>
                                 <% } %>
                                 </td>
-                                <td>
+                                <td class="px-3 py-3 text-right">
                                     <% if (order.thongTinThanhToan.trangThaiThanhToan === 'Đang chờ') { %>
                                         <span class="text-sm text-yellow-600 px-3 py-1 rounded-md leading-none bg-yellow-50 font-medium  whitespace-nowrap"> <%=  order.thongTinThanhToan.trangThaiThanhToan %></span>
                                     <% } else { %>
@@ -146,42 +148,13 @@
                                         </div>
                                     </div>
                                 </td>
+                                <% if (searchStatus === '' || searchStatus === undefined) { %>
                                 <td class="px-9 py-3 text-end">
-                                   
                                     <div class="flex items-center justify-end space-x-2">
-                                        <% if (searchStatus === '' || searchStatus === undefined) { %>
                                         <a href="/admin/order/nextStatus/<%= order._id %>" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</a>
-                                        <% } %>
-                                        <div class="relative" x-data="{ printTooltip: false }">
-                                            <button
-                                                class="w-auto px-3 h-10 leading-10 text-xs bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center justify-center"
-                                                x-on:mouseenter="printTooltip = true"
-                                                x-on:mouseleave="printTooltip = false"
-                                            >
-                                                <svg
-                                                    class="-translate-y-px"
-                                                    width="16"
-                                                    height="16"
-                                                    viewBox="0 0 32 32"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="m10.9052 29.895h10.18c1.099 0 1.99-.8909 1.99-1.99v-5.92c0-1.099-.891-1.99-1.99-1.99h-10.18c-1.099 0-1.99.891-1.99 1.99v5.92c0 1.099.8909 1.99 1.99 1.99z"
-                                                    ></path>
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="m7.915 26.0044v-6.0093c0-.5522.4478-1 1-1h14.1602c.5522 0 1 .4478 1 1v6.0098h1.5498c2.7461 0 4.98-1.9873 4.98-4.4302v-6.9795c0-2.4375-2.2339-4.4204-4.98-4.4204h-19.2598c-2.7407 0-4.9702 1.9829-4.9702 4.4204v6.9795c0 2.4429 2.2295 4.4302 4.9937 4.4297z"
-                                                    ></path>
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="m11.8751 2.105c-1.1 0-2 .9-2 2v3.84c0 .8174.6627 1.48 1.48 1.48h9.27c.8174 0 1.48-.6626 1.48-1.48v-3.85c0-1.1-.89-1.99-2-1.99z"
-                                                    ></path>
-                                                </svg>
-                                            </button>
-                                        </div>
                                     </div>
                                 </td>
+                                <% } %>
                             </tr>
                             <% }) %>
                         </tbody>

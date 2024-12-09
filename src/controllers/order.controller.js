@@ -124,23 +124,184 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     const nextStatus = status.find((s) => s._id.equals(statusId));
-
-    await DonHangModel.findOneAndUpdate(
-        { maDonHang: orderId },
-        {
-            $push: {
-                trangThaiDonHang: {
-                    maTrangThai: nextStatus._id,
-                    _id: nextStatus._id,
-                    thoiGian: new Date(),
+    if (!nextStatus) {
+        req.flash("error", "Trạng thái đơn hàng không hợp lệ");
+        return res.redirect("/admin/order/detail/" + orderId);
+    }
+    if (nextStatus.tenTrangThai === "Hoàn thành") {
+        await DonHangModel.findOneAndUpdate(
+            { maDonHang: orderId },
+            {
+                $push: {
+                    trangThaiDonHang: {
+                        maTrangThai: nextStatus._id,
+                        _id: nextStatus._id,
+                        thoiGian: new Date(),
+                    },
                 },
-            },
-        }
-    );
+                $set: {
+                    "thongTinThanhToan.trangThaiThanhToan": "Hoàn thành",
+                },
+            }
+        );
+    } else {
+        await DonHangModel.findOneAndUpdate(
+            { maDonHang: orderId },
+            {
+                $push: {
+                    trangThaiDonHang: {
+                        maTrangThai: nextStatus._id,
+                        _id: nextStatus._id,
+                        thoiGian: new Date(),
+                    },
+                },
+            }
+        );
+    }
 
     req.flash("message", "Cập nhật trạng thái đơn hàng thành công");
     return res.redirect("/admin/order/detail/" + orderId);
 };
+
+// API
+// [GET] /api/get-all-success-order/month
+const getOrdersAndRevenue = async (filterCondition) => {
+    try {
+        const orders = await DonHangModel.find(filterCondition)
+            .populate("maKhachHang")
+            .populate("trangThaiDonHang.maTrangThai")
+            .populate("chiTietDonHang.maSanPham")
+            .populate("chiTietDonHang.maKichCoSanPham")
+            .exec();
+
+        const revenue = await DonHangModel.aggregate([
+            {
+                //Lọc các đơn hàng theo điều kiện truyền vào
+                $match: filterCondition,
+            },
+            {
+                // Nhóm theo ngày đặt hàng và tính tổng tiền
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$ngayDatHang" } },
+                    totalAmount: { $sum: "$tongTienThanhToan" },
+                },
+            },
+            {
+                // Định dạng lại kết quả
+                $project: {
+                    _id: 0,
+                    date: "$_id",
+                    totalAmount: 1,
+                },
+            },
+        ]);
+
+        return { orders, revenue };
+    } catch (error) {
+        console.error("Lỗi tìm nạp dữ liệu:", error);
+        throw new Error("Không thể tìm nạp đơn đặt hàng và doanh thu.");
+    }
+};
+export async function apiGetOrder(req, res) {
+    const { timeType } = req.params;
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+
+    const status = await TrangThaiModel.find().exec(); //Hoàn thành
+    const statusCode = status[3].maTrangThai;
+
+    let filterCondition = {};
+
+    if (timeType === "day") {
+        filterCondition = {
+            ngayDatHang: {
+                $gte: new Date(year, month - 1, 1),
+                $lt: new Date(year, month, 1),
+            },
+            trangThaiDonHang: {
+                $elemMatch: {
+                    maTrangThai: statusCode,
+                },
+            },
+        };
+    } else if (timeType === "week") {
+    } else if (timeType === "month") {
+        const startDate = new Date(year, 0, 1);
+        const endDate = new Date(year + 1, 0, 1);
+
+        filterCondition = {
+            ngayDatHang: {
+                $gte: startDate,
+                $lt: endDate,
+            },
+            trangThaiDonHang: {
+                $elemMatch: {
+                    maTrangThai: statusCode,
+                },
+            },
+        };
+    } else {
+        // Year
+        const startDate = new Date(new Date().getFullYear() - 10, 0, 1); // Ngày đầu năm 10 năm trước
+        const endDate = new Date(new Date().getFullYear() + 1, 0, 1); // Ngày đầu năm kế tiếp (lấy hết năm hiện tại)
+
+        filterCondition = {
+            ngayDatHang: {
+                $gte: startDate,
+                $lt: endDate,
+            },
+            trangThaiDonHang: {
+                $elemMatch: {
+                    maTrangThai: statusCode,
+                },
+            },
+        };
+    }
+
+    const result = await getOrdersAndRevenue(filterCondition);
+
+    if (result) {
+        return res.json({
+            revenue: result.revenue,
+            orders: result.orders,
+        });
+    } else {
+        return res.status(404).json({ error: "Không tìm thấy đơn hàng nào" });
+    }
+}
+
+// [GET] /api/get-orders-today
+export async function apiGetOrdersToday(req, res) {
+    const date = new Date();
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth();
+    const day = new Date().getDate();
+
+    const status = await TrangThaiModel.find().exec(); //Hoàn thành
+    const statusCode = status[3].maTrangThai;
+    let filterCondition = {
+        ngayDatHang: {
+            $gte: new Date(year, month, day), // Lớn hơn hoặc bằng ngày hiện tại
+            // $lt: new Date(year, month, day + 1) // Nhỏ hơn ngày hôm sau
+        },
+        trangThaiDonHang: {
+            $elemMatch: {
+                maTrangThai: statusCode,
+            },
+        },
+    };
+
+    const result = await getOrdersAndRevenue(filterCondition);
+
+    if (result) {
+        return res.json({
+            revenue: result.revenue,
+            orders: result.orders,
+        });
+    } else {
+        return res.status(404).json({ error: "Không tìm thấy đơn hàng nào" });
+    }
+}
 export const cancelOrderHandle = async (req, res) => {
     const { id: orderId } = req.params;
     const order = await DonHangModel.findById(orderId);
@@ -172,6 +333,16 @@ export const cancelOrderHandle = async (req, res) => {
             },
         }
     );
+    order.chiTietDonHang.forEach(async (item) => {
+        const product = await sanPhamModel.findById(item.maSanPham);
+        if (product) {
+            const sizeIndex = product.danhSachKichCo.findIndex((size) => size.maKichCo.equals(item.maKichCoSanPham));
+            if (sizeIndex !== -1) {
+                product.danhSachKichCo[sizeIndex].soLuongKichCo += item.soLuongDaChon;
+                await product.save();
+            }
+        }
+    });
     req.flash("message", "Hủy đơn hàng thành công");
     return res.redirect("/user/order");
 };
@@ -216,6 +387,7 @@ export const refundOrderHandle = async (req, res) => {
                         )
                     );
                 });
+
                 chiTietDoiTraHang.push({
                     maSanPham: item[i],
                     maKichCoSanPham: sanpham.maKichCoSanPham,
@@ -224,7 +396,7 @@ export const refundOrderHandle = async (req, res) => {
                 });
             }
         }
-        await DonHangModel.findOneAndUpdate(
+        await DonHangModel.updateOne(
             { maDonHang: id },
             {
                 thongTinDoiTraHang: {
@@ -266,7 +438,7 @@ export const refundOrderHandle = async (req, res) => {
                 });
             }
         }
-        await DonHangModel.findOneAndUpdate(
+        await DonHangModel.updateOne(
             { maDonHang: id },
             {
                 thongTinDoiTraHang: {
@@ -320,6 +492,9 @@ export const completedOrderHandle = async (req, res) => {
                     thoiGian: new Date(),
                 },
             },
+            $set: {
+                "thongTinThanhToan.trangThaiThanhToan": "Hoàn thành",
+            },
         }
     );
     req.flash("message", "Hoàn thành đơn hàng thành công");
@@ -356,19 +531,41 @@ export const nextStatusRequest = async (req, res) => {
 
             const currentIndex = status.findIndex((s) => s._id.equals(statusCodes));
             const nextStatus = status[currentIndex + 1];
+            if (!nextStatus) {
+                req.flash("error", "Không thể cập nhật trạng thái cho đơn hàng này");
+                return res.status(400).json({ message: "Không thể cập nhật trạng thái cho đơn hàng này" });
+            }
 
-            await DonHangModel.findOneAndUpdate(
-                { maDonHang: orderId },
-                {
-                    $push: {
-                        trangThaiDonHang: {
-                            maTrangThai: nextStatus._id,
-                            _id: nextStatus._id,
-                            thoiGian: new Date(),
+            if (nextStatus.tenTrangThai === "Hoàn thành") {
+                await DonHangModel.findOneAndUpdate(
+                    { maDonHang: orderId },
+                    {
+                        $push: {
+                            trangThaiDonHang: {
+                                maTrangThai: nextStatus._id,
+                                _id: nextStatus._id,
+                                thoiGian: new Date(),
+                            },
                         },
-                    },
-                }
-            );
+                        $set: {
+                            "thongTinThanhToan.trangThaiThanhToan": "Hoàn thành",
+                        },
+                    }
+                );
+            } else {
+                await DonHangModel.findOneAndUpdate(
+                    { maDonHang: orderId },
+                    {
+                        $push: {
+                            trangThaiDonHang: {
+                                maTrangThai: nextStatus._id,
+                                _id: nextStatus._id,
+                                thoiGian: new Date(),
+                            },
+                        },
+                    }
+                );
+            }
         })
     )
         .then(() => {

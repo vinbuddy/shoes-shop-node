@@ -1,4 +1,9 @@
 import express from "express";
+
+import {
+    renderAdminDashboard
+} from "../controllers/home.controller.js"
+
 import {
     renderAdminGoodsReceiptDetails,
     renderAdminGoodsReceiptList,
@@ -10,6 +15,10 @@ import {
     updateProductHandler,
     deleteProductHandler,
 } from "../controllers/product.controller.js";
+
+import {
+    renderAdminCustomerPage,
+} from "../controllers/customer.controller.js";
 
 import {
     createEmployeeHandler,
@@ -24,8 +33,9 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import categoryRoutes from "./category.route.js";
 import statusRoutes from "./status.route.js";
+import authRoutes from "./auth.route.js"
+import reportRoutes from "./report.route.js"
 import sizeRoutes from "./size.route.js";
-import authRoutes from "./auth.route.js";
 
 import {
     renderAdminOrderPage,
@@ -50,6 +60,10 @@ import {
     renderAdminPromotionPage,
 } from "../controllers/promotion.controller.js";
 
+import {
+    searchCustomer,
+} from "../controllers/customer.controller.js"
+
 import multer from "multer";
 import {
     verifyManagerRole,
@@ -62,6 +76,8 @@ import { renderAdminSalePage, saleCheckoutRequest } from "../controllers/sale.co
 const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
+
+router.get('/dashboard', renderAdminDashboard);
 
 // Goods Receipt [Nhân viên kho]
 router.get("/goods-receipt-list", verifyWarehouseStaffRole, renderAdminGoodsReceiptList);
@@ -96,8 +112,9 @@ router.use("/brand", brandRoutes);
 router.use("/supplier", supplierRoutes);
 router.use("/category", categoryRoutes);
 router.use("/status", statusRoutes);
-router.use("/size", sizeRoutes);
 router.use("/auth", authRoutes);
+router.use("/report", reportRoutes);
+router.use("/size", sizeRoutes);
 
 router.get("/product", renderAdminProductPage);
 router.get("/product/create", renderAdminCreateProductPage);
@@ -132,6 +149,9 @@ router.get("/refund/:tabId", fetchRefundOrders);
 router.get("/order/search/:keyword", SearchOrders);
 
 router.get("/profile", renderAdminProfilePage);
+
+router.get("/customer", renderAdminCustomerPage);
+router.get("/customer/search-customer", searchCustomer)
 
 // Employee [Nhân viên quản lý]
 router.get("/employee", verifyManagerRole, renderAdminEmployeePage);
