@@ -149,7 +149,7 @@
                                 <td class="px-9 py-3 text-end">
                                    
                                     <div class="flex items-center justify-end space-x-2">
-                                        <% if (searchStatus === '' && searchStatus !== undefined) { %>
+                                        <% if (searchStatus === '' || searchStatus === undefined) { %>
                                         <a href="/admin/order/nextStatus/<%= order._id %>" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 dark:shadow-md dark:shadow-red-800/80">Chuyển</a>
                                         <% } %>
                                         <div class="relative" x-data="{ printTooltip: false }">

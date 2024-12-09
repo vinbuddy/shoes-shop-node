@@ -1,3 +1,24 @@
+<% if (locals.message && locals.message.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+        <p><%= message %></p>
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-green-600'></i>
+        </button>
+      </div>
+<% } %>
+
+<% if (locals.error && locals.error.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+        <p>
+            <%= error %>
+        </p>
+
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-red-600'></i>
+        </button>
+    </div>
+    
+<% } %>
 <div class="container mt-5">
     <h2 class="text-2xl font-bold mb-4">Danh sách đơn hàng của tôi</h2>
     <ul class="flex border-b mb-4" id="orderStatusTabs" role="tablist">

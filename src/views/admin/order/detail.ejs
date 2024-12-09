@@ -1,4 +1,25 @@
 <div class="tp-main-wrapper bg-slate-100" x-data="{ sideMenu: false }">
+    <% if (locals.message && locals.message.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+            <p><%= message %></p>
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-green-600'></i>
+            </button>
+          </div>
+    <% } %>
+    
+    <% if (locals.error && locals.error.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+            <p>
+                <%= error %>
+            </p>
+    
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-red-600'></i>
+            </button>
+        </div>
+        
+    <% } %>
     <div class="tp-main-content " x-data="{ searchOverlay: false }">
         <div class="body-content px-8 py-8 bg-gray-100">
             <div class="flex justify-between mb-10">

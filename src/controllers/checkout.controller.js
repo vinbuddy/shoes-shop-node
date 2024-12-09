@@ -332,7 +332,6 @@ export async function renderCheckoutResultPage(req, res) {
     try {
         const statusCode = req.query?.vnp_ResponseCode?.toString() || req.query?.resultCode?.toString();
         const tempOrder = req.session.tempOrder;
-        console.log("tempOrder: ", tempOrder);
 
         if (!tempOrder) {
             throw new Error("Không tìm thấy đơn hàng.");
