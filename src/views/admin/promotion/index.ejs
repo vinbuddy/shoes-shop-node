@@ -80,7 +80,7 @@
         <nav class="mt-10 flex justify-center">
             <ul class="list-style-none flex">
                 <li>
-                    <% var previousURL = "?" + new URLSearchParams({ ...filters, page: currentPage - 1 }).toString() %>
+                    <% var previousURL = "?" + new URLSearchParams({ ...filters, page: Number(currentPage) - 1 }).toString() %>
                     
                     <a href="<%= currentPage > 1 ? previousURL : "#" %>"
                         class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
@@ -95,7 +95,7 @@
                     </a>
                 <% } %>
                
-                <% var nextURL = "?" + new URLSearchParams({ ...filters, page: currentPage + 1 }).toString()  %>
+                <% var nextURL = "?" + new URLSearchParams({ ...filters, page: Number(currentPage) + 1 }).toString()  %>
                 <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
                     class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
                      Trang sau
