@@ -1,12 +1,20 @@
 <div class="relative">
     <header id="header" class="fixed top-0 left-0 right-0 z-10 bg-white">
-        <div class="container flex justify-between items-center py-4">
-            <a href="/" class="flex items-center gap-4">
-                <img class="size-10" src="/images/logo.png" alt="" />
-                <h1 class="font-bold text-xl text-primary">Shoes Shop</h1>
-            </a>
-    
-            <ul class="flex items-center justify-between h-16 [&_li]:cursor-pointer">
+        <div class="container mx-auto px-4 flex justify-between items-center py-4 space-y-4 md:space-y-0">
+            <div class="flex items-center lg:mt-0">
+                <!-- Burger -->
+                <button class="lg:hidden text-2xl me-4" id="mobile-menu-button">
+                    <i class="bx bx-menu"></i>
+                </button>
+
+                <a href="/" class="flex items-center gap-4">
+                    <img class="size-10" src="/images/logo.png" alt="" />
+                    <h1 class="md:block hidden font-bold text-xl text-primary">Shoes Shop</h1>
+                </a>
+            </div>
+            
+
+            <ul class="hidden lg:flex items-center justify-between h-16 [&_li]:cursor-pointer">
                 <li class="rounded-full px-3 text-black <%= locals.currentPath === '/' ? 'bg-[#E4E4E7]' : '' %>">
                     <a href="/">Trang chủ</a>
                 </li>
@@ -106,17 +114,17 @@
                 <a id="search-icon" href="javascript:void(0);" class="text-2xl">
                     <i id="search-icon-inner" class="bx bx-search"></i>
                 </a>
-    
+
                 <a id="cart-icon" class="relative text-2xl" href="/cart">
                     <i class="bx bx-cart-alt"></i>
-    
+
                     <span
                         class="absolute top-[-10px] right-[-10px] flex justify-center items-center bg-danger text-white rounded-full text-sm size-5"
                         >0</span
                     >
                 </a>
                 <input id="search-input" class="hidden outline-none" placeholder="Tìm kiếm sản phẩm" type="text" />
-    
+
                 <% if (locals?.session?.customer) { %>
                     <div  class="group/customer relative">
                         <img
@@ -138,7 +146,7 @@
                     </div>
                     
                 <% } %>
-    
+
                 <% if (!locals?.session?.customer) { %>
                     <a
                         id="sign-in-btn"
@@ -188,6 +196,30 @@
                 </ul>
                 
             </div>
+            
+        </div>
+
+        <div class="lg:hidden hidden w-full" id="mobile-menu">
+            <ul class="flex flex-col items-start space-y-2 px-5">
+                <li class="rounded-full px-3 py-2 text-black <%= locals.currentPath === '/' ? 'bg-[#E4E4E7]' : '' %>">
+                    <a href="/">Trang chủ</a>
+                </li>
+                <li class="rounded-full px-3 py-2 text-black <%= locals.currentPath.includes('/product') ? 'bg-[#E4E4E7]' : '' %>">
+                    <a href="/product">Sản phẩm</a>
+                </li>
+                <li class="px-3 py-2 text-black">
+                    <a href="/product" class="flex items-center justify-between">
+                        Khám phá
+                        <i class="bx bx-chevron-down"></i>
+                    </a>
+                </li>
+                <li class="px-3 py-2 text-black <%= locals.currentPath.includes('/about') ? 'bg-[#E4E4E7]' : '' %>">
+                    <a href="#">Về chúng tôi</a>
+                </li>
+                <li class="px-3 py-2 text-black">
+                    <a href="#">Liên hệ</a>
+                </li>
+            </ul>
         </div>
     </header>
 </div>
@@ -310,4 +342,14 @@
         );
 
     })
+</script>
+
+<!-- Mobile -->
+<script>
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
 </script>
