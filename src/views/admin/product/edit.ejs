@@ -6,6 +6,7 @@
      <div>
         <form id="create-product-form" action="/admin/product/edit" method="post" enctype="multipart/form-data">
 
+            <input type="hidden" name="retainedImages" id="retainedImages" value="<%= product.danhSachHinhAnh.join(',') %>" />
             <input type="text" name="productId" value="<%= product.maSanPham.toString() %>" hidden>
             
             <div class="grid grid-cols-12 gap-5">
@@ -248,8 +249,18 @@
 
     const productImageThumbnailInputFile = document.getElementById("product-image-thumbnail");
     const productImageThumbnailUpload = document.getElementById("uploadImageThumnail");
+    const retainedImagesInput = document.getElementById("retainedImages");
 
     const fileListTransfer = new DataTransfer();
+
+    const updateRetainedImages = () => {
+        const retainedUrls = [];
+        const images = document.querySelectorAll("#uploadImages img");
+        images.forEach((img) => {
+            retainedUrls.push(img.src);
+        });
+        retainedImagesInput.value = retainedUrls.join(",");
+    };
 
     // Render image files (add to existing list)
     const renderImageFiles = (files) => {
@@ -282,6 +293,8 @@
 
                     // Update input files
                     productImageInputFiles.files = fileListTransfer.files;
+
+                    updateRetainedImages();
                 });
             };
 
@@ -300,6 +313,9 @@
         productImageInputFiles.files = fileListTransfer.files;
 
         renderImageFiles(files);
+
+        // Update retained images
+        updateRetainedImages();
     });
 
     // Thumbnail image logic
@@ -351,6 +367,9 @@
         btn.addEventListener("click", function () {
             const parent = this.closest("li");
             parent.remove();
+
+            // Update retained images
+            updateRetainedImages();
         });
     });
 </script>

@@ -166,12 +166,12 @@
 
                         <a href="/product/<%= product.maSanPham %>" class="group">
                             <div
-                                class="relative aspect-h-1 aspect-w-1 w-full min-h-[100px] max-h-[100px] lg:min-h-[300px] lg:max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                                class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                             >
                                 <img
                                     src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                     alt="<%= product.tenSanPham %>"
-                                    class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                    class="h-full w-full object-contain object-center group-hover:opacity-75"
                                 />
 
                                 <% if (maxDiscount > 0) { %>

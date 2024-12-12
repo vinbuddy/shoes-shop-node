@@ -176,12 +176,12 @@
 
                     <a href="/product/<%= product.maSanPham %>" class="group">
                         <div
-                            class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                         >
                             <img
                                 src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                 alt="<%= product.tenSanPham %>"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
                             />
 
                             <% if (maxDiscount > 0) { %>
@@ -193,7 +193,6 @@
                         </div>
                         <h3 class="mt-4 text-sm text-gray-700 truncate"><%= product.tenSanPham %></h3>
                         <% if (maxDiscount > 0) { %>
-                            
                            <div class="flex items-center gap-2">
                             <p class="mt-1 text-lg font-medium text-primary">
                                 <%= formatVNCurrency(finalPrice || 0) %>
@@ -208,7 +207,6 @@
                                 <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
                             </p>
                         <% } %>
-                        <!-- <p class="mt-1 text-lg font-medium text-gray-900">$<%= product.price %></p> -->
                     </a>
                 <% }) %>
             <% } else { %>
@@ -245,12 +243,12 @@
 
                     <a href="/product/<%= product.maSanPham %>" class="group">
                         <div
-                            class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                         >
                             <img
                                 src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                 alt="<%= product.tenSanPham %>"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
                             />
 
                             <% if (maxDiscount > 0) { %>
@@ -313,12 +311,12 @@
 
                     <a href="/product/<%= product.maSanPham %>" class="group">
                         <div
-                            class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                         >
                             <img
                                 src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                 alt="<%= product.tenSanPham %>"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
                             />
 
                             <% if (maxDiscount > 0) { %>
@@ -361,7 +359,7 @@
             <img src="/images/categories/category-adidas.jpg" alt="" />
         </section>
         <section class="h-full bg-[#2f6178] p-10">
-            <h3 class="text-2xl lg:text-[70px] font-semibold mb-5 text-white">Giày Thể Thao Đánh Dấu Sự Trở Lại Của Adidas</h3>
+            <h3 class="text-2xl lg:text-[70px] lg:leading-[70px] leading-3 font-semibold mb-5 text-white">Giày Thể Thao Đánh Dấu Sự Trở Lại Của Adidas</h3>
 
             <a href="" class="btn btn-outline border bg-transparent border-white text-white rounded-full w-fit">
                 Khám phá ngay
