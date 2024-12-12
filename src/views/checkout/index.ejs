@@ -8,13 +8,13 @@
     </div>
 
     <form id="checkout-form" action="/checkout" method="post">
-        <div class="grid grid-cols-12 gap-10">
-            <div class="col-span-6">
+        <div class="grid grid-cols-12 md:gap-10 gap-5">
+            <div class="col-span-12 md:col-span-6">
                 <div>
                     <section>
                         <h3 class="text-lg font-semibold mb-4">Thông tin giao hàng</h3>
                         <div class="grid grid-cols-12 gap-5">
-                            <div class="col-span-6">
+                            <div class="col-span-12 md:col-span-6">
                                 <label class="form-control w-full">
                                     <div class="label">
                                         <span class="label-text">Nhập tên người nhận</span>
@@ -28,7 +28,7 @@
                                     />
                                 </label>
                             </div>
-                            <div class="col-span-6">
+                            <div class="col-span-12 md:col-span-6">
                                 <label class="form-control w-full">
                                     <div class="label">
                                         <span class="label-text">Nhập số điện thoại</span>
@@ -56,9 +56,9 @@
                                 </label>
                             </div>
                             <div class="col-span-12">
-                                <div class="grid grid-cols-3 gap-5">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <div>
-                                        <label class="form-control w-full max-w-xs">
+                                        <label class="form-control w-full">
                                             <div class="label">
                                                 <span class="label-text">Tỉnh thành</span>
                                             </div>
@@ -68,7 +68,7 @@
                                         </label>
                                     </div>
                                     <div>
-                                        <label class="form-control w-full max-w-xs">
+                                        <label class="form-control w-full">
                                             <div class="label">
                                                 <span class="label-text">Quận huyện</span>
                                             </div>
@@ -78,7 +78,7 @@
                                         </label>
                                     </div>
                                     <div>
-                                        <label class="form-control w-full max-w-xs">
+                                        <label class="form-control w-full">
                                             <div class="label">
                                                 <span class="label-text">Phường xã</span>
                                             </div>
@@ -142,7 +142,7 @@
                     </section>
                 </div>
             </div>
-            <div class="col-span-6">
+            <div class="col-span-12 md:col-span-6">
                 <section class="rounded-2xl p-5 bg-gray-100/70">
                     <h3 class="text-lg font-semibold mb-5">Các sản phẩm đã chọn</h3>
                     <div>
@@ -150,17 +150,17 @@
                         <% if (locals?.session?.selectedItems && locals?.session?.selectedItems.length > 0) { %>
                         
                             <% locals.session.selectedItems.forEach((item) => { %>
-                                <div class="flex items-center mb-5 last:mb-0">
-                                    <a class="fade" href="/product/<%= item.maSanPham.maSanPham %>">
-                                        <img src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>" width="60" class="rounded-xl border" />
+                                <div class="flex flex-wrap items-center mb-5 last:mb-0">
+                                    <a class="fade size-[40px] lg:size-[60px] block" href="/product/<%= item.maSanPham.maSanPham %>">
+                                        <img src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>" class="rounded-xl object-contain size-[40px] lg:size-[60px] border" />
                                     </a>
         
-                                    <a class="flex-1">
-                                        <div class="fade flex flex-col ml-3">
-                                            <span class="font-medium max-w-full truncate">
+                                    <a class="flex-1 md:ml-3">
+                                        <div class="fade flex flex-col">
+                                            <span class="font-medium max-w-[90%] truncate">
                                                 <%= item.maSanPham.tenSanPham %>
                                             </span>
-                                            <div class="flex justify-between items-center mt-1">
+                                            <div class="flex flex-wrap justify-between items-center mt-1">
                                                 <span class="text-sm font-light text-gray-500">
                                                     Kích cỡ: <%= item.maKichCoSanPham.tenKichCo %> - Giá:  <%= formatVNCurrency(item.giaSanPham) %>
                                                 </span>

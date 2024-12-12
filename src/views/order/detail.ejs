@@ -16,8 +16,8 @@
       </span>
     </div>
   </div>
-<div class="max-w mx-auto  p-6 bg-gray-100 shadow-lg rounded-lg">
-    <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
+<div class="max-w mx-auto  p-6 bg-gray-100 rounded-xl">
+    <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-xl">
         <h3 class="text-xl font-semibold mb-2">Địa Chỉ Nhận Hàng</h2>
         <p class="font-medium"><%= order.thongTinGiaoHang.tenNguoiNhan %></p>
         <p class="text-gray-700"><%= order.thongTinGiaoHang.soDienThoaiNguoiNhan %></p>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Trạng thái đơn hàng -->
-    <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
+    <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-xl">
         <h3 class="text-xl font-semibold mb-6">Đơn Hàng</h3>
         <!-- Timeline Container -->
 
@@ -41,7 +41,7 @@
         </div>
     </div>
    
-    <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
+    <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-xl">
         <!-- Sản phẩm -->
         <% order.chiTietDonHang.forEach(product => { %>
         <div class="border-b pb-4 mb-4">
@@ -49,7 +49,7 @@
                 <img
                     src="<%= product.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
                     alt="<%= product.maSanPham.tenSanPham %>"
-                    class="w-24 h-24 object-cover rounded-lg shadow-sm"
+                    class="w-24 h-24 object-contain rounded-xl shadow-sm"
                 />
                 <div>
                     <h4 class="font-semibold text-lg"><%= product.maSanPham.tenSanPham %></h4>
@@ -64,15 +64,15 @@
         <div class="mt-4">
             <div class="flex justify-between mb-2">
                 <p class="text-gray-700">Tổng tiền hàng</p>
-                <p class="font-semibold">₫<%= order.tongTienThanhToan.toLocaleString('vi-VN') %></p>
+                <p class="font-semibold"><%= order.tongTienThanhToan.toLocaleString('vi-VN') %> ₫</p>
             </div>
             <div class="flex justify-between mb-2">
                 <p class="text-gray-700">Phí vận chuyển</p>
-                <p class="font-semibold">₫<%= (order.thongTinGiaoHang.phiVanChuyen == 0) ? order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN'): '0'  %></p>
+                <p class="font-semibold"><%= (order.thongTinGiaoHang.phiVanChuyen == 0) ? order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN'): '0'  %> ₫</p>
             </div>
             <div class="flex justify-between mt-2 border-t pt-2">
                 <p class="font-semibold">Thành tiền</p>
-                <p class="font-bold text-lg text-primary">₫<%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %></p>
+                <p class="font-bold text-lg text-primary"><%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %> ₫</p>
             </div>
         </div>
 
@@ -94,7 +94,7 @@
         
     </div>
     <% if(order.thongTinDoiTraHang != null) { %>
-        <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-lg">
+        <div class="max-w mx-auto mt-6 p-6 bg-white shadow-lg rounded-xl">
             <h3 class="text-xl font-semibold mb-6">Danh sách sản phẩm đổi trả</h3>
             <% order.thongTinDoiTraHang.chiTietDoiTraHang.forEach(product => { %>
                 <div class="border-b pb-4 mb-4">
@@ -102,7 +102,7 @@
                         <img
                             src="<%= product.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
                             alt="<%= product.maSanPham.tenSanPham %>"
-                            class="w-24 h-24 object-cover rounded-lg shadow-sm"
+                            class="w-24 h-24 object-contain rounded-xl shadow-sm"
                         />
                         <div>
                             <h4 class="font-semibold text-lg"><%= product.maSanPham.tenSanPham %></h4>

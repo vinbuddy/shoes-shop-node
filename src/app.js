@@ -15,6 +15,7 @@ import { initializeLoginWithGoogleService } from "./utils/google.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
+import favicon from "serve-favicon";
 
 import DanhMucModel from "./models/danhMuc.model.js";
 import HangSanXuatModel from "./models/hangSanXuat.model.js";
@@ -31,6 +32,7 @@ const __dirname = dirname(__filename);
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "views")));
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 app.use(expressLayouts);
 app.set("layout", "./layouts/main");

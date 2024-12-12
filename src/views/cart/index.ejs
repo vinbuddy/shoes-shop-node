@@ -17,7 +17,7 @@
                                     data-productId="<%= item.maSanPham.maSanPham %>" 
                                     data-productStockQuantity="<%= item.soLuongTon %>"
                                     data-productPrice="<%= item.giaSanPham %>"
-                                    class="<%= item.soLuongTon == 0 ? "[&_.fade]:opacity-60" : ""  %> flex justify-between items-center mt-6 pt-6">
+                                    class="<%= item.soLuongTon == 0 ? "[&_.fade]:opacity-60" : ""  %> flex flex-wrap justify-between items-center mt-6 pt-6">
                                     <div class="flex items-center">
                                         <input
                                             type="checkbox"
@@ -26,17 +26,18 @@
                                             class="checkbox checkbox-sm [--chkbg:#0578f8]"
                                             <%= item.soLuongTon == 0 ? "disabled" : "" %>
                                         />
-                                        <a class="fade" href="/product/<%= item.maSanPham.maSanPham %>">
+                                        <a class="fade block size-[40px] lg:size-[60px]" href="/product/<%= item.maSanPham.maSanPham %>">
                                             <img
                                                 src="<%= item.maSanPham.hinhAnhDaiDien || "/images/no-result.png" %>"
                                                 width="60"
-                                                class="rounded-xl ms-2"
+                                                height="60"
+                                                class="rounded-xl object-contain size-[40px] lg:size-[60px] ms-2"
                                             />
                                         </a>
             
                                         <a href="/product/<%= item.maSanPham.maSanPham %>">
                                             <div class="fade flex flex-col ml-3">
-                                                <span class="md:text-md font-medium max-w-[300px] truncate" title="<%= item.maSanPham.tenSanPham %>">
+                                                <span class="md:text-md font-medium max-w-[100px] lg:max-w-[300px] truncate" title="<%= item.maSanPham.tenSanPham %>">
                                                     <%= item.maSanPham.tenSanPham %>
                                                 </span>
                                                 <span class="text-sm font-light text-gray-500">
@@ -50,7 +51,7 @@
                                         </a>
                                     </div>
         
-                                    <div class="flex justify-center items-center">
+                                    <div class="flex justify-between w-full lg:w-auto lg:justify-center items-center">
                                         <div class="fade pr-8">
                                             <span class="total-price" data-totalPrice="<%= item.giaSanPham * item.soLuongSanPham %>">
                                                 <%= formatVNCurrency(item.giaSanPham * item.soLuongSanPham) %>
@@ -86,7 +87,7 @@
                         
                     </div>
 
-                    <div class="flex justify-between items-center mt-6 pt-6 border-t">
+                    <div class="flex justify-between items-center mt-6 pt-6 border-t mb-5">
                         <div class="flex items-center">
                             <i class="fa fa-arrow-left text-sm pr-2"></i>
                             <a href="/product" class="text-md font-medium text-blue-500">Tiếp tục mua sắm</a>

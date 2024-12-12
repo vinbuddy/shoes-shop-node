@@ -21,13 +21,19 @@
                             </a>
                             <ul class="mt-5 [&_li]:cursor-pointer">
                                 <li>
-                                    <a href="/admin/dashboard" class="flex items-center py-4">
+                                    <a
+                                        href="/admin/dashboard"
+                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath === '/admin/dashboard' ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                    >
                                         <i class="bx bxs-dashboard"></i>
                                         <span class="ms-2.5"> Trang chủ </span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/admin/sale" class="flex items-center py-4">
+                                    <a
+                                        href="/admin/sale"
+                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/sale') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                    >
                                         <i class="bx bxs-basket"></i>
                                         <span class="ms-2.5"> Bán hàng </span>
                                     </a>
@@ -35,44 +41,62 @@
                                 <div class="join join-vertical w-full">
                                     <div class="collapse collapse-arrow join-item">
                                         <input type="checkbox" name="product" checked="checked" />
-                                        <div class="collapse-title flex items-center text-base px-0">
+                                        <div class="collapse-title flex items-center text-base ps-4">
                                             <i class="bx bxl-product-hunt me-2.5"></i>
                                             Sản phẩm
                                         </div>
                                         <div class="collapse-content">
                                             <ul>
                                                 <li>
-                                                    <a href="/admin/product" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/product"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith( '/admin/product' ) ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-list-ul"></i>
                                                         <span class="ms-2.5"> Sản phẩm </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/category" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/category"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/category') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-category-alt"></i>
                                                         <span class="ms-2.5"> Danh mục </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/size" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/size"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/size') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-font-size"></i>
                                                         <span class="ms-2.5"> Kích cỡ </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/brand" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/brand"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/brand') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-bookmarks"></i>
                                                         <span class="ms-2.5"> Nhãn hàng </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/supplier" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/supplier"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/supplier') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bxs-factory"></i>
                                                         <span class="ms-2.5"> Nhà cung cấp </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/goods-receipt-list" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/goods-receipt-list"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/goods-receipt-list') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-transfer-alt"></i>
                                                         <span class="ms-2.5"> Nhập hàng </span>
                                                     </a>
@@ -84,20 +108,26 @@
                                 <div class="join join-vertical w-full">
                                     <div class="collapse collapse-arrow join-item">
                                         <input type="checkbox" name="order" checked="checked" />
-                                        <div class="collapse-title flex items-center text-base px-0">
+                                        <div class="collapse-title flex items-center text-base ps-4">
                                             <i class="bx bxs-package me-2.5"></i>
                                             Đơn hàng
                                         </div>
                                         <div class="collapse-content">
                                             <ul>
                                                 <li>
-                                                    <a href="/admin/order" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/order"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/order') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-list-ul"></i>
                                                         <span class="ms-2.5"> Đơn hàng </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/order/refund" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/order/refund"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/order/refund') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bx-category-alt"></i>
                                                         <span class="ms-2.5"> Trả hàng </span>
                                                     </a>
@@ -106,31 +136,39 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <li>
-                                    <a href="/admin/customer" class="flex items-center py-4">
+                                    <a
+                                        href="/admin/customer"
+                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/customer') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                    >
                                         <i class="bx bxs-group"></i>
                                         <span class="ms-2.5"> Khách hàng </span>
                                     </a>
                                 </li>
                                 <div class="join join-vertical w-full">
                                     <div class="collapse collapse-arrow join-item">
-                                        <input type="checkbox" name="product" />    
-                                        <div class="collapse-title flex items-center text-base px-0">
+                                        <input type="checkbox" name="product" />
+                                        <div class="collapse-title flex items-center text-base ps-4">
                                             <i class="bx bxl-product-hunt me-2.5"></i>
                                             Báo Cáo
                                         </div>
                                         <div class="collapse-content">
                                             <ul>
                                                 <li>
-                                                    <a href="/admin/report/revenue-report" class="flex items-center py-4">
+                                                    <a
+                                                        href="/admin/report/revenue-report"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/report/revenue-report') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
                                                         <i class="bx bxs-bar-chart-alt-2"></i>
                                                         <span class="ms-2.5"> <Dl></Dl> Doanh thu </span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="/admin/report/expenditure-report" class="flex items-center py-4">
-                                                        <i class='bx bx-money'></i>
+                                                    <a
+                                                        href="/admin/report/expenditure-report"
+                                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/revenue/expenditure-report') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                                    >
+                                                        <i class="bx bx-money"></i>
                                                         <span class="ms-2.5"> <Dl></Dl> Chi Tiêu </span>
                                                     </a>
                                                 </li>
@@ -139,13 +177,19 @@
                                     </div>
                                 </div>
                                 <li>
-                                    <a href="/admin/employee" class="flex items-center py-4">
+                                    <a
+                                        href="/admin/employee"
+                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/employee') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                    >
                                         <i class="bx bxs-user"></i>
                                         <span class="ms-2.5"> Nhân viên </span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/admin/promotion" class="flex items-center py-4">
+                                    <a
+                                        href="/admin/promotion"
+                                        class="flex items-center p-4 rounded-xl <%= locals.currentPath.startsWith('/admin/promotion') ? 'bg-[#E4E4E7] text-primary' : '' %>"
+                                    >
                                         <i class="bx bxs-discount"></i>
                                         <span class="ms-2.5"> Khuyến mãi </span>
                                     </a>
@@ -154,7 +198,10 @@
                         </div>
 
                         <div class="p-3 rounded-lg bg-gray-100 mt-5">
-                            <div onclick="window.location.href = '/admin/profile'" class="flex items-center gap-2 mb-5 cursor-pointer">
+                            <div
+                                onclick="window.location.href = '/admin/profile'"
+                                class="flex items-center gap-2 mb-5 cursor-pointer"
+                            >
                                 <img
                                     class="size-8 object-cover rounded-full"
                                     src="<%- locals?.session?.user?.anhDaiDien || '/images/no-result.png' %>"

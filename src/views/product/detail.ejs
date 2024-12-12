@@ -11,14 +11,14 @@
         </div>
     </div>
     <div class="grid grid-cols-12 mt-5 gap-10">
-        <section class="col-span-7">
+        <section class="col-span-12 lg:col-span-7">
             <div class="swiper swiper-product-images [&_.swiper-slide]:rounded-2xl">
-                <div class="swiper-wrapper h-[500px]">
+                <div class="swiper-wrapper h-[200px] lg:h-[500px]">
                     <% if (product && product.danhSachHinhAnh.length > 0) { %>
                         <% product.danhSachHinhAnh.forEach((image, index) => { %>
                             <div class="swiper-slide">
                                 <img
-                                    class="object-cover h-full w-full rounded-2xl"
+                                    class="object-contain lg:object-cover h-full w-full rounded-2xl border"
                                     src="<%= image %>"
                                     alt=""
                                 />
@@ -30,7 +30,7 @@
                 <div class="swiper-button-prev"></div>
             </div>
         </section>
-        <section class="col-span-5">
+        <section class="col-span-12 lg:col-span-5">
             <div>
                 <% 
                     // Tìm khuyến mãi áp dụng cho sản phẩm
