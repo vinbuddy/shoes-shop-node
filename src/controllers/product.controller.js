@@ -52,6 +52,7 @@ export async function renderProductPage(req, res) {
 
     const filters = {
         trangThaiXoa: false,
+        danhSachKichCo: { $elemMatch: { giaKichCo: { $gt: 0 } } },
     };
 
     if (name && name.trim()) {
@@ -154,6 +155,7 @@ export async function renderProductDetailPage(req, res) {
     };
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
+        title: product.tenSanPham,
         loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
         promotions: promotions,
