@@ -453,7 +453,7 @@ export async function renderAdminGoodsReceiptList(req, res, next) {
         }
 
         const user = req.session.user;
-        const product = await ProductModel.findOne({tenSanPham : productName});
+        const product = await ProductModel.findOne({ tenSanPham: productName });
         if (product) {
             filter = {
                 productId: { "chiTiet.maSanPham": product.id },
@@ -461,13 +461,13 @@ export async function renderAdminGoodsReceiptList(req, res, next) {
         }
 
         const phieuNhap = await GoodsReceiptModel.find(filter)
-                        .skip(skip)
-                        .limit(itemsPerPage)
-                        .populate("nhaCungCap")
-                        .populate("chiTiet.maSanPham")
-                        .exec();
-        
-        const formattedPhieuNhap = phieuNhap.map(item => {
+            .skip(skip)
+            .limit(itemsPerPage)
+            .populate("nhaCungCap")
+            .populate("chiTiet.maSanPham")
+            .exec();
+
+        const formattedPhieuNhap = phieuNhap.map((item) => {
             const date = new Date(item.ngayNhap);
             const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
             return { ...item._doc, ngayNhap: formattedDate };
@@ -492,11 +492,11 @@ export async function renderAdminGoodsReceiptDetails(req, res, next) {
         const user = req.session.user;
         const { id } = req.params;
 
-        const details = await GoodsReceiptModel.findOne({maPhieuNhap: id})
-                        .populate("nhaCungCap")
-                        .populate("chiTiet.maSanPham")
-                        .populate("chiTiet.danhSachKichCo.maKichCo")
-                        .exec();
+        const details = await GoodsReceiptModel.findOne({ maPhieuNhap: id })
+            .populate("nhaCungCap")
+            .populate("chiTiet.maSanPham")
+            .populate("chiTiet.danhSachKichCo.maKichCo")
+            .exec();
 
         const date = new Date(details.ngayNhap);
         const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
@@ -602,9 +602,11 @@ export async function createGoodsReceipt(req, res) {
         }
 
         await phieuNhap.save();
+        req.flash("message", "Tạo phiếu nhập hàng thành công");
         return res.status(200).json({ redirectUrl: "/admin/create-goods-receipt" });
     } catch (error) {
         console.error("Lỗi khi lưu phiếu nhập:", error);
+        req.flash("error", "Lỗi khi lưu phiếu nhập");
         res.status(500).json({ message: "Lỗi máy chủ. Vui lòng thử lại sau." });
     }
 }
@@ -637,9 +639,10 @@ export async function updateSizeList(req, res) {
         // Cập nhật danh sách size
         product.danhSachKichCo = danhSachKichCo;
         await product.save();
-
+        req.flash("message", "Cập nhật danh sách kích cỡ thành công.");
         return res.status(200).json({ message: "Cập nhật danh sách kích cỡ thành công.", product });
     } catch (error) {
+        console.error("Lỗi cập nhật danh sách kích cỡ:", error);
         return res.status(500).json({ message: "Lỗi server. Vui lòng thử lại sau.", error });
     }
 }
@@ -647,10 +650,10 @@ export async function updateSizeList(req, res) {
 // [GET] /api/product/
 export async function getProductReceiptByProductId(req, res) {
     const productId = req.params.id;
-    const product = await GoodsReceiptModel.find({'chiTiet.maSanPham': productId})
-                        .populate("chiTiet.maSanPham")
-                        .populate("chiTiet.danhSachKichCo.maKichCo")
-                        .exec();
+    const product = await GoodsReceiptModel.find({ "chiTiet.maSanPham": productId })
+        .populate("chiTiet.maSanPham")
+        .populate("chiTiet.danhSachKichCo.maKichCo")
+        .exec();
 
     if (product) {
         return res.json(product);
@@ -661,104 +664,97 @@ export async function getProductReceiptByProductId(req, res) {
 // [GET] /api/get-goods-receipts/month
 const getDetailsAndExpenditure = async (filterCondition) => {
     try {
-        const goodsReceipts = await GoodsReceiptModel.find(filterCondition)
-            .populate('chiTiet.maSanPham')
-            .exec();
+        const goodsReceipts = await GoodsReceiptModel.find(filterCondition).populate("chiTiet.maSanPham").exec();
 
         const expenditure = await GoodsReceiptModel.aggregate([
             {
                 // Tách chi tiết từng sản phẩm
-                $unwind: "$chiTiet"
+                $unwind: "$chiTiet",
             },
             {
                 // Tách danh sách kích cỡ
-                $unwind: "$chiTiet.danhSachKichCo"
+                $unwind: "$chiTiet.danhSachKichCo",
             },
             {
                 // Tính tổng chi phí cho từng kích cỡ
                 $addFields: {
                     expenditureForSize: {
-                        $multiply: [
-                            "$chiTiet.danhSachKichCo.soLuongKichCo",
-                            "$chiTiet.danhSachKichCo.giaKichCo"
-                        ]
-                    }
-                }
+                        $multiply: ["$chiTiet.danhSachKichCo.soLuongKichCo", "$chiTiet.danhSachKichCo.giaKichCo"],
+                    },
+                },
             },
             {
                 // Nhóm theo ngày nhập và tính tổng chi tiêu
                 $group: {
                     _id: { $dateToString: { format: "%Y-%m-%d", date: "$ngayNhap" } },
-                    totalAmount: { $sum: "$expenditureForSize" } // Tổng chi phí
-                }
+                    totalAmount: { $sum: "$expenditureForSize" }, // Tổng chi phí
+                },
             },
             {
                 $project: {
                     _id: 0,
                     date: "$_id",
-                    totalAmount: 1
-                }
+                    totalAmount: 1,
+                },
             },
             {
-                $sort: { date: 1 }
-            }
+                $sort: { date: 1 },
+            },
         ]);
 
         return { goodsReceipts, expenditure };
     } catch (error) {
-        console.error('Lỗi tìm nạp dữ liệu:', error);
-        throw new Error('Không thể tìm nạp phiếu nhập.');
+        console.error("Lỗi tìm nạp dữ liệu:", error);
+        throw new Error("Không thể tìm nạp phiếu nhập.");
     }
-}
+};
 // Get All Goods Receipts
 // [GET] /product/api/get-goods-receipts
 export async function apiGetGoodsReceipts(req, res) {
-    const {filterTime} = req.params;
+    const { filterTime } = req.params;
     const year = new Date().getFullYear();
     const month = new Date().getMonth() + 1;
-    
-    let filterCondition = {}
 
-    if (filterTime === 'day') {
+    let filterCondition = {};
+
+    if (filterTime === "day") {
         filterCondition = {
             ngayNhap: {
                 $gte: new Date(year, month - 1, 1),
-                $lt: new Date(year, month, 1)
+                $lt: new Date(year, month, 1),
             },
         };
-    }
-    else if (filterTime === 'month') {
+    } else if (filterTime === "month") {
         const startDate = new Date(year, 0, 1);
-        const endDate = new Date(year + 1, 0, 1); 
+        const endDate = new Date(year + 1, 0, 1);
 
         filterCondition = {
             ngayNhap: {
-                $gte: startDate, 
-                $lt: endDate
+                $gte: startDate,
+                $lt: endDate,
             },
         };
-    }
-    else {
+    } else {
         // Year
         const startDate = new Date(new Date().getFullYear() - 10, 0, 1); // Ngày đầu năm 10 năm trước
         const endDate = new Date(new Date().getFullYear() + 1, 0, 1); // Ngày đầu năm kế tiếp (lấy hết năm hiện tại)
 
         filterCondition = {
             ngayNhap: {
-                $gte: startDate, 
-                $lt: endDate
+                $gte: startDate,
+                $lt: endDate,
             },
         };
     }
-    
+
     const result = await getDetailsAndExpenditure(filterCondition);
-    
+
     if (result) {
         return res.json({
             expenditure: result.expenditure,
-            goodsReceipts: result.goodsReceipts
+            goodsReceipts: result.goodsReceipts,
         });
     } else {
-        return res.status(404).json({ error: 'Không tìm thấy đơn hàng nào' });
+        return res.status(404).json({ error: "Không tìm thấy đơn hàng nào" });
     }
 }

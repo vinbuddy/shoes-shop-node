@@ -4,9 +4,12 @@ export async function deleteCategory(req, res) {
     try {
         const { id } = req.params;
         await DanhMucModel.findByIdAndUpdate(id, { trangThaiXoa: true });
+        req.flash("message", "Xóa danh mục thành công");
         return res.redirect("/admin/category");
     } catch (error) {
+        req.flash("error", "Xóa danh mục thất bại");
         console.error("Error deleting category:", error);
+        res.redirect("/admin/category");
     }
 }
 
@@ -14,9 +17,12 @@ export async function restoreCategory(req, res) {
     try {
         const { id } = req.params;
         await DanhMucModel.findByIdAndUpdate(id, { trangThaiXoa: false });
+        req.flash("message", "Khôi phục danh mục thành công");
         return res.redirect("/admin/category");
     } catch (error) {
+        req.flash("error", "Khôi phục danh mục thất bại");
         console.error("Error restoring category:", error);
+        return res.redirect("/admin/category");
     }
 }
 
@@ -27,9 +33,12 @@ export async function updateCategory(req, res) {
         const updatedData = { tenDanhMuc, moTa };
 
         await DanhMucModel.findByIdAndUpdate(id, updatedData);
+        req.flash("message", "Cập nhật danh mục thành công");
         return res.redirect("/admin/category");
     } catch (error) {
+        req.flash("error", "Cập nhật danh mục thất bại");
         console.error("Error updating category:", error);
+        return res.redirect("/admin/category");
     }
 }
 
@@ -37,7 +46,7 @@ export function renderCreateCategoryPage(req, res) {
     return res.render("admin/category/create", {
         layout: "./layouts/admin",
         page: "category",
-        title: "Create Category",
+        title: "Tạo danh mục",
     });
 }
 
@@ -47,7 +56,7 @@ export async function renderUpdateCategoryPage(req, res) {
     return res.render("admin/category/edit", {
         layout: "./layouts/admin",
         page: "category",
-        title: "Update Category",
+        title: "Cập nhật danh mục",
         category: category,
     });
 }
@@ -60,26 +69,33 @@ export async function createCategory(req, res) {
             return res.render("admin/category/create", {
                 layout: "./layouts/admin",
                 page: "category",
-                title: "Create Category",
+                title: "Tạo danh mục",
                 error: "Danh mục này đã tồn tại",
             });
         }
         const newCategory = new DanhMucModel({ tenDanhMuc, moTa });
         await newCategory.save();
+        await DanhMucModel.updateOne(
+            { _id: newCategory._id },
+            {
+                $set: {
+                    maDanhMuc: newCategory._id,
+                },
+            }
+        );
+
+        req.flash("message", "Tạo danh mục thành công");
         return res.redirect("/admin/category");
     } catch (error) {
-        return res.render("admin/category/create", {
-            layout: "./layouts/admin",
-            page: "category",
-            title: "Create Category",
-            error: error.message,
-        });
+        req.flash("error", "Tạo danh mục thất bại");
+        console.error("Error creating category:", error);
+        return res.redirect("/admin/category/create");
     }
 }
 
 const getPagination = (req) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 3;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     return { page, limit, skip };
 };
@@ -88,10 +104,10 @@ const renderCategoryPage = async (res, categories, page, totalCategories) => {
     return res.render("admin/category/index", {
         layout: "./layouts/admin",
         page: "category",
-        title: "Category Page",
+        title: "Danh sách danh mục",
         categories: categories,
         currentPage: page,
-        totalPages: Math.ceil(totalCategories / 3),
+        totalPages: Math.ceil(totalCategories / 10),
     });
 };
 
@@ -117,7 +133,9 @@ export async function searchCategory(req, res) {
 
         return renderCategoryPage(res, categories, page, totalCategories);
     } catch (error) {
+        req.flash("error", "Tìm kiếm danh mục thất bại");
         console.error("Error searching category:", error);
+        res.redirect("/admin/category");
     }
 }
 

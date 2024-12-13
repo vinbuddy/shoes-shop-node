@@ -5,8 +5,10 @@ export async function deleteSize(req, res) {
     try {
         const { id } = req.params;
         await SizeModel.findByIdAndUpdate(id, { trangThaiXoa: true });
+        req.flash("message", "Xóa kích cỡ thành công");
         return res.redirect("/admin/size");
     } catch (error) {
+        req.flash("error", "Xóa kích cỡ thất bại");
         console.error("Error deleting size:", error);
     }
 }
@@ -14,8 +16,10 @@ export async function restoreSize(req, res) {
     try {
         const { id } = req.params;
         await SizeModel.findByIdAndUpdate(id, { trangThaiXoa: false });
+        req.flash("message", "khôi phục kích cỡ thành công");
         return res.redirect("/admin/size");
     } catch (error) {
+        req.flash("error", "khôi phục kích cỡ thất bại");
         console.error("Error deleting size:", error);
     }
 }
@@ -36,7 +40,7 @@ export async function updateSize(req, res) {
         return res.render("admin/size/index", {
             layout: "./layouts/admin",
             page: "size",
-            title: "size page",
+            title: "Danh sách kích cỡ",
             sizes: sizes,
             currentPage: 1,
             totalPages: Math.ceil(totalSizes / 10),
@@ -50,7 +54,7 @@ export function renderCreatePage(req, res) {
     return res.render("admin/size/create", {
         layout: "./layouts/admin",
         page: "size",
-        title: "create size",
+        title: "Tạo kích cỡ",
     });
 }
 
@@ -69,7 +73,7 @@ export async function createSize(req, res) {
             { _id: newSize._id },
             {
                 $set: {
-                    maHangSanXuat: newSize._id,
+                    maKichCo: newSize._id,
                 },
             }
         );
@@ -92,7 +96,7 @@ const renderSizePage = async (res, sizes, page, totalSizes) => {
     return res.render("admin/size/index", {
         layout: "./layouts/admin",
         page: "size",
-        title: "size page",
+        title: "Danh sách kích cỡ",
         sizes: sizes,
         currentPage: page,
         totalPages: Math.ceil(totalSizes / 10),
@@ -120,6 +124,7 @@ export async function searchSize(req, res) {
 
         return renderSizePage(res, sizes, page, totalSizes);
     } catch (error) {
+        req.flash("error", error.message);
         console.error("Error searching size:", error);
     }
 }
@@ -146,6 +151,7 @@ export async function getAllSize(req, res) {
     if (sizes) {
         return res.json(sizes);
     } else {
+        req.flash("error", "Lỗi lấy dữ liệu kích cỡ");
         return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
     }
 }
@@ -155,19 +161,26 @@ export async function addSize(req, res) {
     const { tenKichCo, moTaKichCo } = req.body;
 
     if (!tenKichCo) {
+        req.flash("error", "Tên kích cỡ không được để trống");
         return res.status(400).json({ message: "Dữ liệu không hợp lệ." });
     }
 
     const size = new KichCoModel({
         tenKichCo: tenKichCo,
         moTaKichCo: moTaKichCo,
-        trangThaiXoa: false
+        trangThaiXoa: false,
     });
 
     const savedSize = await size.save();
-    savedSize.maKichCo = savedSize._id;
-
-    await savedSize.save();
+    await SizeModel.updateOne(
+        { _id: savedSize._id },
+        {
+            $set: {
+                maKichCo: savedSize._id,
+            },
+        }
+    );
+    req.flash("message", "Thêm kích cỡ thành công");
 
     return res.status(200).json({
         message: "Dữ liệu đã lưu thành công.",

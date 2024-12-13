@@ -4,8 +4,10 @@ export async function deleteStatus(req, res) {
     try {
         const { id } = req.params;
         await TrangThaiModel.findByIdAndUpdate(id, { trangThaiXoa: true });
+        req.flash("message", "Xóa trạng thái thành công");
         return res.redirect("/admin/status");
     } catch (error) {
+        req.flash("error", "Xóa trạng thái thất bại");
         console.error("Error deleting status:", error);
     }
 }
@@ -13,8 +15,10 @@ export async function restoreStatus(req, res) {
     try {
         const { id } = req.params;
         await TrangThaiModel.findByIdAndUpdate(id, { trangThaiXoa: false });
+        req.flash("message", "Khôi phục trạng thái thành công");
         return res.redirect("/admin/status");
     } catch (error) {
+        req.flash("error", "Khôi phục trạng thái thất bại");
         console.error("Error deleting status:", error);
     }
 }
@@ -25,8 +29,10 @@ export async function updateStatus(req, res) {
         const updatedData = { tenTrangThai };
         console.log(updatedData);
         await TrangThaiModel.findByIdAndUpdate(id, updatedData);
+        req.flash("message", "Cập nhật trạng thái thành công");
         return res.redirect("/admin/status");
     } catch (error) {
+        req.flash("error", "Cập nhật trạng thái thất bại");
         console.error("Error updating status:", error);
     }
 }
@@ -34,7 +40,7 @@ export function renderCreatePage(req, res) {
     return res.render("admin/status/create", {
         layout: "./layouts/admin",
         page: "status",
-        title: "create status",
+        title: "Tạo trạng thái",
     });
 }
 export async function renderUpdatePage(req, res) {
@@ -43,7 +49,7 @@ export async function renderUpdatePage(req, res) {
     return res.render("admin/status/edit", {
         layout: "./layouts/admin",
         page: "status",
-        title: "Update status",
+        title: "Cập nhật trạng thái",
         status: status,
     });
 }
@@ -52,11 +58,11 @@ export async function createStatus(req, res) {
         const { tenTrangThai } = req.body;
         const existingStatus = await TrangThaiModel.findOne({ tenTrangThai });
         if (existingStatus) {
+            req.flash("error", "Trạng thái này đã tồn tại");
             return res.render("admin/status/create", {
                 layout: "./layouts/admin",
                 page: "Status",
                 title: "create status",
-                error: "Trạng thái này đã tồn tại",
             });
         }
         const newStatus = new TrangThaiModel({ tenTrangThai });
@@ -69,13 +75,14 @@ export async function createStatus(req, res) {
                 },
             }
         );
+        req.flash("message", "Thêm trạng thái thành công");
         return res.redirect("/admin/status");
     } catch (error) {
+        req.flash("error", "Thêm trạng thái thất bại", error);
         return res.render("admin/status/create", {
             layout: "./layouts/admin",
             page: "status",
-            title: "create status",
-            error: error.message,
+            title: "Tạo trạng thái",
         });
     }
 }
@@ -91,7 +98,7 @@ const renderStatusPage = async (res, statuss, page, totalStatuss) => {
     return res.render("admin/status/index", {
         layout: "./layouts/admin",
         page: "status",
-        title: "status page",
+        title: "Danh sách trạng thái",
         statuss: statuss,
         currentPage: page,
         totalPages: Math.ceil(totalStatuss / 10),
