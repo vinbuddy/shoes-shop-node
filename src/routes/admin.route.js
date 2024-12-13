@@ -1,8 +1,6 @@
 import express from "express";
 
-import {
-    renderAdminDashboard
-} from "../controllers/home.controller.js"
+import { renderAdminDashboard } from "../controllers/home.controller.js";
 
 import {
     renderAdminGoodsReceiptDetails,
@@ -16,9 +14,7 @@ import {
     deleteProductHandler,
 } from "../controllers/product.controller.js";
 
-import {
-    renderAdminCustomerPage,
-} from "../controllers/customer.controller.js";
+import { renderAdminCustomerPage } from "../controllers/customer.controller.js";
 
 import {
     createEmployeeHandler,
@@ -33,8 +29,8 @@ import brandRoutes from "./brand.route.js";
 import supplierRoutes from "./supplier.route.js";
 import categoryRoutes from "./category.route.js";
 import statusRoutes from "./status.route.js";
-import authRoutes from "./auth.route.js"
-import reportRoutes from "./report.route.js"
+import authRoutes from "./auth.route.js";
+import reportRoutes from "./report.route.js";
 import sizeRoutes from "./size.route.js";
 
 import {
@@ -60,15 +56,14 @@ import {
     renderAdminPromotionPage,
 } from "../controllers/promotion.controller.js";
 
-import {
-    searchCustomer,
-} from "../controllers/customer.controller.js"
+import { searchCustomer } from "../controllers/customer.controller.js";
 
 import multer from "multer";
 import {
     verifyManagerRole,
     verifyWarehouseStaffRole,
-    // verifySalesStaffRole,
+    verifySalesStaffRole,
+    verifyUserLogin,
 } from "../middlewares/verifyRoleMiddleware.js";
 
 import { renderAdminSalePage, saleCheckoutRequest } from "../controllers/sale.controller.js";
@@ -77,18 +72,27 @@ const uploadFile = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
-router.get('/dashboard', renderAdminDashboard);
+// Home admin
+router.get("/dashboard", verifyUserLogin, renderAdminDashboard);
+
+// Trang đăng nhập admin
+router.use("/auth", authRoutes);
 
 // Goods Receipt [Nhân viên kho]
 router.get("/goods-receipt-list", verifyWarehouseStaffRole, renderAdminGoodsReceiptList);
 router.get("/goods-receipt-details/:id", verifyWarehouseStaffRole, renderAdminGoodsReceiptDetails);
 router.get("/create-goods-receipt", verifyWarehouseStaffRole, renderAdminCreateGoodsReceipt);
 
+// Brand [Nhân viên quản lý]
 router.use("/brand", brandRoutes);
+
+// supplier [Nhân viên quản lý]
 router.use("/supplier", supplierRoutes);
+
+// category [Nhân viên kho]
 router.use("/category", categoryRoutes);
+// status [Nhân viên quản lý]
 router.use("/status", statusRoutes);
-router.use("/auth", authRoutes);
 
 // Product [Nhân viên kho]
 router.get("/product", verifyWarehouseStaffRole, renderAdminProductPage);
@@ -108,17 +112,6 @@ router.post(
     ]),
     createProductHandler
 );
-router.use("/brand", brandRoutes);
-router.use("/supplier", supplierRoutes);
-router.use("/category", categoryRoutes);
-router.use("/status", statusRoutes);
-router.use("/auth", authRoutes);
-router.use("/report", reportRoutes);
-router.use("/size", sizeRoutes);
-
-router.get("/product", renderAdminProductPage);
-router.get("/product/create", renderAdminCreateProductPage);
-router.get("/product/edit/:id", renderAdminEditProductPage);
 router.post(
     "/product/edit",
     verifyWarehouseStaffRole,
@@ -136,22 +129,28 @@ router.post(
 );
 router.get("/product/delete/:id", verifyWarehouseStaffRole, deleteProductHandler);
 
+// Report [Nhân viên bán hàng + Nhân viên kho]
+router.use("/report", reportRoutes);
+
+// Size [Nhân viên kho]
+router.use("/size", sizeRoutes);
+
 // Order [Nhân viên bán hàng]
-router.get("/order", renderAdminOrderPage);
+router.get("/order", verifySalesStaffRole, renderAdminOrderPage);
+router.get("/order/detail/:id", verifySalesStaffRole, renderAdminOrderDetailPage);
+router.post("/order/updateStatus/:id", verifySalesStaffRole, updateOrderStatus);
+router.post("/order/nextStatus", verifySalesStaffRole, nextStatusRequest);
+router.get("/order/nextStatus/:id", verifySalesStaffRole, nextStatusHandler);
+router.post("/order/refundStatus", verifySalesStaffRole, refundStatusRequest);
+router.get("/order/refund", verifySalesStaffRole, renderRefundAdminPage);
+router.get("/refund/:tabId", verifySalesStaffRole, fetchRefundOrders);
+router.get("/order/search/:keyword", verifySalesStaffRole, SearchOrders);
 
-router.get("/order/detail/:id", renderAdminOrderDetailPage);
-router.post("/order/updateStatus/:id", updateOrderStatus);
-router.post("/order/nextStatus", nextStatusRequest);
-router.get("/order/nextStatus/:id", nextStatusHandler);
-router.post("/order/refundStatus", refundStatusRequest);
-router.get("/order/refund", renderRefundAdminPage);
-router.get("/refund/:tabId", fetchRefundOrders);
-router.get("/order/search/:keyword", SearchOrders);
+router.get("/profile", verifyUserLogin, renderAdminProfilePage);
 
-router.get("/profile", renderAdminProfilePage);
-
-router.get("/customer", renderAdminCustomerPage);
-router.get("/customer/search-customer", searchCustomer)
+// Customer [Nhân viên quản lý]
+router.get("/customer", verifySalesStaffRole, renderAdminCustomerPage);
+router.get("/customer/search-customer", verifySalesStaffRole, searchCustomer);
 
 // Employee [Nhân viên quản lý]
 router.get("/employee", verifyManagerRole, renderAdminEmployeePage);
@@ -190,7 +189,7 @@ router.post("/promotion/edit", verifyManagerRole, editPromotionHandler);
 router.get("/promotion/delete/:id", verifyManagerRole, deletePromotionHandler);
 
 // Sale [Nhân viên bán hàng]
-router.get("/sale", renderAdminSalePage);
-router.post("/sale/checkout", saleCheckoutRequest);
+router.get("/sale", verifySalesStaffRole, renderAdminSalePage);
+router.post("/sale/checkout", verifySalesStaffRole, saleCheckoutRequest);
 
 export default router;

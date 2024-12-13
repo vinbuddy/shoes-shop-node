@@ -146,6 +146,8 @@
                     <% products.forEach(product => { %>
 
                         <% 
+                            const isSoldOut = product.danhSachKichCo.every(size => size.soLuongKichCo === 0);
+
                             // Lấy khuyến mãi áp dụng cho sản phẩm
                             const applicablePromotions = promotions.filter(promo =>
                                 promo.danhSachSanPhamApDung.some(
@@ -177,6 +179,12 @@
                                 <% if (maxDiscount > 0) { %>
                                     <label class="absolute top-3 right-3 badge badge-error text-white">
                                         Giảm <%= maxDiscount %>%
+                                    </label>
+                                <% } %>
+
+                                <% if (isSoldOut) { %>
+                                    <label class="absolute top-3 left-3 badge badge-error text-white ">
+                                        Hết hàng
                                     </label>
                                 <% } %>
                             </div>
