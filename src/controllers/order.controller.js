@@ -225,6 +225,7 @@ export async function apiGetOrder(req, res) {
             },
         };
     } else if (timeType === "week") {
+        //
     } else if (timeType === "month") {
         const startDate = new Date(year, 0, 1);
         const endDate = new Date(year + 1, 0, 1);
@@ -272,7 +273,6 @@ export async function apiGetOrder(req, res) {
 
 // [GET] /api/get-orders-today
 export async function apiGetOrdersToday(req, res) {
-    const date = new Date();
     const year = new Date().getFullYear();
     const month = new Date().getMonth();
     const day = new Date().getDate();
