@@ -537,7 +537,7 @@ export const nextStatusRequest = async (req, res) => {
                 return res.status(400).json({ message: "Không thể cập nhật trạng thái cho đơn hàng này" });
             }
 
-            if (nextStatus.tenTrangThai === "Hoàn thành") {
+            if (nextStatus.tenTrangThai === "Đã giao") {
                 await DonHangModel.findOneAndUpdate(
                     { maDonHang: orderId },
                     {
@@ -815,26 +815,43 @@ export const nextStatusHandler = async (req, res) => {
         req.flash("error", "Đơn hàng không tồn tại");
         return res.redirect("/admin/order/");
     }
-
     const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
     const status = await TrangThaiModel.find();
     const statusCodes = latestStatus.maTrangThai.toString();
 
     const currentIndex = status.findIndex((s) => s._id.equals(statusCodes));
     const nextStatus = status[currentIndex + 1];
-
-    await DonHangModel.findOneAndUpdate(
-        { maDonHang: orderId },
-        {
-            $push: {
-                trangThaiDonHang: {
-                    maTrangThai: nextStatus._id,
-                    _id: nextStatus._id,
-                    thoiGian: new Date(),
+    if (nextStatus.tenTrangThai === "Đã giao") {
+        await DonHangModel.findOneAndUpdate(
+            { maDonHang: orderId },
+            {
+                $push: {
+                    trangThaiDonHang: {
+                        maTrangThai: nextStatus._id,
+                        _id: nextStatus._id,
+                        thoiGian: new Date(),
+                    },
                 },
-            },
-        }
-    );
+                $set: {
+                    "thongTinThanhToan.trangThaiThanhToan": "Hoàn thành",
+                },
+            }
+        );
+    } else {
+        await DonHangModel.findOneAndUpdate(
+            { maDonHang: orderId },
+            {
+                $push: {
+                    trangThaiDonHang: {
+                        maTrangThai: nextStatus._id,
+                        _id: nextStatus._id,
+                        thoiGian: new Date(),
+                    },
+                },
+            }
+        );
+    }
+
     req.flash("message", "Cập nhật trạng thái đơn hàng thành công");
     return res.redirect("/admin/order/");
 };

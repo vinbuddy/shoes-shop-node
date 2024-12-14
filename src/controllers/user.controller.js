@@ -31,6 +31,7 @@ export async function renderUserOrderPage(req, res) {
         .populate({
             path: "thongTinDoiTraHang.chiTietDoiTraHang.maKichCoSanPham",
         })
+        .sort({ "trangThaiDonHang.thoiGian": -1 })
         .exec();
 
     const pendingOrders = [];
@@ -152,9 +153,9 @@ export async function apiGetAllCustomer(req, res) {
     const customers = await KhachHangModel.find().exec();
     if (customers) {
         return res.json({
-            customers
+            customers,
         });
     } else {
-        return res.status(404).json({ error: 'Không tìm thấy khách hàng nào' });
+        return res.status(404).json({ error: "Không tìm thấy khách hàng nào" });
     }
 }

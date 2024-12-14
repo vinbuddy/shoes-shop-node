@@ -64,15 +64,15 @@
         <div class="mt-4">
             <div class="flex justify-between mb-2">
                 <p class="text-gray-700">Tổng tiền hàng</p>
-                <p class="font-semibold">₫<%= order.tongTienThanhToan.toLocaleString('vi-VN') %></p>
+                <p class="font-semibold"><%= order.chiTietDonHang.reduce((total, product) => total + (product.giaDaChon * product.soLuongDaChon), 0).toLocaleString('vi-VN') %>₫</p>
             </div>
             <div class="flex justify-between mb-2">
                 <p class="text-gray-700">Phí vận chuyển</p>
-                <p class="font-semibold">₫<%= (order.thongTinGiaoHang.phiVanChuyen == 0) ? order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN'): '0'  %></p>
+                <p class="font-semibold"><%= (order.thongTinGiaoHang.phiVanChuyen !== 0) ? order.thongTinGiaoHang.phiVanChuyen.toLocaleString('vi-VN'): '0'  %>₫</p>
             </div>
             <div class="flex justify-between mt-2 border-t pt-2">
                 <p class="font-semibold">Thành tiền</p>
-                <p class="font-bold text-lg text-primary">₫<%= (order.thongTinGiaoHang.phiVanChuyen + order.tongTienThanhToan).toLocaleString('vi-VN') %></p>
+                <p class="font-bold text-lg text-primary"><%= order.tongTienThanhToan.toLocaleString('vi-VN') %>₫</p>
             </div>
         </div>
 
