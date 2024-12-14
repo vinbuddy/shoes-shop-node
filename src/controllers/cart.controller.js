@@ -366,7 +366,7 @@ export async function updateCartItemQuantityHandlerRequest(req, res) {
         const customer = req.session.customer;
         const userId = customer?.maKhachHang;
 
-        const { quantity, productId } = req.body;
+        const { quantity, productId, sizeId } = req.body;
 
         if (!userId) {
             // Get from cookies
@@ -391,7 +391,10 @@ export async function updateCartItemQuantityHandlerRequest(req, res) {
             return res.status(404).json({ message: "Cart not found." });
         }
 
-        const productIndex = cart.danhSachSanPham.findIndex((item) => item.maSanPham.equals(productId));
+        const productIndex = cart.danhSachSanPham.findIndex(
+            (item) =>
+                item.maSanPham.equals(productId) && item.maKichCoSanPham.equals(new mongoose.Types.ObjectId(sizeId))
+        );
 
         if (productIndex < 0) {
             return res.status(404).json({ message: "Product not found in cart." });
