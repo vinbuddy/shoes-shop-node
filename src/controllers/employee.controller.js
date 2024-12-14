@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import UserModel from "../models/nguoidung.model.js";
-import RoleModel from "../models/vaitro.model.js";
+import RoleModel from "../models/vaiTro.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 const VIEW_OPTIONS = {
