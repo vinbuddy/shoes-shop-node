@@ -1,13 +1,35 @@
 <!-- Using layout -->
-<div class="container">
+<% if (locals.message && locals.message.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+        <p><%= message %></p>
+    
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-green-600'></i>
+        </button>
+      </div>
+<% } %>
+
+<% if (locals.error && locals.error.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+        <p>
+            <%= error %>
+        </p>
+
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-red-600'></i>
+        </button>
+    </div>
+    
+<% } %>
+<div class="container mx-auto p-8">
     <div class="text-center uppercase text-3xl font-semibold mt-8 mb-8">
         <h1 class="text-primary">Phiếu Nhập</h1>
     </div>
-    <div class="grid grid-cols-1 text-lg ">
-        <div class="m-auto">
+    <div class="grid grid-cols-1 gap-8 text-lg">
+        <div class="bg-white p-6 rounded-lg shadow-md">
             <div class="mb-5">
-                <label for="" class="inline-block ms-5 me-5 min-w-32 font-semibold">Nhà cung cấp</label>
-                <select name="" id="supplierSelect" class="w-[400px] outline-none border rounded-lg py-1 px-2">
+                <label for="supplierSelect" class="block font-semibold mb-2">Nhà cung cấp</label>
+                <select name="" id="supplierSelect" class="w-full border rounded-lg py-2 px-3">
                     <option value="null">-- Lựa chọn nhà cung cấp --</option>
                     <% data.suppliers.forEach(supplier => { %>
                         <option value="<%- supplier.maNhaCungCap %>"><%- supplier.tenNhaCungCap %></option>
@@ -15,8 +37,8 @@
                 </select>
             </div>
             <div class="mb-5">
-                <label for="" class="inline-block ms-5 me-5 min-w-32 font-semibold">Tên sản phẩm</label>
-                <select name="" id="productSelect" class="w-[400px] outline-none border rounded-lg py-1 px-2">
+                <label for="productSelect" class="block font-semibold mb-2">Tên sản phẩm</label>
+                <select name="" id="productSelect" class="w-full border rounded-lg py-2 px-3">
                     <option value="null">-- Lựa chọn sản phẩm --</option>
                     <% data.products.forEach(product => { %>
                         <option value="<%- product._id %>"><%- product.tenSanPham %></option>
@@ -24,68 +46,64 @@
                 </select>
             </div>
         </div>
-        <div class="border-2 rounded min-h-[407px]">
-            <div class="p-5">
-                <div id="product_name" class="text-xl font-bold text-center">Tên sản phẩm...</div>
-                <div class="flex justify-end">
-                    <label for="same-entry-price" class="ms-5 me-5">Sử dụng cùng một giá</label>
-                    <input type="checkbox" name="" id="same-entry-price" class="">
-                </div>
-                <div class="mt-3">
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <h2 class="text-lg font-semibold mb-2">Size</h2>
-                        <h2 class="text-lg font-semibold mb-2">Số Lượng</h2>
-                        <h2 class="text-lg font-semibold mb-2">Giá Nhập</h2>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="text-xl font-bold text-center mb-4" id="product_name">Tên sản phẩm...</div>
+            <div class="flex justify-end mb-4">
+                <label for="same-entry-price" class="mr-2">Sử dụng cùng một giá</label>
+                <input type="checkbox" id="same-entry-price">
+            </div>
+            <div class="grid grid-cols-3 gap-4 text-center">
+                <h2 class="text-lg font-semibold">Size</h2>
+                <h2 class="text-lg font-semibold">Số Lượng</h2>
+                <h2 class="text-lg font-semibold">Giá Nhập</h2>
+            </div>
+            <div id="product_size_price" class="mt-4">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="flex items-center justify-center">
+                        <input type="checkbox" id="product-id" class="hidden peer">
+                        <label for="product-id" class="w-32 text-center border py-2 px-3 rounded-lg peer-checked:bg-primary peer-checked:text-white">Size</label>
                     </div>
-                    <div id="product_size_price">
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="flex mt-2 mb-2 m-auto">
-                                <input type="checkbox" name="" id="product-id" class="product-checkbox hidden peer">
-                                <label for="product-id" class="w-32 text-center border py-1 px-2 rounded-lg peer-checked:bg-primary peer-checked:text-white">Size</label>
-                            </div>
-                            <div class="mt-2 mb-2 m-auto">
-                                <input type="text" name="" id="" class=" border-2 rounded outline-none py-1 px-2">
-                            </div>
-                            <div class=" mt-2 mb-2 m-auto">
-                                <input type="text" name="" id="" class=" border-2 rounded outline-none py-1 px-2">
-                            </div>
-                        </div>
+                    <div>
+                        <input type="text" class="w-full border rounded-lg py-2 px-3">
+                    </div>
+                    <div>
+                        <input type="text" class="w-full border rounded-lg py-2 px-3">
                     </div>
                 </div>
-                <div class="flex">
-                    <button id="add_to_list" class="my-5 m-auto bg-primary text-white py-3 px-5 rounded-full font-semibold">
-                        Thêm vào danh sách
-                    </button>
-                </div>
+            </div>
+            <div class="flex justify-center mt-6">
+                <button id="add_to_list" class="bg-primary text-white py-3 px-6 rounded-full font-semibold">
+                    Thêm vào danh sách
+                </button>
             </div>
         </div>
     </div>
-    <div class="border-2 rounded">
-        <div class="min-h-[500px]">
-            <div class="p-5">
-                <h1 class="text-2xl font-bold text-center">Danh Sách Thông Tin</h1>
-                <table id="product_item_table" class="min-w-full table-fixed border-collapse">
-                    <thead class="text-center">
-                        <th class="border-2 w-[30%] px-2 py-4">Tên Sản Phẩm</th>
-                        <th class="border-2 w-[15%] px-2 py-4">Số Lượng</th>
-                        <th class="border-2 w-[30%] px-2 py-4">Danh Sách Size</th>
-                        <th class="border-2 w-[15%] px-2 py-4"></th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-center border-2 w-[30%] px-2 py-4"></td>
-                            <td class="text-center border-2 w-[10%] px-2 py-4"></td>
-                            <td class="border-2 w-[30%] px-2 py-4"></td>
-                            <td class="text-center border-2 w-[10%] px-2 py-4"><i onclick="removeProduct()" class='text-red-600 text-xl bx bxs-trash'></i></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="flex">
-                    <button id="import-data" class="my-5 m-auto bg-primary text-white py-3 px-10 rounded-full font-semibold">
-                        Nhập phiếu
-                    </button>
-                </div>
-            </div>
+    <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h1 class="text-2xl font-bold text-center mb-6">Danh Sách Thông Tin</h1>
+        <table id="product_item_table" class="w-full border-collapse">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-4 py-2">Tên Sản Phẩm</th>
+                    <th class="border px-4 py-2">Số Lượng</th>
+                    <th class="border px-4 py-2">Danh Sách Kích cỡ</th>
+                    <th class="border px-4 py-2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border px-4 py-2 text-center"></td>
+                    <td class="border px-4 py-2 text-center"></td>
+                    <td class="border px-4 py-2"></td>
+                    <td class="border px-4 py-2 text-center">
+                        <i onclick="removeProduct()" class='text-red-600 text-xl bx bxs-trash'></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="flex justify-center mt-6">
+            <button id="import-data" class="bg-primary text-white py-3 px-10 rounded-full font-semibold">
+                Nhập phiếu
+            </button>
         </div>
     </div>
 </div>
@@ -97,8 +115,8 @@
         </div>
         <div class="p-4">
             <form action="#" method="post">
-                <div>
-                    <label for="sizeName" class="block text-gray-700 font-medium">Tên Size:</label>
+                <div class="mb-4">
+                    <label for="sizeName" class="block text-gray-700 font-medium">Tên Kích cỡ:</label>
                     <input 
                         type="text" 
                         id="sizeName" 
@@ -108,8 +126,7 @@
                         required 
                     />
                 </div>
-                <!-- Textarea cho mô tả -->
-                <div>
+                <div class="mb-4">
                     <label for="sizeDescription" class="block text-gray-700 font-medium">Mô tả:</label>
                     <textarea 
                         id="sizeDescription" 

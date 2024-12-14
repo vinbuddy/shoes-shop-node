@@ -208,7 +208,7 @@
     async function addSize(name, description) {
         const data = {
             tenKichCo: name,
-            moTaKichCo: description
+            moTaKichCo: description,
         };
         try {
             $.ajax({
@@ -300,14 +300,14 @@
     // Khi nhấn nút 'Thêm vào danh sách'
     $("#add_to_list").on("click", async function () {
         if (productData === null) {
-            console.log('Vui lòng chọn sản phẩm');
+            console.log("Vui lòng chọn sản phẩm");
             return;
         }
         $(`#same-entry-price`).prop("checked", false);
 
         let result = await saveTemporaryData();
         if (result === false) {
-            console.log('Vui lòng điền đầy đủ kích thước và số lượng');
+            console.log("Vui lòng điền đầy đủ kích thước và số lượng");
             return;
         }
         // console.log(lst)
@@ -326,7 +326,7 @@
                 let size = await getProductSizeById(item);
                 let quantity = parseInt($(`#${item.maKichCo}-quantity`).val());
                 let price = parseInt($(`#${item.maKichCo}-entry-price`).val());
-                if (isNaN(price) === true || isNaN(quantity) === true){
+                if (isNaN(price) === true || isNaN(quantity) === true) {
                     return false;
                 }
                 let sizeObj = {
@@ -344,7 +344,7 @@
             if ($(`#${item.maKichCo}`).prop("checked") === true) {
                 let quantity_order = parseInt($(`#${item.maKichCo}-quantity`).val());
                 // if (isNaN(quantity_order) === true) {
-                    // return false;
+                // return false;
                 // }
                 if (quantity_order !== 0) {
                     total_buy += quantity_order;
@@ -355,7 +355,7 @@
         sizeArray.forEach((size) => {
             size_lst += size.size_name + " ";
         });
-        
+
         if (sizeArray.length === 0) {
             return false;
         }
@@ -382,8 +382,8 @@
     }
 
     $("#import-data").on("click", function () {
-        if (lst.length === 0 || supplierId === "" ) {
-            console.log("Vui lòng nhập đầy đủ thông tin")
+        if (lst.length === 0 || supplierId === "") {
+            console.log("Vui lòng nhập đầy đủ thông tin");
             return;
         }
         const chiTiet = lst.map((item) => ({

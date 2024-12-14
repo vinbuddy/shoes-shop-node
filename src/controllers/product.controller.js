@@ -612,9 +612,11 @@ export async function createGoodsReceipt(req, res) {
         }
 
         await phieuNhap.save();
+        req.flash("message", "Tạo phiếu nhập hàng thành công");
         return res.status(200).json({ redirectUrl: "/admin/create-goods-receipt" });
     } catch (error) {
         console.error("Lỗi khi lưu phiếu nhập:", error);
+        req.flash("error", "Lỗi khi lưu phiếu nhập");
         res.status(500).json({ message: "Lỗi máy chủ. Vui lòng thử lại sau." });
     }
 }
@@ -647,9 +649,10 @@ export async function updateSizeList(req, res) {
         // Cập nhật danh sách size
         product.danhSachKichCo = danhSachKichCo;
         await product.save();
-
+        req.flash("message", "Cập nhật danh sách kích cỡ thành công.");
         return res.status(200).json({ message: "Cập nhật danh sách kích cỡ thành công.", product });
     } catch (error) {
+        console.error("Lỗi cập nhật danh sách kích cỡ:", error);
         return res.status(500).json({ message: "Lỗi server. Vui lòng thử lại sau.", error });
     }
 }

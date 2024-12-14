@@ -10,7 +10,7 @@ export async function renderUserProfilePage(req, res) {
     return res.render("user/index", {
         layout: "./layouts/user",
         page: "profile",
-        title: "Profile",
+        title: "Hồ sơ cá nhân",
         customer: customer,
     });
 }
@@ -76,7 +76,7 @@ export async function renderUserOrderPage(req, res) {
     return res.render("order/index", {
         layout: "./layouts/user",
         page: "order",
-        title: "Order",
+        title: "danh sách đơn hàng",
         customer: customer,
         orders: orders,
         pendingOrders: pendingOrders,
@@ -113,20 +113,26 @@ export async function renderUserOrderDetailPage(req, res) {
     return res.render("order/detail", {
         layout: "./layouts/user",
         page: "order",
-        title: "Order Detail",
+        title: "Chi tiết đơn hàng",
         order: order,
         customer: customer,
     });
 }
 
 export async function updateNameUser(req, res) {
-    const { tenKhachHang } = req.body;
-    const customer = req.session.customer;
-    const user = await khachHangModel.findOne({ _id: customer._id });
-    user.tenKhachHang = tenKhachHang;
-    await user.save();
-    req.session.customer = user;
-    return res.redirect("/user/profile");
+    try {
+        const { tenKhachHang } = req.body;
+        const customer = req.session.customer;
+        const user = await khachHangModel.findOne({ _id: customer._id });
+        user.tenKhachHang = tenKhachHang;
+        await user.save();
+        req.session.customer = user;
+        req.flash("message", "Cập nhật tên thành công");
+        return res.redirect("/user/profile");
+    } catch (error) {
+        req.flash("error", "Cập nhật tên thất bại");
+        console.error("Error updating name:", error);
+    }
 }
 //Admin
 export async function renderAdminProfilePage(req, res) {
@@ -135,7 +141,7 @@ export async function renderAdminProfilePage(req, res) {
     return res.render("admin/user/profile", {
         layout: "./layouts/admin",
         page: "profile",
-        title: "Admin Profile",
+        title: "Hồ sơ cá nhân",
         user: user,
     });
 }

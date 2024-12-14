@@ -1,4 +1,25 @@
 <div class="tp-main-wrapper bg-slate-100" x-data="{ sideMenu: false }">
+    <% if (locals.message && locals.message.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+            <p><%= message %></p>
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-green-600'></i>
+            </button>
+          </div>
+    <% } %>
+    
+    <% if (locals.error && locals.error.length > 0)  { %>
+        <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+            <p>
+                <%= error %>
+            </p>
+    
+            <button onclick="return this.parentNode.remove();">
+                <i class='bx bx-x text-red-600'></i>
+            </button>
+        </div>
+        
+    <% } %>
     <div class="tp-main-content " x-data="{ searchOverlay: false }">
         <div class="body-content px-8 py-8 bg-gray-100">
             <div class="flex justify-between mb-10">
@@ -112,9 +133,6 @@
                                     </tr>                                                       
                                 </tbody>
                             </table>
-                            <% if(order.thongTinThanhToan.trangThaiThanhToan !== 'Hoàn thành') { %>
-                            <button type="button" class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full uppercase">xác nhận thanh toán</button>
-                            <% } %>
                         </div>
                     </div>
                     <div class="bg-white rounded-t-md rounded-b-md shadow-xs px-8 py-8">

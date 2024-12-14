@@ -4,8 +4,10 @@ export async function deleteSupplier(req, res) {
     try {
         const { id } = req.params;
         await NhaSanXuatModel.findByIdAndUpdate(id, { trangThaiXoa: true });
+        req.flash("message", "Xóa nhà cung cấp thành công");
         return res.redirect("/admin/supplier");
     } catch (error) {
+        req.flash("error", "Xóa nhà cung cấp thất bại");
         console.error("Error deleting supplier:", error);
     }
 }
@@ -13,8 +15,10 @@ export async function restoreSupplier(req, res) {
     try {
         const { id } = req.params;
         await NhaSanXuatModel.findByIdAndUpdate(id, { trangThaiXoa: false });
+        req.flash("message", "Khôi phục nhà cung cấp thành công");
         return res.redirect("/admin/supplier");
     } catch (error) {
+        req.flash("error", "Khôi phục nhà cung cấp thất bại");
         console.error("Error deleting brand:", error);
     }
 }
@@ -25,8 +29,10 @@ export async function updateSupplier(req, res) {
         const updatedData = { tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi };
 
         await NhaSanXuatModel.findByIdAndUpdate(id, updatedData);
+        req.flash("message", "Cập nhật nhà cung cấp thành công");
         return res.redirect("/admin/supplier");
     } catch (error) {
+        req.flash("error", "Cập nhật nhà cung cấp thất bại");
         console.error("Error updating supplier:", error);
     }
 }
@@ -52,24 +58,29 @@ export async function createSupplier(req, res) {
         const { tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi } = req.body;
         const existingSupplier = await NhaSanXuatModel.findOne({ tenNhaCungCap });
         if (existingSupplier) {
-            return res.render("admin/supplier/create", {
-                layout: "./layouts/admin",
-                page: "Supplier",
-                title: "create supplier",
-                error: "Nhà cung cấp này đã tồn tại",
-            });
+            req.flash("error", "Nhà cung cấp này đã tồn tại");
+            return res.redirect("admin/supplier/create");
         }
         const newSupplier = new NhaSanXuatModel({ tenNhaCungCap, nguoiLienHe, soDienThoai, email, diaChi });
         await newSupplier.save();
-        req.flash("message", "Thêm nhà cung cấp thành công");
 
+        await NhaSanXuatModel.updateOne(
+            { _id: newSupplier._id },
+            {
+                $set: {
+                    maNhaCungCap: newSupplier._id,
+                },
+            }
+        );
+        req.flash("message", "Thêm nhà cung cấp thành công");
         return res.redirect("/admin/supplier");
     } catch (error) {
+        req.flash("error", "Thêm nhà cung cấp thất bại");
+        console.error("Error creating supplier:", error);
         return res.render("admin/supplier/create", {
             layout: "./layouts/admin",
             page: "supplier",
-            title: "create supplier",
-            error: error.message,
+            title: "Tạo nhà cung cấp",
         });
     }
 }
@@ -85,7 +96,7 @@ const renderSupplierPage = async (res, suppliers, page, totalSuppliers) => {
     return res.render("admin/supplier/index", {
         layout: "./layouts/admin",
         page: "supplier",
-        title: "supplier page",
+        title: "Danh sách nhà cung cấp",
         suppliers: suppliers,
         currentPage: page,
         totalPages: Math.ceil(totalSuppliers / 10),
@@ -113,7 +124,7 @@ export async function searchSupplier(req, res) {
 
         return renderSupplierPage(res, suppliers, page, totalSuppliers);
     } catch (error) {
-        console.error("Error searching supplier:", error);
+        req.flash("error", error.message);
     }
 }
 
@@ -141,6 +152,6 @@ export async function getSupplierById(req, res) {
     if (supplier) {
         return res.json(supplier);
     } else {
-        return res.status(404).json({ error: "Supplier not found" });
+        return res.status(404).json({ error: "Không tìm thấy nhà cung cấp" });
     }
 }

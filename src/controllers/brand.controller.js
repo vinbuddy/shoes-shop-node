@@ -4,8 +4,10 @@ export async function deleteBrand(req, res) {
     try {
         const { id } = req.params;
         await BrandModel.findByIdAndUpdate(id, { trangThaiXoa: true });
+        req.flash("message", "Xóa nhãn hàng thành công");
         return res.redirect("/admin/brand");
     } catch (error) {
+        req.flash("error", "Xóa nhãn hàng thất bại");
         console.error("Error deleting brand:", error);
     }
 }
@@ -13,8 +15,10 @@ export async function restoreBrand(req, res) {
     try {
         const { id } = req.params;
         await BrandModel.findByIdAndUpdate(id, { trangThaiXoa: false });
+        req.flash("message", "Khôi phục nhãn hàng thành công");
         return res.redirect("/admin/brand");
     } catch (error) {
+        req.flash("error", "Khôi phục nhãn hàng thất bại");
         console.error("Error deleting brand:", error);
     }
 }
@@ -24,24 +28,16 @@ export async function updateBrand(req, res) {
         const id = req.body.id;
         const { tenHangSanXuat, moTa } = req.body;
         const existingBrand = await BrandModel.findOne({ tenHangSanXuat, _id: { $ne: id } });
-        console.log(tenHangSanXuat, moTa, id);
         if (existingBrand) {
+            req.flash("error", "Nhãn hàng này đã tồn tại");
             return res.redirect("/admin/brand");
         }
-        const totalBrands = await BrandModel.countDocuments();
         const updatedData = { tenHangSanXuat, moTa };
         await BrandModel.findByIdAndUpdate(id, updatedData);
-        const brands = await BrandModel.find();
-        return res.render("admin/brand/index", {
-            layout: "./layouts/admin",
-            page: "brand",
-            title: "brand page",
-            brands: brands,
-            currentPage: 1,
-            totalPages: Math.ceil(totalBrands / 10),
-            error: "Nhãn hàng này đã tồn tại",
-        });
+        req.flash("message", "Cập nhật nhãn hàng thành công");
+        return res.redirect("/admin/brand");
     } catch (error) {
+        req.flash("error", "Cập nhật nhãn hàng thất bại");
         console.error("Error updating brand:", error);
     }
 }
@@ -49,7 +45,7 @@ export function renderCreatePage(req, res) {
     return res.render("admin/brand/create", {
         layout: "./layouts/admin",
         page: "brand",
-        title: "create brand",
+        title: "Tạo nhãn hàng",
     });
 }
 
@@ -61,7 +57,7 @@ export async function createBrand(req, res) {
             return res.render("admin/brand/create", {
                 layout: "./layouts/admin",
                 page: "brand",
-                title: "create brand",
+                title: "Tạo nhãn hàng",
                 error: "Nhãn hàng này đã tồn tại",
             });
         }
@@ -76,13 +72,14 @@ export async function createBrand(req, res) {
                 },
             }
         );
+        req.flash("message", "Tạo nhãn hàng thành công");
         return res.redirect("/admin/brand");
     } catch (error) {
+        req.flash("error", error.message);
         return res.render("admin/brand/create", {
             layout: "./layouts/admin",
             page: "brand",
-            title: "create brand",
-            error: error.message,
+            title: "Tạo nhãn hàng",
         });
     }
 }
@@ -98,7 +95,7 @@ const renderBrandPage = async (res, brands, page, totalBrands) => {
     return res.render("admin/brand/index", {
         layout: "./layouts/admin",
         page: "brand",
-        title: "brand page",
+        title: "Danh sách nhãn hàng",
         brands: brands,
         currentPage: page,
         totalPages: Math.ceil(totalBrands / 10),

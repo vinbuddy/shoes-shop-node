@@ -1,4 +1,25 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<% if (locals.message && locals.message.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+        <p><%= message %></p>
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-green-600'></i>
+        </button>
+      </div>
+<% } %>
+
+<% if (locals.error && locals.error.length > 0)  { %>
+    <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+        <p>
+            <%= error %>
+        </p>
+
+        <button onclick="return this.parentNode.remove();">
+            <i class='bx bx-x text-red-600'></i>
+        </button>
+    </div>
+    
+<% } %>
 <form action="/admin/status/search" method="GET" class="self-start left-0 right-0 flex flex-row sm:flex-col gap-4 sm:rounded-md bg-white shadow-xl mb-4 p-4">
     <input type="text" name="tenTrangThai" placeholder="Tìm theo tên" class="border border-gray-300 rounded px-4 py-2 flex-1" value="<%= typeof tenTrangThai !== 'undefined' ? tenTrangThai : '' %>">
     <select name="trangThaiXoa" class="border border-gray-300 rounded px-4 py-2 flex-1">

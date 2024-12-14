@@ -1,5 +1,26 @@
 
     <body class="bg-gray-100">
+        <% if (locals.message && locals.message.length > 0)  { %>
+            <div class="mb-5 flex items-center justify-between p-5 leading-normal text-green-600 bg-green-100 rounded-lg" role="alert">
+                <p><%= message %></p>
+                <button onclick="return this.parentNode.remove();">
+                    <i class='bx bx-x text-green-600'></i>
+                </button>
+              </div>
+        <% } %>
+        
+        <% if (locals.error && locals.error.length > 0)  { %>
+            <div class="mb-5 flex items-center justify-between p-5 leading-normal text-red-600 bg-red-100 rounded-lg" role="alert">
+                <p>
+                    <%= error %>
+                </p>
+        
+                <button onclick="return this.parentNode.remove();">
+                    <i class='bx bx-x text-red-600'></i>
+                </button>
+            </div>
+            
+        <% } %>
         <div class="container mx-auto mt-10">
             <div class="max-w-md mx-auto bg-white p-5 rounded-md shadow">
                 <h2 class="text-2xl font-semibold text-center mb-5">Chỉnh sửa danh mục</h2>
