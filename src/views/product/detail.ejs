@@ -139,16 +139,27 @@
                 </p>
 
                 <div>
-                    <button 
-                        data-productId="<%= product ? product.maSanPham : '' %>"
-                        data-loginUrl="<%= loginUrl %>" 
-                        id="add-to-cart-btn" 
-                        disabled 
-                        class="disabled:opacity-70 disabled:cursor-not-allowed mt-7 w-full bg-primary text-white py-3 rounded-full font-semibold">
-                       
-                        <i id="add-to-cart-loader" class='animate-spin hidden bx bx-loader-alt'></i>
-                        <span class="ms-2">Thêm vào giỏ hàng</span>
-                    </button>
+                    <% const isSoldOut = product.danhSachKichCo.every(size => size.soLuongKichCo === 0); %>
+
+                    <% if (isSoldOut) { %>
+                                
+                        <button class="btn btn-error w-full mt-7 cursor-default text-white py-3 rounded-full font-semibold">
+                            Hết hàng
+                        </button>
+                     <% } else { %>
+                        <button 
+                            data-productId="<%= product ? product.maSanPham : '' %>"
+                            data-loginUrl="<%= loginUrl %>" 
+                            id="add-to-cart-btn" 
+                            disabled 
+                            class="disabled:opacity-70 disabled:cursor-not-allowed mt-7 w-full bg-primary text-white py-3 rounded-full font-semibold">
+                           
+                            <i id="add-to-cart-loader" class='animate-spin hidden bx bx-loader-alt'></i>
+                            <span class="ms-2">Thêm vào giỏ hàng</span>
+                        </button>
+                     <% } %>
+
+                   
                 </div>
             </div>
         </section>

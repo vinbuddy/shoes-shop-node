@@ -75,7 +75,7 @@
     <div class="py-4 mx-auto max-w-screen-xl sm:py-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 h-full">
             <div class="col-span-2 sm:col-span-1 md:col-span-2 bg-gray-50 h-auto md:h-full flex flex-col">
-                <a href="" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40 flex-grow">
+                <a href="/product?category[]=670f6a2d53195eaa20940645" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40 flex-grow">
                     <img
                         src="/images/categories/category-banner-men.jpg"
                         alt=""
@@ -88,7 +88,7 @@
                 </a>
             </div>
             <div class="col-span-2 sm:col-span-1 md:col-span-2 bg-stone-50">
-                <a href="" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40 mb-4">
+                <a href="/product?category[]=675bad4fa5158323931572ab" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40 mb-4">
                     <img
                         src="/images/category-banner-sandal.jpg"
                         alt=""
@@ -100,7 +100,7 @@
                     </h3>
                 </a>
                 <div class="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-2">
-                    <a href="" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40">
+                    <a href="/product?category[]=670f6a9b53195eaa20940647" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40">
                         <img
                             src="/images/categories/category-banner-kid.jpg"
                             alt=""
@@ -113,7 +113,7 @@
                             Kid
                         </h3> -->
                     </a>
-                    <a href="" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40">
+                    <a href="/product?category[]=670f6a7453195eaa20940646" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40">
                         <img
                             src="/images/categories/category-banner-women.jpg"
                             alt=""
@@ -129,7 +129,7 @@
                 </div>
             </div>
             <div class="col-span-2 sm:col-span-1 md:col-span-1 bg-sky-50 h-auto md:h-full flex flex-col">
-                <a href="" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40 flex-grow">
+                <a href="/product?category[]=670f698b53195eaa20940643" class="group relative flex flex-col overflow-hidden rounded-2xl px-4 pb-4 pt-40 flex-grow">
                     <img
                         src="/images/category-banner-running.jpg"
                         alt=""
@@ -137,7 +137,7 @@
                     />
                     <div class="absolute inset-0 bg-gradient-to-b from-gray-900/25 to-gray-900/5"></div>
                     <h3 class="z-[5] text-2xl font-medium text-white absolute top-0 left-0 p-4 xs:text-xl md:text-3xl">
-                        Sport
+                        Thể thao
                     </h3>
                 </a>
             </div>
@@ -156,6 +156,8 @@
                 <% locals.nikeProducts.forEach(product => { %>
 
                     <% 
+                        const isSoldOut = product.danhSachKichCo.every(size => size.soLuongKichCo === 0);
+
                         // Lấy khuyến mãi áp dụng cho sản phẩm
                         const applicablePromotions = promotions.filter(promo =>
                             promo.danhSachSanPhamApDung.some(
@@ -176,12 +178,12 @@
 
                     <a href="/product/<%= product.maSanPham %>" class="group">
                         <div
-                            class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                         >
                             <img
                                 src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                 alt="<%= product.tenSanPham %>"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
                             />
 
                             <% if (maxDiscount > 0) { %>
@@ -189,11 +191,16 @@
                                     Giảm <%= maxDiscount %>%
                                 </label>
                             <% } %>
+
+                            <% if (isSoldOut) { %>
+                                <label class="absolute top-3 left-3 badge badge-error text-white ">
+                                    Hết hàng
+                                </label>
+                            <% } %>
                             
                         </div>
                         <h3 class="mt-4 text-sm text-gray-700 truncate"><%= product.tenSanPham %></h3>
                         <% if (maxDiscount > 0) { %>
-                            
                            <div class="flex items-center gap-2">
                             <p class="mt-1 text-lg font-medium text-primary">
                                 <%= formatVNCurrency(finalPrice || 0) %>
@@ -208,7 +215,6 @@
                                 <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
                             </p>
                         <% } %>
-                        <!-- <p class="mt-1 text-lg font-medium text-gray-900">$<%= product.price %></p> -->
                     </a>
                 <% }) %>
             <% } else { %>
@@ -225,6 +231,8 @@
                 <% locals.adidasProducts.forEach(product => { %>
 
                     <% 
+                        const isSoldOut = product.danhSachKichCo.every(size => size.soLuongKichCo === 0);
+
                         // Lấy khuyến mãi áp dụng cho sản phẩm
                         const applicablePromotions = promotions.filter(promo =>
                             promo.danhSachSanPhamApDung.some(
@@ -245,17 +253,23 @@
 
                     <a href="/product/<%= product.maSanPham %>" class="group">
                         <div
-                            class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                         >
                             <img
                                 src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                 alt="<%= product.tenSanPham %>"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
                             />
 
                             <% if (maxDiscount > 0) { %>
                                 <label class="absolute top-3 right-3 badge badge-error text-white">
                                     Giảm <%= maxDiscount %>%
+                                </label>
+                            <% } %>
+
+                            <% if (isSoldOut) { %>
+                                <label class="absolute top-3 left-3 badge badge-error text-white ">
+                                    Hết hàng
                                 </label>
                             <% } %>
                         </div>
@@ -284,15 +298,18 @@
             <% } %>
         </div>
     </div>
+    <!-- Vans -->
     <div class="mt-20">
-        <h2 class="font-bold text-xl">Puma</h2>
+        <h2 class="font-bold text-xl">Vans</h2>
 
         <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
            
-            <% if (locals?.pumaProducts.length > 0) { %>
-                <% locals.pumaProducts.forEach(product => { %>
+            <% if (locals?.vansProducts.length > 0) { %>
+                <% locals.vansProducts.forEach(product => { %>
 
                     <% 
+                        const isSoldOut = product.danhSachKichCo.every(size => size.soLuongKichCo === 0);
+
                         // Lấy khuyến mãi áp dụng cho sản phẩm
                         const applicablePromotions = promotions.filter(promo =>
                             promo.danhSachSanPhamApDung.some(
@@ -313,17 +330,99 @@
 
                     <a href="/product/<%= product.maSanPham %>" class="group">
                         <div
-                            class="relative aspect-h-1 aspect-w-1 w-full min-h-[300px] max-h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
                         >
                             <img
                                 src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
                                 alt="<%= product.tenSanPham %>"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
                             />
 
                             <% if (maxDiscount > 0) { %>
                                 <label class="absolute top-3 right-3 badge badge-error text-white">
                                     Giảm <%= maxDiscount %>%
+                                </label>
+                            <% } %>
+
+                            <% if (isSoldOut) { %>
+                                <label class="absolute top-3 left-3 badge badge-error text-white ">
+                                    Hết hàng
+                                </label>
+                            <% } %>
+                        </div>
+                        <h3 class="mt-4 text-sm text-gray-700 truncate"><%= product.tenSanPham %></h3>
+                        
+                        <% if (maxDiscount > 0) { %>
+                            
+                           <div class="flex items-center gap-2">
+                                <p class="mt-1 text-lg font-medium text-primary">
+                                    <%= formatVNCurrency(finalPrice || 0) %>
+                                </p>
+                                <p class="mt-1 text-gray-700 line-through">
+                                    <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                                </p>
+
+                            </div>
+                        <% } else { %>
+                            <p class="mt-1 text-lg font-medium text-gray-900">
+                                <%= formatVNCurrency(product.danhSachKichCo[0]?.giaKichCo || 0) %>
+                            </p>
+                        <% } %>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <p>No products found</p>
+            <% } %>
+        </div>
+    </div>
+    <!-- Puma -->
+    <div class="mt-20">
+        <h2 class="font-bold text-xl">Puma</h2>
+
+        <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+           
+            <% if (locals?.pumaProducts.length > 0) { %>
+                <% locals.pumaProducts.forEach(product => { %>
+
+                    <% 
+                        const isSoldOut = product.danhSachKichCo.every(size => size.soLuongKichCo === 0);
+                        // Lấy khuyến mãi áp dụng cho sản phẩm
+                        const applicablePromotions = promotions.filter(promo =>
+                            promo.danhSachSanPhamApDung.some(
+                                productId => productId.toString() === product.maSanPham.toString()
+                            )
+                        );
+
+                        // Lấy giá trị giảm cao nhất
+                        const maxDiscount = applicablePromotions.length > 0 
+                            ? Math.max(...applicablePromotions.map(promo => promo.giaTriKhuyenMai)) 
+                            : 0;
+
+                        // Tính giá sau khuyến mãi (nếu có)
+                        const finalPrice = product.danhSachKichCo[0]?.giaKichCo 
+                            ? product.danhSachKichCo[0].giaKichCo * (1 - maxDiscount / 100) 
+                            : null;
+                    %>
+
+                    <a href="/product/<%= product.maSanPham %>" class="group">
+                        <div
+                            class="relative aspect-h-1 aspect-w-1 w-full h-[220px] lg:h-[300px] overflow-hidden rounded-xl xl:aspect-h-8 xl:aspect-w-7"
+                        >
+                            <img
+                                src="<%= product.hinhAnhDaiDien || "/images/no-result.png" %>"
+                                alt="<%= product.tenSanPham %>"
+                                class="h-full w-full object-contain object-center group-hover:opacity-75"
+                            />
+
+                            <% if (maxDiscount > 0) { %>
+                                <label class="absolute top-3 right-3 badge badge-error text-white">
+                                    Giảm <%= maxDiscount %>%
+                                </label>
+                            <% } %>
+
+                            <% if (isSoldOut) { %>
+                                <label class="absolute top-3 left-3 badge badge-error text-white ">
+                                    Hết hàng
                                 </label>
                             <% } %>
                         </div>
@@ -361,7 +460,7 @@
             <img src="/images/categories/category-adidas.jpg" alt="" />
         </section>
         <section class="h-full bg-[#2f6178] p-10">
-            <h3 class="text-2xl lg:text-[70px] font-semibold mb-5 text-white">Giày Thể Thao Đánh Dấu Sự Trở Lại Của Adidas</h3>
+            <h3 class="text-2xl lg:text-[70px] lg:leading-[70px] leading-3 font-semibold mb-5 text-white">Giày Thể Thao Đánh Dấu Sự Trở Lại Của Adidas</h3>
 
             <a href="" class="btn btn-outline border bg-transparent border-white text-white rounded-full w-fit">
                 Khám phá ngay

@@ -167,6 +167,10 @@
                 const cartBadge = cartIcon.querySelector("span");
 
                 cartBadge.innerText = Number(cartBadge.innerText) - 1;
+
+                // set atrribute data-totalPrice
+
+                renderSubTotal();
             }
         }
     })
@@ -195,6 +199,11 @@
             
 
             debounceUpdateCart(productId, Number(selectedValue.innerText));
+            
+            // set atrribute data-totalPrice
+            totalPrice.setAttribute("data-totalPrice", Number(productPrice) * Number(selectedValue.innerText));
+
+            renderSubTotal();
         }
     })
 
@@ -216,6 +225,11 @@
                 totalPrice.innerText = formatVNCurrency(Number(productPrice) * Number(selectedValue.innerText));
 
                 debounceUpdateCart(productId, Number(selectedValue.innerText));
+
+                // set atrribute data-totalPrice
+                totalPrice.setAttribute("data-totalPrice", Number(productPrice) * Number(selectedValue.innerText));
+
+                renderSubTotal();
             }
 
         }

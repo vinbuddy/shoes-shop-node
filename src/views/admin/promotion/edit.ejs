@@ -214,59 +214,53 @@
         });
     };
 
-    document.addEventListener("DOMContentLoaded", restoreFormDataFromURL);
-
-
-    const appendFormDataToURL = () => {
-        const params = new URLSearchParams(window.location.search);
-
-        params.set("tenChuongTrinhKhuyenMai", document.getElementById("tenChuongTrinhKhuyenMai").value);
-        params.set("giaTriKhuyenMai", document.getElementById("giaTriKhuyenMai").value);
-        params.set("moTa", document.getElementById("moTa").value);
-        params.set("ngayBatDau", document.getElementById("ngayBatDau").value);
-        params.set("ngayKetThuc", document.getElementById("ngayKetThuc").value);
-        params.set(
-            "products",
-            Array.from(document.querySelectorAll('input[name="products[]"]:checked')).map((el) => el.value).join(",")
-        );
-
-        window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
-    };
-
-    document.getElementById("create-promotion-form").addEventListener("input", appendFormDataToURL);
-    document.getElementById("create-promotion-form").addEventListener("change", appendFormDataToURL);
+    // document.addEventListener("DOMContentLoaded", restoreFormDataFromURL);
 
 </script>
 
-<!-- Selected Product -->
+
 <script>
+    const LOCAL_STORAGE_KEY = 'selectedEditProducts';
     const selectedProductsContainer = document.getElementById("selected-products");
+    
 
-    document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
-        checkbox.addEventListener("change", function () {
-            const productId = this.value;
-            const productName = this.closest("tr").querySelector("td:nth-child(3) .font-semibold").textContent;
+    // Lưu sản phẩm vào Local Storage
+    const saveSelectedProductsToLocalStorage = (selectedProducts) => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedProducts));
+    };
 
-            if (this.checked) {
-                // Thêm sản phẩm vào danh sách
-                addSelectedProduct(productId, productName);
-            } else {
-                // Xóa sản phẩm khỏi danh sách
-                removeSelectedProduct(productId);
-            }
-        });
-    });
+    // Lấy danh sách sản phẩm đã chọn từ Local Storage
+    const getSelectedProductsFromLocalStorage = () => {
+        const storedProducts = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return storedProducts ? JSON.parse(storedProducts) : [];
+    };
 
-    function addSelectedProduct(productId, productName) {
-        // Kiểm tra xem sản phẩm đã tồn tại chưa
+    // Thêm sản phẩm vào Local Storage
+    const addProductToLocalStorage = (productId, productName) => {
+        const selectedProducts = getSelectedProductsFromLocalStorage();
+
+        // Kiểm tra xem sản phẩm đã tồn tại chưa, nếu chưa thì thêm mới
+        if (!selectedProducts.find(product => product.id === productId)) {
+            selectedProducts.push({ id: productId, name: productName });
+            saveSelectedProductsToLocalStorage(selectedProducts);
+        }
+    };
+
+    // Xóa sản phẩm khỏi Local Storage
+    const removeProductFromLocalStorage = (productId) => {
+        const selectedProducts = getSelectedProductsFromLocalStorage();
+        const updatedProducts = selectedProducts.filter(product => product.id !== productId);
+        saveSelectedProductsToLocalStorage(updatedProducts);
+    };
+
+    // Hiển thị sản phẩm đã chọn trong danh sách
+    const addSelectedProduct = (productId, productName) => {
         if (document.getElementById(`selected-${productId}`)) return;
 
-        // Tạo phần tử danh sách mới
         const listItem = document.createElement("li");
         listItem.id = `selected-${productId}`;
         listItem.className = "flex items-center justify-between p-2";
 
-        // Nội dung sản phẩm
         listItem.innerHTML = `
             <span>${productName}</span>
             <button
@@ -277,40 +271,146 @@
                 Xóa
             </button>
         `;
-
         selectedProductsContainer.appendChild(listItem);
-    }
+    };
 
-    function removeSelectedProduct(productId) {
+    // Xóa sản phẩm khỏi danh sách hiển thị
+    const removeSelectedProduct = (productId) => {
+        console.log("productId: ", productId);
         const listItem = document.getElementById(`selected-${productId}`);
         if (listItem) {
-            selectedProductsContainer.removeChild(listItem);
-        }
-    }
+            listItem.remove(); // Xóa trực tiếp
 
-    function removeProductByButton(productId) {
+            const selectedProducts = params.get("products") ? params.get("products").split(",") : [];
+
+            selectedProducts = selectedProducts.filter(product => product !== productId);
+            params.set("products", selectedProducts.join(","));
+
+        }
+
+
+    };
+
+    // Xóa sản phẩm khi nhấn nút "Xóa"
+    const removeProductByButton = (productId) => {
         const checkbox = document.querySelector(`input[name="products[]"][value="${productId}"]`);
         if (checkbox) checkbox.checked = false;
 
+        removeProductFromLocalStorage(productId);
         removeSelectedProduct(productId);
+        updateURLParams();
+    };
 
-        appendFormDataToURL();
-    }
+    // Khôi phục sản phẩm đã chọn từ Local Storage
+    const restoreSelectedProductsFromLocalStorage = () => {
+        const selectedProducts = getSelectedProductsFromLocalStorage();
 
-    function restoreSelectedProductsFromURL() {
+        // Đánh dấu checkbox sản phẩm đã chọn
+        document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
+            if (selectedProducts.find(product => product.id === checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+
+        // Hiển thị danh sách sản phẩm đã chọn
+        selectedProducts.forEach(({ id, name }) => {
+            addSelectedProduct(id, name);
+        });
+    };
+
+    // Cập nhật tham số URL
+    const updateURLParams = () => {
         const params = new URLSearchParams(window.location.search);
-        const selectedProducts = params.get("products") ? params.get("products").split(",") : [];
+
+        // Giữ lại tham số `page` cũ nếu có
+        let currentPage = params.get("page") || 1;
+
+        // Lấy giá trị các input trong form và cập nhật vào URL
+        params.set("tenChuongTrinhKhuyenMai", document.getElementById("tenChuongTrinhKhuyenMai").value);
+        params.set("giaTriKhuyenMai", document.getElementById("giaTriKhuyenMai").value);
+        params.set("moTa", document.getElementById("moTa").value);
+        params.set("ngayBatDau", document.getElementById("ngayBatDau").value);
+        params.set("ngayKetThuc", document.getElementById("ngayKetThuc").value);
+
+
+        // Cập nhật danh sách sản phẩm đã chọn
+        let selectedProducts = getSelectedProductsFromLocalStorage();
+
+        if (selectedProducts.length > 0) {
+            const selectedProductIds = selectedProducts.map(product => product.id);
+            params.set("products", selectedProductIds.join(","));
+        }  else {
+            selectedProducts = params.get("products") ? params.get("products").split(",") : [];
+        }
 
         selectedProducts.forEach((productId) => {
-            const productName = document.querySelector(`input[name="products[]"][value="${productId}"]`)
-                .closest("tr")
-                .querySelector("td:nth-child(3) .font-semibold").textContent;
+            const productInput = document.querySelector(`input[name="products[]"][value="${productId}"]`);
+        
+            // Kiểm tra xem phần tử input có tồn tại không
+            console.log("productInput: ", productInput);
+            if (productInput) {
+                const productName = productInput
+                    .closest("tr")
+                    .querySelector("td:nth-child(3) .font-semibold").textContent;
 
-            addSelectedProduct(productId, productName);
+                addSelectedProduct(productId, productName);
+            }
         });
-    }
 
-    document.addEventListener("DOMContentLoaded", restoreSelectedProductsFromURL);
+        // Cập nhật URL mà không tải lại trang
+        window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+        updatePaginationLinks();
+    };
 
+    // Cập nhật các liên kết phân trang
+    const updatePaginationLinks = () => {
+        const params = new URLSearchParams(window.location.search);
+        const currentPage = parseInt(params.get("page")) || 1;
+        const totalPages = parseInt(params.get("totalPages")) || 1;
 
+        const previousLink = document.querySelector('.pagination-prev');
+        const nextLink = document.querySelector('.pagination-next');
+
+        if (previousLink) {
+            const previousPage = currentPage > 1 ? currentPage - 1 : 1;
+            params.set("page", previousPage);
+            previousLink.setAttribute('href', `?${params.toString()}`);
+        }
+
+        if (nextLink) {
+            const nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+            params.set("page", nextPage);
+            nextLink.setAttribute('href', `?${params.toString()}`);
+        }
+    };
+
+    // Lắng nghe sự kiện checkbox thay đổi
+    document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            const productId = this.value;
+            const productName = this.closest("tr").querySelector("td:nth-child(3) .font-semibold").textContent;
+
+            if (this.checked) {
+                addProductToLocalStorage(productId, productName);
+                addSelectedProduct(productId, productName);
+            } else {
+                removeProductFromLocalStorage(productId);
+                removeSelectedProduct(productId);
+            }
+            updateURLParams();
+        });
+    });
+
+    // Lắng nghe sự kiện thay đổi của form để cập nhật URL khi người dùng thay đổi input
+    document.querySelectorAll('#tenChuongTrinhKhuyenMai, #giaTriKhuyenMai, #moTa, #ngayBatDau, #ngayKetThuc').forEach((input) => {
+        input.addEventListener('input', updateURLParams); // Bắt sự kiện input
+    });
+    
+    // Khôi phục sản phẩm đã chọn khi tải trang
+    document.addEventListener('DOMContentLoaded', () => {
+        restoreFormDataFromURL();
+        restoreSelectedProductsFromLocalStorage();
+        updateURLParams();
+        updatePaginationLinks();
+    });
 </script>

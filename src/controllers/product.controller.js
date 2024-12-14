@@ -52,6 +52,7 @@ export async function renderProductPage(req, res) {
 
     const filters = {
         trangThaiXoa: false,
+        danhSachKichCo: { $elemMatch: { giaKichCo: { $gt: 0 } } },
     };
 
     if (name && name.trim()) {
@@ -154,6 +155,7 @@ export async function renderProductDetailPage(req, res) {
     };
     return res.render("product/detail", {
         ...VIEW_OPTIONS.PRODUCT_DETAIL,
+        title: product.tenSanPham,
         loginUrl: req?.session?.customer ? null : process.env.BASE_URL + "/auth/login",
         product: product,
         promotions: promotions,
@@ -317,32 +319,42 @@ export async function updateProductHandler(req, res) {
         const productImageFiles = files["productImageFiles"];
         const thumbnailImageFile = files["productImageThumbnail"];
         let uploadedFiles = [];
-        let thumbnailUrl = product.hinhAnhDaiDien; // Giữ lại thumbnail cũ nếu không có file mới
+        let thumbnailUrl = product.hinhAnhDaiDien; // Giữ thumbnail cũ nếu không upload mới
 
         // Xử lý hình ảnh đại diện (thumbnail)
         if (thumbnailImageFile && thumbnailImageFile.length > 0) {
             const thumbnailUpload = await uploadToCloudinary(thumbnailImageFile[0], "thumbnails");
             thumbnailUrl = thumbnailUpload.url;
         }
+        // Retained images là chuỗi chứa ký tự , phân tách các URL hình ảnh cũ
+        const retainedImageUrls = retainedImages.split(",").filter((url) => url.trim() !== "");
 
-        // Danh sách hình ảnh giữ lại
-        const retainedImageUrls =
-            Array.isArray(retainedImages) && retainedImages.length > 0 ? retainedImages : product.danhSachHinhAnh;
+        // Danh sách hình ảnh hiện tại của sản phẩm
+        const oldImageUrls = product.danhSachHinhAnh || [];
 
-        // Upload hình ảnh mới
+        // Xác định các hình ảnh cần xóa (hình không nằm trong retainedImageUrls)
+        const imagesToDelete = oldImageUrls.filter((url) => !retainedImageUrls.includes(url));
+
+        // Xóa các hình ảnh này khỏi Cloudinary
+        if (imagesToDelete.length > 0) {
+            await Promise.all(imagesToDelete.map((url) => deleteFromCloudinary(url)));
+        }
+
+        // Upload các hình ảnh mới nếu có
         if (productImageFiles && productImageFiles.length > 0) {
             const uploadPromises = productImageFiles.map((file) => uploadToCloudinary(file, "products"));
             uploadedFiles = await Promise.all(uploadPromises);
         }
 
-        // Danh sách hình ảnh mới
-        const updatedImages = retainedImageUrls.concat(uploadedFiles.map((file) => file.url));
+        // Lấy danh sách URL của các hình ảnh mới upload
+        const newImageUrls = uploadedFiles.map((file) => file.url);
 
-        // (Tùy chọn) Xóa hình ảnh không còn được sử dụng khỏi Cloudinary
-        if (retainedImageUrls.length < product.danhSachHinhAnh.length) {
-            const imagesToDelete = product.danhSachHinhAnh.filter((url) => !retainedImageUrls.includes(url));
-            await Promise.all(imagesToDelete.map((url) => deleteFromCloudinary(url)));
-        }
+        // Tạo danh sách hình ảnh cập nhật
+        const updatedImages = [
+            ...retainedImageUrls, // Giữ lại các hình ảnh từ retainedImages
+            ...newImageUrls, // Thêm các hình ảnh mới upload
+        ];
+
         // Xử lý danh sách kích cỡ
         const productSizes = Object.entries(sizes).map(([maKichCo, kichCo]) => {
             if (!maKichCo || !kichCo.maKichCo || !kichCo.giaKichCo) {
@@ -355,7 +367,7 @@ export async function updateProductHandler(req, res) {
             };
         });
 
-        // Cập nhật sản phẩm
+        // Cập nhật thông tin sản phẩm
         product.tenSanPham = name;
         product.maHangSanXuat = new mongoose.Types.ObjectId(brand);
         product.danhSachDanhMuc = Array.isArray(category)
@@ -364,16 +376,14 @@ export async function updateProductHandler(req, res) {
         product.moTaSanPham = description;
         product.hinhAnhDaiDien = thumbnailUrl;
         product.danhSachHinhAnh = updatedImages;
-        product.danhSachKichCo = productSizes.filter((size) => size !== null) || [];
+        product.danhSachKichCo = productSizes;
 
         await product.save();
 
         req.flash("message", "Cập nhật sản phẩm thành công");
-
         return res.redirect("/admin/product");
     } catch (error) {
         console.error("Error updating product:", error);
-
         req.flash("error", error.message);
         return res.redirect("/admin/product");
     }
