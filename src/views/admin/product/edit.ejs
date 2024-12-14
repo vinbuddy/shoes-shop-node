@@ -72,6 +72,24 @@
                  </section>
                  <section class="col-span-8">
                      <p class="mb-5">Chọn kích cỡ cho sản phẩm</p>
+
+                     <div class="flex items-center gap-4 p-5 border rounded-xl bg-gray-100 mb-5">
+                        
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" name="same-size-price-mode" class="checkbox checked:bg-primary" />
+                            <div class="label">
+                                <span class="label-text">Nhập cùng giá</span>
+                            </div>
+                        </div>
+
+                        <label class="flex-1 form-control w-full">
+                            <label class="form-control w-full max-w-full">
+                                <input id="same-size-price-input" name="same-size-price-input" type="text" class="input input-bordered w-full max-w-full" disabled />
+                                <input id="same-size-price" name="same-size-price" type="text" hidden />
+                            </label>
+                        </label>
+                    </div>
+
                      <ul id="size-list">
                          <% if (sizes && sizes.length > 0) { %>
                              <% sizes.forEach(size => { %>
@@ -380,27 +398,96 @@
      // Toggle disable input price size
      const sizeList = document.getElementById("size-list");
      const sizeCheckboxes = sizeList.querySelectorAll("input[type='checkbox']");
- 
-     sizeCheckboxes.forEach(checkbox => {
-         checkbox.addEventListener("change", function(event) {
-             const isChecked = this.checked;
-             const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
- 
-             inputPrice.disabled = !isChecked;
- 
-             // Focus input price
-             if (isChecked) {
-                 inputPrice.focus();
-             }
-         });
- 
-         // Get price input
-         const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+     const sameSizePriceMode = document.querySelector("input[name='same-size-price-mode']");
+    const sameSizePriceInput = document.getElementById("same-size-price-input");
+    const sameSizeHiddenInput = document.getElementById("same-size-price");
 
+    
+    // Function to format VN currency
+    function formatVNCurrency(value) {
+        value = value.replace(/[^0-9]/g, '');
+        const numericValue = Number(value);
+
+        if (isNaN(numericValue)) {
+            return ''; 
+        } 
+
+        return numericValue.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).replace('₫', '').trim();
+    }
+
+    function updateAllSizesPrice(value) {
+        const formattedPrice = formatVNCurrency(value);
+        const numericValue = Number(value.replace(/[^0-9]/g, ''));
+
+        sizeCheckboxes.forEach(checkbox => {
+            const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+            const hiddenInput = checkbox.closest("li").querySelector("input[type='text'][hidden]");
+
+            if (inputPrice && hiddenInput) {
+                inputPrice.value = formattedPrice;
+                hiddenInput.value = numericValue;
+            }
+        });
+    }
+
+    sameSizePriceMode.addEventListener("change", function () {
+        const isSamePriceMode = this.checked;
+
+        sizeCheckboxes.forEach(checkbox => {
+            checkbox.checked = isSamePriceMode;
+            checkbox.disabled = false;
+            const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+
+            // if (inputPrice) {
+            //     inputPrice.disabled = !checkbox.checked;
+            // }
+        });
+
+        sameSizePriceInput.disabled = !isSamePriceMode;
+
+        // if (!isSamePriceMode) {
+        //     // Clear same price input when disabling mode
+        //     sameSizePriceInput.value = '';
+        //     sameSizeHiddenInput.value = '';
+        // }
+    });
+
+    sameSizePriceInput.addEventListener("input", function () {
+        const formattedPrice = formatVNCurrency(this.value);
+        this.value = formattedPrice;
+
+        const numericValue = Number(this.value.replace(/[^0-9]/g, ''));
+        sameSizeHiddenInput.value = numericValue;
+
+        // Update all sizes with the same price
+        updateAllSizesPrice(this.value);
+    });
+
+    // Add event listeners for individual size checkboxes and inputs
+    sizeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", function () {
+            const isChecked = this.checked;
+            const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+            // console.log("inputPrice: ", inputPrice);
+
+            inputPrice.disabled = !isChecked;
+
+            // Focus input price
+            if (isChecked) {
+                inputPrice.focus();
+            }
+        });
+
+        
+
+        const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
          // Set value for price input
          const sizePrice = inputPrice.getAttribute("data-sizePrice");
 
-        if (sizePrice) {
+         if(sizePrice) {
             inputPrice.value = Number(sizePrice).toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
@@ -408,31 +495,72 @@
 
             // Remove disabled
             inputPrice.disabled = false;
-        }
+         }
+
+        // Format price input
+        inputPrice.addEventListener("input", function () {
+            const formattedPrice = formatVNCurrency(this.value);
+            this.value = formattedPrice;
+
+            // Update hidden input
+            const hiddenInput = this.closest("li").querySelector("[hidden]");
+            hiddenInput.value = Number(this.value.replace(/[^0-9]/g, ''));
+        });
+    });
+
  
-         // Format price input
-         inputPrice.addEventListener("input", formatVNCurrency);
-     });
+    //  sizeCheckboxes.forEach(checkbox => {
+    //      checkbox.addEventListener("change", function(event) {
+    //          const isChecked = this.checked;
+    //          const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
  
-     function formatVNCurrency() {
-         let value = this.value.replace(/[^0-9]/g, '');
-         const numericValue = Number(value);
+    //          inputPrice.disabled = !isChecked;
  
-         if (isNaN(numericValue)) {
-             this.value = ''; 
-             return;
-         } 
+    //          // Focus input price
+    //          if (isChecked) {
+    //              inputPrice.focus();
+    //          }
+    //      });
  
-         this.value = numericValue.toLocaleString("vi-VN", {
-             style: "currency",
-             currency: "VND",
-         }).replace('₫', '').trim();
+    //      // Get price input
+    //      const inputPrice = checkbox.closest("li").querySelector("input[type='text']:not([hidden])");
+
+    //      // Set value for price input
+    //      const sizePrice = inputPrice.getAttribute("data-sizePrice");
+
+    //     if (sizePrice) {
+    //         inputPrice.value = Number(sizePrice).toLocaleString("vi-VN", {
+    //             style: "currency",
+    //             currency: "VND",
+    //         }).replace('₫', '').trim();
+
+    //         // Remove disabled
+    //         inputPrice.disabled = false;
+    //     }
  
-         // Update hidden input
-         const hiddenInput = this.closest("li").querySelector("[hidden]");
-         hiddenInput.value = numericValue;
+    //      // Format price input
+    //      inputPrice.addEventListener("input", formatVNCurrency);
+    //  });
  
-     }
+    //  function formatVNCurrency() {
+    //      let value = this.value.replace(/[^0-9]/g, '');
+    //      const numericValue = Number(value);
+ 
+    //      if (isNaN(numericValue)) {
+    //          this.value = ''; 
+    //          return;
+    //      } 
+ 
+    //      this.value = numericValue.toLocaleString("vi-VN", {
+    //          style: "currency",
+    //          currency: "VND",
+    //      }).replace('₫', '').trim();
+ 
+    //      // Update hidden input
+    //      const hiddenInput = this.closest("li").querySelector("[hidden]");
+    //      hiddenInput.value = numericValue;
+ 
+    //  }
          
  
  </script>
