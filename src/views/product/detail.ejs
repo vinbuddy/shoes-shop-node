@@ -84,9 +84,18 @@
                             <% product.danhSachKichCo.forEach((size, index) => { %>
 
                                 <% 
-                                    const finalPrice = size.giaKichCo - discountValue > 0
-                                        ? size.giaKichCo - discountValue
-                                        : 0;
+                                    const applicablePromotions = promotions.filter(promo =>
+                                        promo.danhSachSanPhamApDung.some(
+                                            productId => productId.toString() === product.maSanPham.toString()
+                                        )
+                                 );
+                                    const maxDiscount = applicablePromotions.length > 0 
+                                    ? Math.max(...applicablePromotions.map(promo => promo.giaTriKhuyenMai)) 
+                                    : 0;
+
+                                    const finalPrice = size.giaKichCo  
+                                        ? size.giaKichCo  * (1 - maxDiscount / 100) 
+                                        : null;
                                 %>
 
                                 <button 
