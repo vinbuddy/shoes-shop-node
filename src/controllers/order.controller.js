@@ -475,8 +475,7 @@ export const completedOrderHandle = async (req, res) => {
     const latestStatus = order.trangThaiDonHang[order.trangThaiDonHang.length - 1];
     const status = await TrangThaiModel.find();
     const statusCodes = latestStatus.maTrangThai;
-
-    if (!status.slice(0, 2).some((s) => s.maTrangThai.toString() == statusCodes)) {
+    if (!status.slice(0, 3).some((s) => s.maTrangThai.toString() == statusCodes.toString())) {
         req.flash("error", "Không thể hoàn thành đơn hàng này");
         return res.redirect("/user/order");
     }
