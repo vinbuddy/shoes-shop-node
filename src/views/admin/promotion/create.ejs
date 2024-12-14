@@ -89,25 +89,24 @@
                     <ul class="list-style-none flex">
                         <li>
                             <% var previousURL = "?" + new URLSearchParams({ ...filters, page: Number(currentPage) - 1 }).toString() %>
-                            
-                            <a href="<%= currentPage > 1 ? previousURL : "#" %>"
-                                class="<%= currentPage === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                            <a href="<%= Number(currentPage) > 1 ? previousURL : '#' %>"
+                                class="pagination-prev pagination-link  <%= Number(currentPage) === 1 ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
                                 Trang trước
-                             </a>
+                            </a>
                         </li>
                         
                         <% for (let i = 1; i <= totalPages; i++) { %>
                             <a href="?<%= new URLSearchParams({ ...filters, page: i }).toString() %>"
-                               class="<%= currentPage == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
+                               class="pagination-link pagination-link-number <%= Number(currentPage) == i ? 'bg-primary text-white' : 'text-black bg-transparent' %> relative block rounded px-3 py-1.5 text-sm text-surface transition duration-300 hover:opacity-80">
                                 <%= i %>
                             </a>
                         <% } %>
-                       
-                        <% var nextURL = "?" + new URLSearchParams({ ...filters, page: Number(currentPage) + 1 }).toString()  %>
-                        <a href="<%= currentPage < totalPages ? nextURL: '#' %>"
-                            class="<%= currentPage === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
-                             Trang sau
-                         </a>
+                        
+                        <% var nextURL = "?" + new URLSearchParams({ ...filters, page: Number(currentPage) + 1 }).toString() %>
+                        <a href="<%= Number(currentPage) < totalPages ? nextURL : '#' %>"
+                            class="pagination-next pagination-link <%= Number(currentPage) === totalPages ? 'pointer-events-none' : '' %> relative block rounded bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400">
+                            Trang sau
+                        </a>
                     </ul>
                 </nav>
             <% } %>
@@ -234,8 +233,175 @@
 
 </script>
 
-<!-- Selected Product -->
 <script>
+    const LOCAL_STORAGE_KEY = 'selectedProducts';
+    const selectedProductsContainer = document.getElementById("selected-products");
+
+    // Lưu sản phẩm vào Local Storage
+    const saveSelectedProductsToLocalStorage = (selectedProducts) => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedProducts));
+    };
+
+    // Lấy danh sách sản phẩm đã chọn từ Local Storage
+    const getSelectedProductsFromLocalStorage = () => {
+        const storedProducts = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return storedProducts ? JSON.parse(storedProducts) : [];
+    };
+
+    // Thêm sản phẩm vào Local Storage
+    const addProductToLocalStorage = (productId, productName) => {
+        const selectedProducts = getSelectedProductsFromLocalStorage();
+
+        // Kiểm tra xem sản phẩm đã tồn tại chưa, nếu chưa thì thêm mới
+        if (!selectedProducts.find(product => product.id === productId)) {
+            selectedProducts.push({ id: productId, name: productName });
+            saveSelectedProductsToLocalStorage(selectedProducts);
+        }
+    };
+
+    // Xóa sản phẩm khỏi Local Storage
+    const removeProductFromLocalStorage = (productId) => {
+        const selectedProducts = getSelectedProductsFromLocalStorage();
+        const updatedProducts = selectedProducts.filter(product => product.id !== productId);
+        saveSelectedProductsToLocalStorage(updatedProducts);
+    };
+
+    // Hiển thị sản phẩm đã chọn trong danh sách
+    const addSelectedProduct = (productId, productName) => {
+        if (document.getElementById(`selected-${productId}`)) return;
+
+        const listItem = document.createElement("li");
+        listItem.id = `selected-${productId}`;
+        listItem.className = "flex items-center justify-between p-2";
+
+        listItem.innerHTML = `
+            <span>${productName}</span>
+            <button
+                class="btn btn-sm btn-error text-white"
+                data-product-id="${productId}"
+                onclick="removeProductByButton('${productId}')"
+            >
+                Xóa
+            </button>
+        `;
+        selectedProductsContainer.appendChild(listItem);
+    };
+
+    // Xóa sản phẩm khỏi danh sách hiển thị
+    const removeSelectedProduct = (productId) => {
+        const listItem = document.getElementById(`selected-${productId}`);
+        if (listItem) {
+            selectedProductsContainer.removeChild(listItem);
+        }
+    };
+
+    // Xóa sản phẩm khi nhấn nút "Xóa"
+    const removeProductByButton = (productId) => {
+        const checkbox = document.querySelector(`input[name="products[]"][value="${productId}"]`);
+        if (checkbox) checkbox.checked = false;
+
+        removeProductFromLocalStorage(productId);
+        removeSelectedProduct(productId);
+        updateURLParams();
+    };
+
+    // Khôi phục sản phẩm đã chọn từ Local Storage
+    const restoreSelectedProductsFromLocalStorage = () => {
+        const selectedProducts = getSelectedProductsFromLocalStorage();
+
+        // Đánh dấu checkbox sản phẩm đã chọn
+        document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
+            if (selectedProducts.find(product => product.id === checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+
+        // Hiển thị danh sách sản phẩm đã chọn
+        selectedProducts.forEach(({ id, name }) => {
+            addSelectedProduct(id, name);
+        });
+    };
+
+    // Cập nhật tham số URL
+    const updateURLParams = () => {
+        const params = new URLSearchParams(window.location.search);
+
+        // Giữ lại tham số `page` cũ nếu có
+        let currentPage = params.get("page") || 1;
+
+        // Lấy giá trị các input trong form và cập nhật vào URL
+        params.set("tenChuongTrinhKhuyenMai", document.getElementById("tenChuongTrinhKhuyenMai").value);
+        params.set("giaTriKhuyenMai", document.getElementById("giaTriKhuyenMai").value);
+        params.set("moTa", document.getElementById("moTa").value);
+        params.set("ngayBatDau", document.getElementById("ngayBatDau").value);
+        params.set("ngayKetThuc", document.getElementById("ngayKetThuc").value);
+
+
+        // Cập nhật danh sách sản phẩm đã chọn
+        const selectedProducts = getSelectedProductsFromLocalStorage();
+        const selectedProductIds = selectedProducts.map(product => product.id);
+        params.set("products", selectedProductIds.join(","));
+
+        // Cập nhật URL mà không tải lại trang
+        window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+        updatePaginationLinks();
+    };
+
+    // Cập nhật các liên kết phân trang
+    const updatePaginationLinks = () => {
+        const params = new URLSearchParams(window.location.search);
+        const currentPage = parseInt(params.get("page")) || 1;
+        const totalPages = parseInt(params.get("totalPages")) || 1;
+
+        const previousLink = document.querySelector('.pagination-prev');
+        const nextLink = document.querySelector('.pagination-next');
+
+        if (previousLink) {
+            const previousPage = currentPage > 1 ? currentPage - 1 : 1;
+            params.set("page", previousPage);
+            previousLink.setAttribute('href', `?${params.toString()}`);
+        }
+
+        if (nextLink) {
+            const nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+            params.set("page", nextPage);
+            nextLink.setAttribute('href', `?${params.toString()}`);
+        }
+    };
+
+    // Lắng nghe sự kiện checkbox thay đổi
+    document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            const productId = this.value;
+            const productName = this.closest("tr").querySelector("td:nth-child(3) .font-semibold").textContent;
+
+            if (this.checked) {
+                addProductToLocalStorage(productId, productName);
+                addSelectedProduct(productId, productName);
+            } else {
+                removeProductFromLocalStorage(productId);
+                removeSelectedProduct(productId);
+            }
+            updateURLParams();
+        });
+    });
+
+    // Lắng nghe sự kiện thay đổi của form để cập nhật URL khi người dùng thay đổi input
+    document.querySelectorAll('#tenChuongTrinhKhuyenMai, #giaTriKhuyenMai, #moTa, #ngayBatDau, #ngayKetThuc').forEach((input) => {
+        input.addEventListener('input', updateURLParams); // Bắt sự kiện input
+    });
+    
+    // Khôi phục sản phẩm đã chọn khi tải trang
+    document.addEventListener('DOMContentLoaded', () => {
+        restoreSelectedProductsFromLocalStorage();
+        updateURLParams();
+        updatePaginationLinks();
+    });
+</script>
+
+
+<!-- Selected Product -->
+<!-- <script>
     const selectedProductsContainer = document.getElementById("selected-products");
 
     document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
@@ -306,7 +472,114 @@
         });
     }
 
-    document.addEventListener("DOMContentLoaded", restoreSelectedProductsFromURL);
+    const LOCAL_STORAGE_KEY = 'selectedProducts';
+
+// Lưu sản phẩm vào Local Storage
+const saveSelectedProductsToLocalStorage = (selectedProducts) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedProducts));
+};
+
+// Lấy danh sách sản phẩm đã chọn từ Local Storage
+const getSelectedProductsFromLocalStorage = () => {
+    const storedProducts = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return storedProducts ? JSON.parse(storedProducts) : [];
+};
+
+// Thêm sản phẩm vào Local Storage
+const addProductToLocalStorage = (productId, productName) => {
+    const selectedProducts = getSelectedProductsFromLocalStorage();
+
+    // Kiểm tra xem sản phẩm đã tồn tại chưa, nếu chưa thì thêm mới
+    if (!selectedProducts.find(product => product.id === productId)) {
+        selectedProducts.push({ id: productId, name: productName });
+        saveSelectedProductsToLocalStorage(selectedProducts);
+    }
+};
+
+// Xóa sản phẩm khỏi Local Storage
+const removeProductFromLocalStorage = (productId) => {
+    const selectedProducts = getSelectedProductsFromLocalStorage();
+    const updatedProducts = selectedProducts.filter(product => product.id !== productId);
+    saveSelectedProductsToLocalStorage(updatedProducts);
+};
 
 
-</script>
+    // Hàm cập nhật các tham số URL từ form input (bao gồm các input và checkbox)
+const updateURLParams = () => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Giữ lại tham số `page` cũ nếu có
+    let currentPage = params.get("page") || 1;
+
+    // Lấy giá trị các input trong form và cập nhật vào URL
+    params.set("tenChuongTrinhKhuyenMai", document.getElementById("tenChuongTrinhKhuyenMai").value);
+    params.set("giaTriKhuyenMai", document.getElementById("giaTriKhuyenMai").value);
+    params.set("moTa", document.getElementById("moTa").value);
+    params.set("ngayBatDau", document.getElementById("ngayBatDau").value);
+    params.set("ngayKetThuc", document.getElementById("ngayKetThuc").value);
+
+    // Cập nhật các sản phẩm đã chọn
+    restoreSelectedProductsFromURL();
+
+    // Cập nhật URL mà không reload trang
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+
+    // Cập nhật liên kết phân trang
+    updatePaginationLinks();
+};
+
+// Cập nhật các liên kết phân trang
+const updatePaginationLinks = () => {
+const params = new URLSearchParams(window.location.search);
+let currentPage = parseInt(params.get("page")) || 1;
+const totalPages = parseInt(params.get("totalPages")) || 1;
+
+// Cập nhật trang trước
+const previousLink = document.querySelector('.pagination-prev');
+if (previousLink) {
+    const previousPage = currentPage > 1 ? currentPage - 1 : 1;
+    params.set("page", previousPage);
+    previousLink.setAttribute('href', `?${params.toString()}`);
+}
+
+// Cập nhật trang sau
+const nextLink = document.querySelector('.pagination-next');
+if (nextLink) {
+    const nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+    params.set("page", nextPage);
+    nextLink.setAttribute('href', `?${params.toString()}`);
+}
+
+// Cập nhật các số trang
+const pageLinks = document.querySelectorAll('.pagination-link-number');
+pageLinks.forEach((link, index) => {
+    const pageNumber = index + 1;
+    params.set("page", pageNumber);
+    link.setAttribute('href', `?${params.toString()}`);
+    if (currentPage === pageNumber) {
+        link.classList.add('bg-primary', 'text-white');
+        link.classList.remove('text-black', 'bg-transparent');
+    } else {
+        link.classList.add('text-black', 'bg-transparent');
+        link.classList.remove('bg-primary', 'text-white');
+    }
+});
+};
+
+// Lắng nghe sự kiện thay đổi của form để cập nhật URL khi người dùng thay đổi input
+document.querySelectorAll('#tenChuongTrinhKhuyenMai, #giaTriKhuyenMai, #moTa, #ngayBatDau, #ngayKetThuc').forEach((input) => {
+    input.addEventListener('input', updateURLParams); // Bắt sự kiện input
+});
+
+document.querySelectorAll('input[name="products[]"]').forEach((checkbox) => {
+    checkbox.addEventListener('change', updateURLParams); // Bắt sự kiện change cho checkbox
+});
+
+// Cập nhật tham số URL khi trang được tải lại
+// Cập nhật URL và phân trang khi trang được tải lại
+document.addEventListener('DOMContentLoaded', () => {
+    updateURLParams(); // Cập nhật URL ngay khi tải trang
+    updatePaginationLinks(); // Cập nhật liên kết phân trang
+});
+
+</script> -->
